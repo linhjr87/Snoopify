@@ -1,16 +1,14 @@
 import { useAppStore } from '../../store/useAppStore'
-import { useT } from '../../i18n/useT'
-import { Modal } from '../../components/ui/Modal'
-import { Button } from '../../components/ui/Button'
 import { sampleJson } from '../../data/seed'
+
 export function ImportJsonModal() {
-  const t = useT()
   const importOpen = useAppStore((s) => s.importOpen)
   const importText = useAppStore((s) => s.importText)
   const importStatus = useAppStore((s) => s.importStatus)
   const setPanel = useAppStore((s) => s.setPanel)
   const setImportText = useAppStore((s) => s.setImportText)
   const parseAndImport = useAppStore((s) => s.parseAndImport)
+
   const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]; if (!f) return
     const r = new FileReader()
@@ -18,17 +16,99 @@ export function ImportJsonModal() {
     r.onerror = () => parseAndImport('')
     r.readAsText(f)
   }
+
+  const copySample = () => {
+    try { navigator.clipboard.writeText(sampleJson) } catch (_) {}
+  }
+
+  if (!importOpen) return null
+
+  const statusStyle: React.CSSProperties = {
+    fontSize: '13px', fontWeight: 600,
+    color: importStatus && importStatus.ok ? '#2f6b43' : 'var(--rust)',
+  }
+
   return (
-    <Modal open={importOpen} onClose={() => setPanel('importOpen', false)} title={t.importJson}>
-      <p className="mb-2 text-sm text-muted">Chọn file .json theo cấu trúc mẫu bên dưới, hoặc dán trực tiếp rồi bấm Nhập.</p>
-      <input type="file" accept=".json" onChange={onFile} className="mb-2 text-sm" />
-      <textarea aria-label="json" value={importText} onChange={(e) => setImportText(e.target.value)}
-        className="h-32 w-full rounded-lg border border-line bg-paper p-2 font-mono text-xs text-ink" placeholder="Chọn file .json hoặc dán bên dưới" />
-      <pre className="mt-2 max-h-32 overflow-auto rounded-lg bg-paper p-2 text-xs text-muted">{sampleJson}</pre>
-      <div className="mt-3 flex items-center gap-3">
-        <Button onClick={() => parseAndImport(importText)}>{t.importJson}</Button>
-        {importStatus && <span className={`text-sm ${importStatus.ok ? 'text-accent' : 'text-rust'}`}>{importStatus.msg}</span>}
+    <div
+      onClick={() => setPanel('importOpen', false)}
+      style={{
+        position: 'fixed', inset: 0, background: 'rgba(33,29,27,0.42)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '20px', zIndex: 80,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: '560px', maxWidth: '100%', maxHeight: '86vh', overflow: 'auto',
+          background: 'var(--surface)', border: '1px solid var(--line)',
+          borderRadius: '18px', boxShadow: '0 30px 60px -20px rgba(40,35,25,0.5)',
+          padding: '26px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+          <h2 style={{ margin: 0, fontFamily: "'Newsreader',serif", fontWeight: 500, fontSize: '22px' }}>
+            Nhập bộ thẻ từ JSON
+          </h2>
+          <button
+            onClick={() => setPanel('importOpen', false)}
+            style={{ border: 'none', background: 'transparent', fontSize: '20px', color: 'var(--muted)', cursor: 'pointer', lineHeight: 1 }}
+          >✕</button>
+        </div>
+        <p style={{ margin: '0 0 14px', color: 'var(--muted)', fontSize: '14px', lineHeight: 1.5 }}>
+          Chọn file <span style={{ fontFamily: 'monospace' }}>.json</span> theo cấu trúc mẫu bên dưới, hoặc dán trực tiếp rồi bấm Nhập.
+        </p>
+        <div style={{ fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>
+          Cấu trúc mẫu
+        </div>
+        <pre style={{
+          margin: '0 0 10px', background: 'var(--paper)', border: '1px solid var(--line)',
+          borderRadius: '12px', padding: '14px', fontFamily: 'monospace', fontSize: '12.5px',
+          lineHeight: 1.55, color: 'var(--ink)', overflow: 'auto', whiteSpace: 'pre',
+        }}>{sampleJson}</pre>
+        <button
+          onClick={copySample}
+          style={{
+            border: '1px solid var(--line)', borderRadius: '9px', background: 'var(--surface)',
+            color: 'var(--muted)', padding: '7px 13px', fontFamily: "'Hanken Grotesk',sans-serif",
+            fontSize: '13px', cursor: 'pointer', marginBottom: '18px',
+          }}
+        >Sao chép mẫu</button>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '14px' }}>
+          <label style={{
+            border: '1px solid var(--accent)', color: '#fff', background: 'var(--accent)',
+            borderRadius: '10px', padding: '10px 18px', fontWeight: 600, fontSize: '14px', cursor: 'pointer',
+          }}>
+            Chọn file .json
+            <input type="file" accept="application/json,.json" onChange={onFile} style={{ display: 'none' }} />
+          </label>
+          <span style={{ fontSize: '13px', color: 'var(--muted)' }}>hoặc dán bên dưới</span>
+        </div>
+        <textarea
+          aria-label="json"
+          rows={5}
+          placeholder={'{ "deck": "...", "cards": [ ... ] }'}
+          value={importText}
+          onChange={(e) => setImportText(e.target.value)}
+          style={{
+            width: '100%', border: '1px solid var(--line)', borderRadius: '10px',
+            background: 'var(--paper)', padding: '10px 12px', fontFamily: 'monospace',
+            fontSize: '12.5px', marginBottom: '12px', color: 'var(--ink)',
+            resize: 'vertical', outline: 'none', boxSizing: 'border-box',
+          }}
+        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => parseAndImport(importText)}
+            style={{
+              border: 'none', borderRadius: '10px', background: 'var(--ink)',
+              color: '#fff', padding: '10px 22px', fontFamily: "'Hanken Grotesk',sans-serif",
+              fontWeight: 600, fontSize: '14px', cursor: 'pointer',
+            }}
+          >Nhập</button>
+          {importStatus && <span style={statusStyle}>{importStatus.msg}</span>}
+        </div>
       </div>
-    </Modal>
+    </div>
   )
 }
