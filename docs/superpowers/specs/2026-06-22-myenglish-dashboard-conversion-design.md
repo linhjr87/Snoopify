@@ -48,8 +48,26 @@ proper project structure and reusable components.
 
 ## 4. Project structure
 
+### Repo layout
+
+The repository is split into two top-level folders so the backend can be added
+later without reworking the frontend:
+
 ```
-snoopify/
+LEARN-EN/                    # repo root
+  frontend/                  # Snoopify FE — this spec
+  backend/                   # future backend — its own spec, built after the FE
+  docs/                      # specs and design docs
+```
+
+Only `frontend/` is in scope here. `backend/` is created as an empty placeholder
+(with a short README stating it is unimplemented); its stack and API are decided
+in a separate spec once the FE is working.
+
+### Frontend (`frontend/`)
+
+```
+frontend/
   index.html
   package.json
   vite.config.ts
@@ -260,6 +278,12 @@ screens matching the export.
 
 ## 10. Out of scope
 
+- **Backend** — deferred to a separate spec built after the FE, living in the
+  sibling `backend/` folder. This spec creates `backend/` only as an empty
+  placeholder.
 - Real spaced-repetition scheduling / review history.
-- Backend, accounts, or cross-device sync.
+- Accounts or cross-device sync.
 - New screens or features beyond what the export shows.
+
+When the backend lands, the FE's Zustand store and `data/seed.ts` are the seams
+where local data is swapped for API calls, with minimal change to components.
