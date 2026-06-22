@@ -22,3 +22,19 @@ class CardOut(BaseModel):
     last_reviewed_at: datetime | None
     created_at: datetime
     updated_at: datetime
+
+
+class CardCreate(BaseModel):
+    word: str
+    phonetic: str = ""
+    pos: str = ""
+    meaning: str = ""
+    example: str = ""
+
+
+class CardUpdate(BaseModel):
+    word: str | None = None
+    phonetic: str | None = None
+    pos: str | None = None
+    meaning: str | None = None
+    example: str | None = None

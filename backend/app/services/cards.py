@@ -1,0 +1,45 @@
+import uuid
+
+from fastapi import HTTPException
+from sqlalchemy import select
+
+from app.db.models import Card
+from app.schemas.card import CardCreate, CardUpdate
+from app.services.decks import _get_or_404 as _get_deck_or_404
+
+
+async def get_card_or_404(session, card_id: uuid.UUID) -> Card:
+    card = await session.get(Card, card_id)
+    if card is None:
+        raise HTTPException(status_code=404, detail="Card not found")
+    return card
+
+
+async def list_cards(session, deck_id: uuid.UUID) -> list[Card]:
+    await _get_deck_or_404(session, deck_id)
+    rows = await session.execute(select(Card).where(Card.deck_id == deck_id))
+    return list(rows.scalars().all())
+
+
+async def add_card(session, deck_id: uuid.UUID, data: CardCreate) -> Card:
+    await _get_deck_or_404(session, deck_id)
+    card = Card(deck_id=deck_id, **data.model_dump())
+    session.add(card)
+    await session.commit()
+    await session.refresh(card)
+    return card
+
+
+async def update_card(session, card_id: uuid.UUID, data: CardUpdate) -> Card:
+    card = await get_card_or_404(session, card_id)
+    for field, value in data.model_dump(exclude_none=True).items():
+        setattr(card, field, value)
+    await session.commit()
+    await session.refresh(card)
+    return card
+
+
+async def delete_card(session, card_id: uuid.UUID) -> None:
+    card = await get_card_or_404(session, card_id)
+    await session.delete(card)
+    await session.commit()
