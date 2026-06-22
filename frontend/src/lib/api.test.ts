@@ -12,7 +12,7 @@ describe('api client', () => {
   })
 
   it('apiPost sends a JSON body with method POST', async () => {
-    const spy = vi.fn(async () => fakeResponse({ ok: true }, 200))
+    const spy = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) => fakeResponse({ ok: true }, 200))
     vi.stubGlobal('fetch', spy)
     await apiPost('/grade', { a: 1 })
     const init = spy.mock.calls[0][1] as RequestInit

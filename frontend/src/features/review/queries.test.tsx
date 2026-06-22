@@ -32,7 +32,7 @@ describe('useSession', () => {
 
 describe('useGradeMutation', () => {
   it('POSTs the grade to /review/grade', async () => {
-    const spy = vi.fn(async () => fakeResponse({
+    const spy = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) => fakeResponse({
       card_id: 'c1', ease_factor: 2.5, interval_days: 1, repetitions: 1,
       lapses: 0, due_at: '2026-06-23T00:00:00Z', last_reviewed_at: '2026-06-22T00:00:00Z',
     }))
