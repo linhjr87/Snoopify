@@ -1,0 +1,46 @@
+export type ReviewMode = 'flash' | 'quiz' | 'fill'
+export type Lang = 'vn' | 'en'
+
+export interface Card { word: string; phonetic: string; pos: string; meaning: string; example: string }
+export interface Deck { name: string; topic: string; count: number; cards: Card[] }
+export interface ImportStatus { ok: boolean; msg: string }
+
+export interface AppState {
+  reviewMode: ReviewMode
+  flipped: boolean
+  quizPick: string | null
+  fillValue: string
+  fillChecked: boolean
+  sIndex: number
+  sCorrect: number
+  dark: boolean
+  lang: Lang
+  collapsed: boolean
+  settingsOpen: boolean
+  confirmReset: boolean
+  importOpen: boolean
+  notifOpen: boolean
+  langMenuOpen: boolean
+  importText: string
+  importStatus: ImportStatus | null
+  importedDecks: Deck[]
+}
+
+export interface AppActions {
+  setReviewMode(mode: ReviewMode): void
+  flip(): void
+  pickQuiz(key: string): void
+  setFill(value: string): void
+  checkFill(): void
+  advanceSession(correct: boolean): void
+  resetSession(): void
+  toggleDark(): void
+  setLang(lang: Lang): void
+  toggleCollapsed(): void
+  setPanel(panel: 'settingsOpen' | 'confirmReset' | 'importOpen' | 'notifOpen' | 'langMenuOpen', open: boolean): void
+  setImportText(text: string): void
+  parseAndImport(text: string): void
+  resetProgress(): void
+}
+
+export type AppStore = AppState & AppActions
