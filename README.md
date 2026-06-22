@@ -3,6 +3,8 @@
 Vietnamese-language English flashcard app. React + Vite frontend, FastAPI +
 PostgreSQL backend with SM-2 spaced repetition.
 
+The instructions below describe the completed frontend/backend integration.
+
 ## Run the whole system (test/demo)
 
 ```bash
@@ -14,21 +16,37 @@ Open http://localhost:5173 — the frontend talks to the API through nginx at
 
 ## Develop with hot reload
 
+Install both the root tooling and frontend dependencies after a fresh clone:
+
 ```bash
-npm install                 # first time only (installs concurrently)
-docker compose up db api    # or: npm run dev  (runs this + Vite together)
+npm install
+npm --prefix frontend ci
+```
+
+Then either start the full development stack with one command:
+
+```bash
+npm run dev
+```
+
+Or run its two parts in separate terminals:
+
+```bash
+# Terminal 1
+docker compose up db api
+
+# Terminal 2
 npm --prefix frontend run dev
 ```
-Vite serves http://localhost:5173 with HMR and proxies `/api` to the API on
-`localhost:8000`.
+
+Vite serves http://localhost:5173 with HMR. In the completed integration it
+proxies `/api` to the API on `localhost:8000`.
 
 ## Notes
 
 - The frontend always calls relative `/api/*`; the proxy (Vite in dev, nginx in
   the container) forwards it and strips the `/api` prefix (the backend serves at
   root).
-- After wiring to the real API, the old display-only showcase decks are gone;
-  the Library shows real decks (seeded starter deck + imported). Dashboard/
-  progress numbers are now real and start small until you review.
-- Session counters are no longer persisted across reloads; the server's SM-2
-  schedule decides what is due.
+- Review loads due cards from the real API, and grading persists the server's
+  SM-2 scheduling updates.
+- Other screens remain outside this integration slice.
