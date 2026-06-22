@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper:#f6f4ee; --surface:#fffdf9; --ink:#211f1b; --muted:#6f6a61;
+  --line:#e8e3d8; --track:#ece7da; --rust:#9c5a3c;
+  --accent:#2f5d4e; --accent-soft:#e7efea;
+}
+html.dark {
+  --paper:#191712; --surface:#221f18; --ink:#efe9df; --muted:#a39b8d;
+  --line:#36322a; --track:#322e26;
+}
+body { margin:0; background:var(--paper); color:var(--ink); font-family:'Hanken Grotesk',sans-serif; }
