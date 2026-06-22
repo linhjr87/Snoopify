@@ -151,7 +151,7 @@ export function Sidebar() {
             padding: '0 10px 8px',
           }}
         >
-          {t.learn.toUpperCase()} (t.learn)
+          {t.learn.toUpperCase()}
         </div>
         {items.map((item) => {
           const isActive = item.to === '/'
@@ -193,7 +193,7 @@ export function Sidebar() {
             paddingBottom: 10,
           }}
         >
-          {t.decks.toUpperCase()} (t.decks)
+          {t.decks.toUpperCase()}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 9, fontSize: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer' }}>
