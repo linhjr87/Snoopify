@@ -3,3 +3,9 @@ dist/
 .DS_Store
 *.local
 .claude/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+backend/.venv/
