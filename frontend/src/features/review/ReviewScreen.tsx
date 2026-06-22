@@ -6,7 +6,28 @@ import { FlashcardMode } from './FlashcardMode'
 import { QuizMode } from './QuizMode'
 import { FillMode } from './FillMode'
 import { SessionComplete } from './SessionComplete'
-import { SESSION } from '../../data/seed'
+import { useSession } from './queries'
+
+function ReviewMessage({ text, onHome }: { text: string; onHome?: () => void }) {
+  return (
+    <div style={{ maxWidth: '680px', margin: '0 auto', textAlign: 'center', padding: '60px 20px', color: 'var(--muted)' }}>
+      <div style={{ fontSize: '17px' }}>{text}</div>
+      {onHome && (
+        <button
+          className="ghost"
+          onClick={onHome}
+          style={{
+            marginTop: '20px', border: '1px solid var(--line)', borderRadius: '11px',
+            background: 'var(--surface)', padding: '10px 20px',
+            fontFamily: "'Hanken Grotesk',sans-serif", fontWeight: 600, color: 'var(--muted)', cursor: 'pointer',
+          }}
+        >
+          Về trang chủ
+        </button>
+      )}
+    </div>
+  )
+}
 
 export default function ReviewScreen() {
   const t = useT()
@@ -14,11 +35,18 @@ export default function ReviewScreen() {
   const reviewMode = useAppStore((s) => s.reviewMode)
   const sIndex = useAppStore((s) => s.sIndex)
   const sCorrect = useAppStore((s) => s.sCorrect)
-  const total = SESSION.length
+  const { data, isLoading, isError } = useSession()
 
+  if (isLoading) return <ReviewMessage text="Đang tải phiên ôn tập…" />
+  if (isError) return <ReviewMessage text="Không tải được phiên ôn tập. Thử lại sau." onHome={() => nav('/')} />
+
+  const session = data ?? []
+  const total = session.length
+
+  if (total === 0) return <ReviewMessage text="Không có thẻ nào đến hạn ôn tập. Quay lại sau nhé!" onHome={() => nav('/')} />
   if (sIndex >= total) return <SessionComplete correct={sCorrect} total={total} />
 
-  const cur = SESSION[sIndex]
+  const cur = session[sIndex]
   const isLast = sIndex >= total - 1
   const progressPct = Math.round((sIndex / total) * 100)
 
@@ -48,10 +76,10 @@ export default function ReviewScreen() {
         </div>
       </div>
 
-      {/* Deck label + score */}
+      {/* Session label + score */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '9px', marginBottom: '20px' }}>
         <span style={{ fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-          Business English
+          Đến hạn hôm nay
         </span>
         <span style={{ fontSize: '12px', color: 'var(--accent,#2f5d4e)', fontWeight: 700 }}>
           · {sCorrect} đúng
