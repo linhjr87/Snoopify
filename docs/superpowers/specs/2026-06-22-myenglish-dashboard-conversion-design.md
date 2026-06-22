@@ -1,4 +1,4 @@
-# my English — Dashboard Conversion Design
+# Snoopify — Dashboard Conversion Design
 
 **Date:** 2026-06-22
 **Status:** Approved
@@ -7,16 +7,22 @@
 ## 1. Goal
 
 Convert the self-contained static design export `myEnglish Dashboard.html` into a
-working, maintainable frontend project. The export is a single `DCLogic`
-component implementing a Vietnamese-language English-learning SPA ("my English").
-The conversion reproduces it with **faithful behavior parity** while introducing a
+working, maintainable frontend project named **Snoopify**. The export is a single
+`DCLogic` component implementing a Vietnamese-language English-learning SPA
+(branded "my English" in the export). The conversion reproduces it with
+**faithful behavior parity** — rebranded to **Snoopify** — while introducing a
 proper project structure and reusable components.
+
+> **Rebrand:** the app's user-facing name changes from "my English" to
+> **Snoopify**. This affects the sidebar logo, the page `<title>`, and any brand
+> string. App content, the user name ("Minh"), greetings, decks, and cards are
+> unchanged.
 
 ## 2. Constraints (decided)
 
 - **Stack:** Vite + React 18 + TypeScript.
 - **Styling:** Tailwind CSS — theme tokens in Tailwind config, class-based dark mode.
-- **State:** Zustand store with `persist` middleware → `localStorage` key `myenglish_v1`.
+- **State:** Zustand store with `persist` middleware → `localStorage` key `snoopify_v1`.
 - **Routing:** React Router v6 — the export's `screen` value becomes the URL.
 - **Scope:** Full app — all 5 screens, 3 review modes, dark mode, VN/EN i18n,
   JSON import, settings.
@@ -43,7 +49,7 @@ proper project structure and reusable components.
 ## 4. Project structure
 
 ```
-my-english/
+snoopify/
   index.html
   package.json
   vite.config.ts
@@ -195,7 +201,8 @@ status message), `resetProgress`.
 Only the export's persisted subset is written: `reviewMode, flipped, quizPick,
 sIndex, sCorrect, fillValue, fillChecked, importedDecks, dark, lang, collapsed`.
 Transient panel flags are excluded — matching the export's `componentDidUpdate`.
-Same `localStorage` key (`myenglish_v1`) so existing saved state still loads.
+Persisted under `localStorage` key `snoopify_v1` (renamed from the export's
+`myenglish_v1` as part of the rebrand).
 
 ### Data flow
 
