@@ -52,6 +52,8 @@ describe('ReviewScreen', () => {
     renderWithProviders(<ReviewScreen />)
     expect(await screen.findByText('Hoàn thành phiên')).toBeInTheDocument()
     expect(screen.getByText(/câu đúng/)).toBeInTheDocument()
+    // the correct count (4) is rendered in the SessionComplete numeral
+    expect(screen.getAllByText((content) => content === '4').length).toBeGreaterThan(0)
   })
 
   it('shows an empty state when there are no due cards', async () => {
