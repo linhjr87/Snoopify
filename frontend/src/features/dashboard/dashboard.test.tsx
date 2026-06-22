@@ -20,7 +20,9 @@ describe('DashboardScreen', () => {
   beforeEach(() => { localStorage.clear(); useAppStore.setState({ ...initialState }) })
   it('renders today session and word of day', () => {
     render(<Harness />)
-    expect(screen.getByText('8/24')).toBeInTheDocument()
+    // "8" and "/24" are in separate styled spans to match the export's ring layout
+    expect(screen.getByText('8', { selector: 'div' })).toBeInTheDocument()
+    expect(screen.getByText('/24')).toBeInTheDocument()
     expect(screen.getByText('serendipity')).toBeInTheDocument()
   })
   it('start review navigates to /review', async () => {
