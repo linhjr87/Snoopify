@@ -6,7 +6,9 @@ import { Button } from '../ui/Button'
 export function SettingsPanel() {
   const t = useT()
   const { settingsOpen, dark, confirmReset } = useAppStore((s) => ({ settingsOpen: s.settingsOpen, dark: s.dark, confirmReset: s.confirmReset }))
-  const { setPanel, toggleDark, resetProgress } = useAppStore.getState()
+  const setPanel = useAppStore((s) => s.setPanel)
+  const toggleDark = useAppStore((s) => s.toggleDark)
+  const resetProgress = useAppStore((s) => s.resetProgress)
   return (
     <Modal open={settingsOpen} onClose={() => setPanel('settingsOpen', false)} title={t.settings}>
       <div className="flex items-center justify-between py-2">
