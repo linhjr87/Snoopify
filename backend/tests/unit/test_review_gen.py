@@ -26,8 +26,11 @@ def test_build_quiz_dedupes_and_handles_small_pool():
     pool = [FakeCard(meaning="đúng"), FakeCard(meaning="khác")]  # dup of correct + 1
     q = build_quiz(card, pool, rng=random.Random(1))
     texts = [o["text"] for o in q["options"]]
+    assert len(q["options"]) == 4  # padded to 4 even with a tiny pool
     assert texts.count("đúng") == 1  # correct only once, dup filtered
     assert "khác" in texts
+    correct = next(o for o in q["options"] if o["key"] == q["correct_key"])
+    assert correct["text"] == "đúng"
 
 
 def test_build_fill_splits_example_and_makes_hint():

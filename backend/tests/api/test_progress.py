@@ -45,3 +45,8 @@ async def test_word_of_day_and_recent(client, seeded):
     assert (await client.get("/dashboard/word-of-day")).status_code == 200
     recent = (await client.get("/cards/recent")).json()
     assert len(recent) == 3
+
+
+async def test_word_of_day_empty_db_returns_404(client):
+    r = await client.get("/dashboard/word-of-day")
+    assert r.status_code == 404

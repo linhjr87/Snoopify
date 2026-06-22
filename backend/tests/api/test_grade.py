@@ -29,6 +29,20 @@ async def test_grade_forgot_increments_lapses(client, card_id):
     assert r.json()["interval_days"] == 1
 
 
+async def test_grade_vague_grows_reps_without_lapse(client, card_id):
+    # advance to reps=1 first, then a vague grade
+    await client.post("/review/grade",
+                      json={"card_id": card_id, "rating": "remember", "mode": "flash"})
+    r = await client.post("/review/grade",
+                          json={"card_id": card_id, "rating": "vague", "mode": "quiz",
+                                "is_correct": False})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["repetitions"] == 2  # not reset
+    assert body["lapses"] == 0  # vague is not a lapse
+    assert body["ease_factor"] < 2.6  # q=3 lowers ease
+
+
 async def test_grade_missing_card_404(client):
     r = await client.post("/review/grade",
                           json={"card_id": "00000000-0000-0000-0000-000000000000",

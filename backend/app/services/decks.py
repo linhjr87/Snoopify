@@ -60,7 +60,7 @@ async def update_deck(session, deck_id: uuid.UUID, data: DeckUpdate) -> DeckOut:
     if data.topic is not None:
         deck.topic = data.topic
     await session.commit()
-    await session.refresh(deck)
+    await session.refresh(deck)  # cards stay loaded via selectin; count remains correct
     return _to_out(deck, datetime.now(timezone.utc))
 
 

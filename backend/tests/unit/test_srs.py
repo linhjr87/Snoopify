@@ -47,6 +47,24 @@ def test_vague_grows_reps_but_lowers_ease():
     assert out.ease_factor < 2.5  # q=3 -> -0.14
 
 
+def test_vague_at_rep2_applies_ease_multiplier():
+    # repetitions >= 2 hits the round(interval * ease) branch, not the fixed 1/6
+    s = Schedule(ease_factor=2.5, interval_days=6, repetitions=2, lapses=0)
+    out = review(s, Rating.vague)
+    assert round(out.ease_factor, 2) == 2.36  # 2.5 - 0.14
+    assert out.interval_days == round(6 * out.ease_factor) == 14
+    assert out.repetitions == 3
+    assert out.lapses == 0  # vague is not a lapse
+
+
+def test_ease_clamp_survives_repeated_forgot():
+    s = Schedule(ease_factor=2.5, interval_days=6, repetitions=3, lapses=0)
+    for _ in range(20):
+        s = review(s, Rating.forgot)
+    assert s.ease_factor == 1.3  # floor holds across many reductions
+    assert s.lapses == 20
+
+
 def test_mastery_buckets():
     assert mastery(0, 0) == "new"
     assert mastery(1, 6) == "learning"

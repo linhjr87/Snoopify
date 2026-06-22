@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.enums import Rating, ReviewMode
 
@@ -12,7 +12,7 @@ class QuizOption(BaseModel):
 
 
 class QuizOut(BaseModel):
-    options: list[QuizOption]
+    options: list[QuizOption] = Field(min_length=4)
     correct_key: str
 
 

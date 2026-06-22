@@ -8,6 +8,7 @@ from app.db.models import Card, ReviewLog
 from app.schemas.review import FillOut, GradeRequest, GradeResult, QuizOption, QuizOut, ReviewItemOut
 from app.services import srs
 from app.services.cards import get_card_or_404
+from app.services.decks import _get_or_404 as get_deck_or_404
 
 _KEYS = ["A", "B", "C", "D"]
 
@@ -27,7 +28,12 @@ def build_quiz(card, pool, rng: random.Random | None = None) -> dict:
             seen.add(m)
             distinct.append(m)
     rng.shuffle(distinct)
-    options_text = distinct[:3] + [correct]
+    distractors = distinct[:3]
+    # guarantee exactly 4 options even when the pool has < 3 distinct distractors
+    # (e.g. a tiny database); the schema contract and frontend assume keys A–D.
+    while len(distractors) < 3:
+        distractors.append(f"— ({len(distractors) + 1})")
+    options_text = distractors + [correct]
     rng.shuffle(options_text)
     options = [{"key": _KEYS[i], "text": t} for i, t in enumerate(options_text)]
     correct_key = next(o["key"] for o in options if o["text"] == correct)
@@ -82,6 +88,7 @@ async def assemble_session(session, deck_id: uuid.UUID | None, limit: int) -> li
     now = datetime.now(timezone.utc)
     stmt = select(Card).where(Card.due_at <= now)
     if deck_id is not None:
+        await get_deck_or_404(session, deck_id)  # 404 for a bogus deck vs. silently empty
         stmt = stmt.where(Card.deck_id == deck_id)
     stmt = stmt.order_by(Card.due_at).limit(limit)
     due = list((await session.execute(stmt)).scalars().all())
