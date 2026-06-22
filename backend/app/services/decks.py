@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from fastapi import HTTPException
 from sqlalchemy import select
 
-from app.db.models import Card, Deck
+from app.db.models import Deck
 from app.schemas.deck import DeckCreate, DeckDetailOut, DeckOut, DeckUpdate
 from app.schemas.card import CardOut
 
