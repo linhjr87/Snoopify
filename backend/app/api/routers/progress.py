@@ -36,3 +36,8 @@ async def word_of_day(session: SessionDep):
 @cards_extra_router.get("/recent", response_model=list[CardOut])
 async def recent(session: SessionDep, limit: int = Query(default=3, ge=1, le=20)):
     return await svc.recent_cards(session, limit)
+
+
+@progress_router.post("/reset")
+async def reset(session: SessionDep):
+    return await svc.reset_progress(session)

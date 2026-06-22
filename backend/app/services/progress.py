@@ -1,7 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import desc, select
+from sqlalchemy import delete, desc, select, update
 
 from app.config import get_settings
 from app.db.models import Card, ReviewLog
@@ -123,3 +123,20 @@ async def recent_cards(session, limit: int = 3) -> list[CardOut]:
         await session.execute(select(Card).order_by(desc(Card.created_at)).limit(limit))
     ).scalars().all()
     return [CardOut.model_validate(c) for c in rows]
+
+
+async def reset_progress(session) -> dict:
+    await session.execute(delete(ReviewLog))
+    await session.execute(
+        update(Card).values(
+            ease_factor=2.5,
+            interval_days=0,
+            repetitions=0,
+            lapses=0,
+            last_reviewed_at=None,
+            due_at=datetime.now(timezone.utc),
+        )
+    )
+    count = (await session.execute(select(Card))).scalars().all()
+    await session.commit()
+    return {"reset": len(count)}
