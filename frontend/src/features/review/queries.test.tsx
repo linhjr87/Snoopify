@@ -42,4 +42,20 @@ describe('useGradeMutation', () => {
     expect(String(spy.mock.calls[0][0])).toContain('/review/grade')
     expect((spy.mock.calls[0][1] as RequestInit).method).toBe('POST')
   })
+
+  it('invalidates progress and decks on success', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => fakeResponse({
+      card_id: 'c1', ease_factor: 2.5, interval_days: 1, repetitions: 1,
+      lapses: 0, due_at: '2026-06-23T00:00:00Z', last_reviewed_at: '2026-06-22T00:00:00Z',
+    })))
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const spy = vi.spyOn(qc, 'invalidateQueries')
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+    )
+    const { result } = renderHook(() => useGradeMutation(), { wrapper })
+    await result.current.mutateAsync({ card_id: 'c1', rating: 'remember', mode: 'flash', is_correct: null })
+    expect(spy).toHaveBeenCalledWith({ queryKey: ['progress'] })
+    expect(spy).toHaveBeenCalledWith({ queryKey: ['decks'] })
+  })
 })
