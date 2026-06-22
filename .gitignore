@@ -2,7 +2,3 @@ node_modules/
 dist/
 .DS_Store
 *.local
-.superpowers/
-_visual/
-_gt_*
-frontend/shoot-*.mjs
