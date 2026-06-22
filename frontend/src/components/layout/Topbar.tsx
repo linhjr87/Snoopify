@@ -51,17 +51,6 @@ export function Topbar() {
         gap: 24,
       }}
     >
-      {/* Date label */}
-      <span
-        style={{
-          fontSize: 13,
-          color: 'var(--muted)',
-          marginRight: 'auto',
-        }}
-      >
-        Thứ Hai · 22 tháng 6
-      </span>
-
       {/* Dark toggle */}
       <button
         onClick={toggleDark}
