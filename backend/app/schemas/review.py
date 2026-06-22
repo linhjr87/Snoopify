@@ -1,6 +1,9 @@
 import uuid
+from datetime import datetime
 
 from pydantic import BaseModel
+
+from app.enums import Rating, ReviewMode
 
 
 class QuizOption(BaseModel):
@@ -29,3 +32,20 @@ class ReviewItemOut(BaseModel):
     example: str
     quiz: QuizOut
     fill: FillOut
+
+
+class GradeRequest(BaseModel):
+    card_id: uuid.UUID
+    rating: Rating
+    mode: ReviewMode
+    is_correct: bool | None = None
+
+
+class GradeResult(BaseModel):
+    card_id: uuid.UUID
+    ease_factor: float
+    interval_days: int
+    repetitions: int
+    lapses: int
+    due_at: datetime
+    last_reviewed_at: datetime

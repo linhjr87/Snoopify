@@ -1,11 +1,13 @@
 import random
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import select
 
-from app.db.models import Card
-from app.schemas.review import FillOut, QuizOption, QuizOut, ReviewItemOut
+from app.db.models import Card, ReviewLog
+from app.schemas.review import FillOut, GradeRequest, GradeResult, QuizOption, QuizOut, ReviewItemOut
+from app.services import srs
+from app.services.cards import get_card_or_404
 
 _KEYS = ["A", "B", "C", "D"]
 
@@ -93,3 +95,36 @@ async def assemble_session(session, deck_id: uuid.UUID | None, limit: int) -> li
         pool = list((await session.execute(select(Card))).scalars().all())
 
     return [_to_item(c, pool) for c in due]
+
+
+async def grade_card(session, req: GradeRequest) -> GradeResult:
+    card = await get_card_or_404(session, req.card_id)
+    new = srs.review(
+        srs.Schedule(
+            ease_factor=card.ease_factor,
+            interval_days=card.interval_days,
+            repetitions=card.repetitions,
+            lapses=card.lapses,
+        ),
+        req.rating,
+    )
+    now = datetime.now(timezone.utc)
+    card.ease_factor = new.ease_factor
+    card.interval_days = new.interval_days
+    card.repetitions = new.repetitions
+    card.lapses = new.lapses
+    card.last_reviewed_at = now
+    card.due_at = now + timedelta(days=new.interval_days)
+
+    session.add(ReviewLog(card_id=card.id, rating=req.rating, mode=req.mode, is_correct=req.is_correct))
+    await session.commit()
+    await session.refresh(card)
+    return GradeResult(
+        card_id=card.id,
+        ease_factor=card.ease_factor,
+        interval_days=card.interval_days,
+        repetitions=card.repetitions,
+        lapses=card.lapses,
+        due_at=card.due_at,
+        last_reviewed_at=card.last_reviewed_at,
+    )
