@@ -17,7 +17,9 @@ TEST_DATABASE_URL = os.environ.get(
 
 @pytest_asyncio.fixture
 async def engine():
-    eng = create_async_engine(TEST_DATABASE_URL)
+    disable_cache = os.environ.get("DB_DISABLE_STATEMENT_CACHE", "false").lower() == "true"
+    connect_args = {"statement_cache_size": 0} if disable_cache else {}
+    eng = create_async_engine(TEST_DATABASE_URL, connect_args=connect_args)
     async with eng.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)

@@ -69,4 +69,6 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_cards_deck_id'), table_name='cards')
     op.drop_table('cards')
     op.drop_table('decks')
+    op.execute("DROP TYPE IF EXISTS rating")
+    op.execute("DROP TYPE IF EXISTS review_mode")
     # ### end Alembic commands ###
