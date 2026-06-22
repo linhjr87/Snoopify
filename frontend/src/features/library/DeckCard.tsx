@@ -10,7 +10,7 @@ export function DeckCard({ name, tag, meta, mastery, last, barW, needAttention }
         <TagPill tone={needAttention ? 'rust' : 'muted'}>{tag}</TagPill>
       </div>
       <div className="mt-1 text-sm text-muted">{meta}</div>
-      <div className="mt-3"><ProgressBar value={parseInt(barW)} tone={needAttention ? 'rust' : 'accent'} /></div>
+      <div className="mt-3"><ProgressBar value={parseInt(barW, 10)} tone={needAttention ? 'rust' : 'accent'} /></div>
       <div className="mt-2 flex justify-between text-xs text-muted"><span>{mastery}</span><span>{last}</span></div>
     </Card>
   )

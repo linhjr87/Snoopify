@@ -15,7 +15,7 @@ export default function LibraryScreen() {
   const decks: DeckCardProps[] = useMemo(() => {
     const importedVM = imported.map((d) => ({ name: d.name, tag: d.topic || 'đã nhập', meta: `${d.count} thẻ · chưa ôn`, mastery: 'mới · chưa ôn', last: 'vừa nhập', barW: '0%', needAttention: false }))
     const all = [...seedDecks, ...importedVM]
-    if (group === 'mastery') return [...all].sort((a, b) => parseInt(b.barW) - parseInt(a.barW))
+    if (group === 'mastery') return [...all].sort((a, b) => parseInt(b.barW, 10) - parseInt(a.barW, 10))
     return all
   }, [imported, group])
   return (

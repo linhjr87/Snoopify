@@ -1,11 +1,8 @@
 import { Card } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { wordOfDay } from '../../data/seed'
-import { useAppStore } from '../../store/useAppStore'
 
 export function WordOfDay() {
-  const showWordOfDay = useAppStore((s) => (s as any).showWordOfDay ?? true)
-  if (!showWordOfDay) return null
   return (
     <Card className="p-5">
       <div className="mb-2 text-xs uppercase tracking-wide text-muted">Từ của ngày</div>
