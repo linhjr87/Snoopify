@@ -1,12 +1,43 @@
-import { Card } from '../../components/ui/Card'
-import { Heatmap } from '../../components/ui/Heatmap'
 import { makeHeatmap } from '../../data/seed'
+
+function heatColor(lv: number): string {
+  if (lv === 0) return 'var(--track)'
+  if (lv === 1) return 'color-mix(in srgb, var(--accent) 30%, #fff)'
+  if (lv === 2) return 'color-mix(in srgb, var(--accent) 65%, #fff)'
+  return 'var(--accent)'
+}
+
 export function Calendar() {
+  const levels = makeHeatmap()
   return (
-    <Card className="p-5">
-      <div className="mb-3 text-sm font-semibold text-ink">Lịch học · 18 tuần qua</div>
-      <Heatmap levels={makeHeatmap()} />
-      <div className="mt-2 flex items-center gap-2 text-xs text-muted">ít <span className="inline-block h-3 w-3 rounded-sm bg-track" /><span className="inline-block h-3 w-3 rounded-sm bg-accent" /> nhiều</div>
-    </Card>
+    <div>
+      <h2 style={{ margin: '0 0 16px', fontFamily: "'Newsreader', serif", fontWeight: 500, fontSize: 19 }}>
+        Lịch học · 18 tuần qua
+      </h2>
+      {/* 7-row × 18-col grid, column-major flow */}
+      <div style={{
+        display: 'grid',
+        gridTemplateRows: 'repeat(7, 13px)',
+        gridAutoFlow: 'column',
+        gridAutoColumns: '13px',
+        gap: 4,
+      }}>
+        {levels.map((lv, i) => (
+          <div
+            key={i}
+            style={{ width: 13, height: 13, borderRadius: 3, background: heatColor(lv) }}
+          />
+        ))}
+      </div>
+      {/* Legend */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 14, fontSize: 12, color: 'var(--muted)' }}>
+        ít
+        <div style={{ width: 13, height: 13, borderRadius: 3, background: 'var(--track)' }} />
+        <div style={{ width: 13, height: 13, borderRadius: 3, background: 'color-mix(in srgb, var(--accent) 30%, #fff)' }} />
+        <div style={{ width: 13, height: 13, borderRadius: 3, background: 'color-mix(in srgb, var(--accent) 65%, #fff)' }} />
+        <div style={{ width: 13, height: 13, borderRadius: 3, background: 'var(--accent)' }} />
+        nhiều
+      </div>
+    </div>
   )
 }
