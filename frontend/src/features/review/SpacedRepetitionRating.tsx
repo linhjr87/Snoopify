@@ -1,15 +1,32 @@
 export function SpacedRepetitionRating({ onRate }: { onRate: (correct: boolean) => void }) {
-  const opts: [string, string, boolean][] = [
-    ['Quên', 'ôn lại ngay', false],
-    ['Mơ hồ', 'sau 1 ngày', true],
-    ['Nhớ', 'sau 4 ngày', true],
+  const opts: [string, string, boolean, string, string][] = [
+    ['Quên', 'ôn lại ngay', false, 'var(--rust)', 'var(--rust)'],
+    ['Mơ hồ', 'sau 1 ngày', true, 'var(--gold)', 'var(--gold)'],
+    ['Nhớ', 'sau 4 ngày', true, '#3f8f5b', '#2f6b43'],
   ]
   return (
-    <div className="grid grid-cols-3 gap-3">
-      {opts.map(([label, sub, correct]) => (
-        <button key={label} onClick={() => onRate(correct)} className="rounded-xl border border-line bg-surface p-3 text-center hover:bg-paper">
-          <div className="font-semibold text-ink">{label}</div>
-          <div className="text-xs text-muted">{sub}</div>
+    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+      {opts.map(([label, sub, correct, borderColor, textColor]) => (
+        <button
+          key={label}
+          onClick={() => onRate(correct)}
+          style={{
+            border: `1px solid ${borderColor}`,
+            color: textColor,
+            borderRadius: '12px',
+            background: 'var(--surface)',
+            padding: '12px 24px',
+            fontFamily: "'Hanken Grotesk', sans-serif",
+            fontWeight: 600,
+            cursor: 'pointer',
+            textAlign: 'center',
+            transition: 'background .15s ease',
+          }}
+        >
+          {label}
+          <div style={{ fontSize: '12px', fontWeight: 400, color: 'var(--muted)', marginTop: '2px' }}>
+            {sub}
+          </div>
         </button>
       ))}
     </div>
