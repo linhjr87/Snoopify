@@ -77,3 +77,23 @@ export interface CardOut {
   created_at: string
   updated_at: string
 }
+
+export interface MasteryCounts { new: number; learning: number; proficient: number }
+export interface WeeklyBar { label: string; count: number }
+export interface ProgressSummary {
+  streak: number
+  reviews_today: number
+  mastery: MasteryCounts
+  weekly_bars: WeeklyBar[]
+  due_total: number
+}
+export interface HeatmapOut { cells: number[] }
+export interface NeedsReviewItem { card_id: string; word: string; lapses: number }
+export interface WordOfDayOut {
+  card_id: string
+  word: string
+  phonetic: string
+  pos: string
+  meaning: string
+  example: string
+}

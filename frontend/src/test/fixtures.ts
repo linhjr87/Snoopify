@@ -1,4 +1,4 @@
-import type { DeckOut, ReviewItemOut } from '../lib/api-types'
+import type { DeckOut, ReviewItemOut, ProgressSummary, HeatmapOut, NeedsReviewItem, WordOfDayOut, CardOut } from '../lib/api-types'
 
 // Mirrors the 5 seed cards, shaped as the /review/session response.
 export const reviewSessionFixture: ReviewItemOut[] = [
@@ -69,5 +69,39 @@ export const decksFixture: DeckOut[] = [
     id: 'd2', name: 'Business English', topic: 'chủ đề', count: 92, due_count: 12,
     mastery_pct: 72, last_reviewed_at: '2026-06-21T00:00:00Z',
     created_at: '2026-06-10T00:00:00Z', updated_at: '2026-06-21T00:00:00Z',
+  },
+]
+
+export const progressSummaryFixture: ProgressSummary = {
+  streak: 12,
+  reviews_today: 8,
+  mastery: { new: 96, learning: 177, proficient: 213 },
+  weekly_bars: [
+    { label: 'T2', count: 5 }, { label: 'T3', count: 8 }, { label: 'T4', count: 4 },
+    { label: 'T5', count: 9 }, { label: 'T6', count: 6 }, { label: 'T7', count: 2 }, { label: 'CN', count: 0 },
+  ],
+  due_total: 16,
+}
+
+export const heatmapFixture: HeatmapOut = { cells: Array.from({ length: 126 }, (_, i) => i % 4) }
+
+export const needsReviewFixture: NeedsReviewItem[] = [
+  { card_id: 'n1', word: 'much vs many', lapses: 4 },
+  { card_id: 'n2', word: 'put off', lapses: 3 },
+]
+
+export const wordOfDayFixture: WordOfDayOut = {
+  card_id: 'c2', word: 'serendipity', phonetic: '/ˌser.ənˈdɪp.ə.ti/', pos: 'noun',
+  meaning: 'sự tình cờ may mắn; duyên may bất ngờ',
+  example: 'Finding that little café was pure serendipity.',
+}
+
+export const recentCardsFixture: CardOut[] = [
+  {
+    id: 'c1', deck_id: 'd1', word: 'resilient', phonetic: '/rɪˈzɪl.i.ənt/', pos: 'adjective',
+    meaning: 'có khả năng phục hồi nhanh', example: 'She is so resilient.',
+    ease_factor: 2.5, interval_days: 0, repetitions: 0, lapses: 0,
+    due_at: '2026-06-23T00:00:00Z', last_reviewed_at: null,
+    created_at: '2026-06-23T00:00:00Z', updated_at: '2026-06-23T00:00:00Z',
   },
 ]
