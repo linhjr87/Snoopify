@@ -13,6 +13,7 @@ export interface AppState {
   fillChecked: boolean
   sIndex: number
   sCorrect: number
+  gradeError: boolean
   dark: boolean
   lang: Lang
   collapsed: boolean
@@ -34,6 +35,7 @@ export interface AppActions {
   checkFill(): void
   advanceSession(correct: boolean): void
   resetSession(): void
+  setGradeError(value: boolean): void
   toggleDark(): void
   setLang(lang: Lang): void
   toggleCollapsed(): void

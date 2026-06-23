@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiGet, apiPost } from '../../lib/api'
 import type { ReviewItemOut, GradeRequest, GradeResult } from '../../lib/api-types'
 import { toSessionItem, type SessionCard } from '../../lib/adapters'
+import { useAppStore } from '../../store/useAppStore'
 
 export function useSession(deckId?: string, limit = 20) {
   return useQuery({
@@ -21,8 +22,12 @@ export function useGradeMutation() {
   return useMutation({
     mutationFn: (req: GradeRequest) => apiPost<GradeResult>('/review/grade', req),
     onSuccess: () => {
+      useAppStore.getState().setGradeError(false)
       qc.invalidateQueries({ queryKey: ['progress'] })
       qc.invalidateQueries({ queryKey: ['decks'] })
     },
+    // The session keeps advancing optimistically; surface the failure (non-blocking)
+    // so the user knows their last grade did not persist server-side.
+    onError: () => useAppStore.getState().setGradeError(true),
   })
 }
