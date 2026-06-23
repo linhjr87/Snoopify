@@ -19,6 +19,7 @@ export function AddCardForm() {
   const [data, setData] = useState<PreviewData>(empty)
   const [saved, setSaved] = useState<string[]>([])
   const [deckId, setDeckId] = useState<string>('')
+  const [saveError, setSaveError] = useState(false)
 
   const { data: decks } = useDecks()
   const createDeck = useCreateDeck()
@@ -38,8 +39,10 @@ export function AddCardForm() {
     const card: CardCreate = {
       word, phonetic: data.phonetic, pos: data.pos, meaning: data.meaning, example: data.example,
     }
+    setSaveError(false)
     addCard.mutate({ deckId, card }, {
       onSuccess: () => { setSaved((prev) => [word, ...prev].slice(0, 10)); setData(empty) },
+      onError: () => setSaveError(true),
     })
   }
 
@@ -138,6 +141,11 @@ export function AddCardForm() {
         </div>
 
         {/* Action buttons */}
+        {saveError && (
+          <div role="alert" style={{ marginBottom: 10, padding: '8px 14px', borderRadius: 10, background: '#f6e6e2', border: '1px solid var(--rust)', color: 'var(--rust)', fontSize: 13, fontWeight: 600 }}>
+            Lưu thất bại — kiểm tra kết nối và thử lại.
+          </div>
+        )}
         <div style={{ display: 'flex', gap: 12 }}>
           <button
             onClick={handleSave}

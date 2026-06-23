@@ -22,7 +22,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     throw new ApiError(res.status, detail)
   }
   if (res.status === 204) return undefined as T
-  return (await res.json()) as T
+  try {
+    return (await res.json()) as T
+  } catch {
+    throw new ApiError(res.status, 'Phản hồi không hợp lệ từ server')
+  }
 }
 
 export const apiGet = <T>(path: string) => request<T>(path)

@@ -7,7 +7,7 @@ import { useProgressSummary } from './queries'
 
 export default function ProgressScreen() {
   const t = useT()
-  const { data } = useProgressSummary()
+  const { data, isError } = useProgressSummary()
   const s = data
   return (
     <div style={{ animation: 'fadeUp .45s ease both' }}>
@@ -20,6 +20,12 @@ export default function ProgressScreen() {
           {t.progressTitle}
         </h1>
       </div>
+
+      {isError && (
+        <div role="alert" style={{ padding: '10px 16px', marginBottom: 16, borderRadius: 12, background: '#f6e6e2', border: '1px solid var(--rust)', color: 'var(--rust)', fontSize: 14, fontWeight: 600 }}>
+          Không tải được dữ liệu — số liệu có thể không chính xác.
+        </div>
+      )}
 
       {/* 4 stat tiles (API-backed) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 22 }}>

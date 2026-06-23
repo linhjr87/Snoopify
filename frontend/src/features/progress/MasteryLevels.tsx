@@ -3,7 +3,7 @@ import { useProgressSummary } from './queries'
 const COLORS = ['var(--rust)', '#c9a23a', '#3f8f5b'] // Mới, Đang học, Thành thạo
 
 export function MasteryLevels() {
-  const { data } = useProgressSummary()
+  const { data, isError } = useProgressSummary()
   const m = data?.mastery ?? { new: 0, learning: 0, proficient: 0 }
   const rows = [
     { label: 'Mới', n: m.new },
@@ -14,6 +14,9 @@ export function MasteryLevels() {
   return (
     <section style={{ border: '1px solid var(--line)', borderRadius: 18, background: 'var(--surface)', padding: 22, boxShadow: '0 1px 2px rgba(40,35,25,0.03)' }}>
       <h2 style={{ margin: '0 0 16px', fontFamily: "'Newsreader', serif", fontWeight: 500, fontSize: 18 }}>Mức độ thành thạo</h2>
+      {isError && !data && (
+        <div style={{ fontSize: 14, color: 'var(--rust)', marginBottom: 8 }}>Không tải được dữ liệu.</div>
+      )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         {rows.map((m2, i) => (
           <div key={m2.label}>

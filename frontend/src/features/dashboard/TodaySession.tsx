@@ -7,7 +7,7 @@ const CIRC = 2 * Math.PI * 60 // r=60
 export function TodaySession() {
   const t = useT()
   const nav = useNavigate()
-  const { data } = useProgressSummary()
+  const { data, isError } = useProgressSummary()
   const reviewed = data?.reviews_today ?? 0
   const due = data?.due_total ?? 0
   const target = reviewed + due
@@ -21,8 +21,14 @@ export function TodaySession() {
           <circle cx="72" cy="72" r="60" fill="none" stroke="var(--accent,#2f5d4e)" strokeWidth="11" strokeLinecap="round" strokeDasharray={CIRC} strokeDashoffset={offset} transform="rotate(-90 72 72)" />
         </svg>
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ fontFamily: 'var(--num-font)', fontSize: '34px', fontWeight: 600, lineHeight: 1 }}>{reviewed}<span style={{ color: 'var(--muted)', fontSize: '20px' }}>/{target}</span></div>
-          <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '3px' }}>đã ôn</div>
+          {isError && !data ? (
+            <div style={{ fontSize: '12px', color: 'var(--rust)', textAlign: 'center', padding: '0 8px' }}>Lỗi tải</div>
+          ) : (
+            <>
+              <div style={{ fontFamily: 'var(--num-font)', fontSize: '34px', fontWeight: 600, lineHeight: 1 }}>{reviewed}<span style={{ color: 'var(--muted)', fontSize: '20px' }}>/{target}</span></div>
+              <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '3px' }}>đã ôn</div>
+            </>
+          )}
         </div>
       </div>
 

@@ -3,7 +3,7 @@ import { useNeedsReview } from './queries'
 
 export function NeedsReview() {
   const nav = useNavigate()
-  const { data } = useNeedsReview()
+  const { data, isError } = useNeedsReview()
   const items = data ?? []
   return (
     <section style={{ border: '1px solid var(--rust)', borderRadius: 18, background: 'var(--surface)', padding: 22, boxShadow: '0 1px 2px rgba(40,35,25,0.03)' }}>
@@ -11,7 +11,8 @@ export function NeedsReview() {
         Cần ôn gấp
       </h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 15 }}>
-        {items.length === 0 && <span style={{ color: 'var(--muted)', fontSize: 14 }}>Chưa có thẻ nào cần ôn gấp.</span>}
+        {isError && !data && <span style={{ color: 'var(--rust)', fontSize: 14 }}>Không tải được dữ liệu. Thử lại sau.</span>}
+        {!isError && items.length === 0 && <span style={{ color: 'var(--muted)', fontSize: 14 }}>Chưa có thẻ nào cần ôn gấp.</span>}
         {items.map((n) => (
           <div key={n.card_id} style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span style={{ color: 'var(--ink)' }}>{n.word}</span>

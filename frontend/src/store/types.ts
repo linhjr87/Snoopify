@@ -1,4 +1,4 @@
-export type ReviewMode = 'flash' | 'quiz' | 'fill'
+export type { ReviewMode } from '../lib/api-types'
 export type Lang = 'vn' | 'en'
 
 export interface ImportStatus { ok: boolean; msg: string }

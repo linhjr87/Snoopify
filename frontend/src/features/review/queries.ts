@@ -25,7 +25,9 @@ export function useGradeMutation() {
       useAppStore.getState().setGradeError(false)
       qc.invalidateQueries({ queryKey: ['progress'] })
       qc.invalidateQueries({ queryKey: ['decks'] })
-      qc.invalidateQueries({ queryKey: ['review'] })
+      // Do NOT invalidate ['review'] here — that would refetch the active session
+      // mid-card and reset the cursor. Session invalidation is handled by
+      // SessionComplete.reviewAgain when the user explicitly starts a new session.
     },
     // The session keeps advancing optimistically; surface the failure (non-blocking)
     // so the user knows their last grade did not persist server-side.

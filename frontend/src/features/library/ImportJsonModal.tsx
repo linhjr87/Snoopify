@@ -22,8 +22,8 @@ export function ImportJsonModal() {
     r.readAsText(f)
   }
 
-  const copySample = () => {
-    try { navigator.clipboard.writeText(sampleJson) } catch (_) {}
+  const copySample = async () => {
+    try { await navigator.clipboard.writeText(sampleJson) } catch (_) {}
   }
 
   if (!importOpen) return null
@@ -42,7 +42,12 @@ export function ImportJsonModal() {
         setStatus({ ok: result.ok, msg: result.msg })
         if (result.ok) setImportText('')
       },
-      onError: () => setStatus({ ok: false, msg: INVALID_MSG }),
+      onError: (err: unknown) => {
+        const msg = err instanceof TypeError
+          ? 'Lỗi kết nối — kiểm tra mạng và thử lại.'
+          : INVALID_MSG
+        setStatus({ ok: false, msg })
+      },
     })
   }
 

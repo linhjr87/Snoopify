@@ -23,5 +23,6 @@ export function useResetProgress() {
         qc.invalidateQueries({ queryKey: key })
       }
     },
+    onError: (err) => console.error('[useResetProgress] reset failed:', err),
   })
 }
