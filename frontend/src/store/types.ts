@@ -1,8 +1,6 @@
 export type ReviewMode = 'flash' | 'quiz' | 'fill'
 export type Lang = 'vn' | 'en'
 
-export interface Card { word: string; phonetic: string; pos: string; meaning: string; example: string }
-export interface Deck { name: string; topic: string; count: number; cards: Card[] }
 export interface ImportStatus { ok: boolean; msg: string }
 
 export interface AppState {
@@ -23,8 +21,6 @@ export interface AppState {
   notifOpen: boolean
   langMenuOpen: boolean
   importText: string
-  importStatus: ImportStatus | null
-  importedDecks: Deck[]
 }
 
 export interface AppActions {
@@ -41,7 +37,6 @@ export interface AppActions {
   toggleCollapsed(): void
   setPanel(panel: 'settingsOpen' | 'confirmReset' | 'importOpen' | 'notifOpen' | 'langMenuOpen', open: boolean): void
   setImportText(text: string): void
-  parseAndImport(text: string): void
   resetProgress(): void
 }
 
