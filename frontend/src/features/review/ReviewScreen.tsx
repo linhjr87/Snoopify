@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppStore } from '../../store/useAppStore'
 import { useT } from '../../i18n/useT'
@@ -6,7 +7,28 @@ import { FlashcardMode } from './FlashcardMode'
 import { QuizMode } from './QuizMode'
 import { FillMode } from './FillMode'
 import { SessionComplete } from './SessionComplete'
-import { SESSION } from '../../data/seed'
+import { useSession } from './queries'
+
+function ReviewMessage({ text, onHome }: { text: string; onHome?: () => void }) {
+  return (
+    <div style={{ maxWidth: '680px', margin: '0 auto', textAlign: 'center', padding: '60px 20px', color: 'var(--muted)' }}>
+      <div style={{ fontSize: '17px' }}>{text}</div>
+      {onHome && (
+        <button
+          className="ghost"
+          onClick={onHome}
+          style={{
+            marginTop: '20px', border: '1px solid var(--line)', borderRadius: '11px',
+            background: 'var(--surface)', padding: '10px 20px',
+            fontFamily: "'Hanken Grotesk',sans-serif", fontWeight: 600, color: 'var(--muted)', cursor: 'pointer',
+          }}
+        >
+          Về trang chủ
+        </button>
+      )}
+    </div>
+  )
+}
 
 export default function ReviewScreen() {
   const t = useT()
@@ -14,11 +36,31 @@ export default function ReviewScreen() {
   const reviewMode = useAppStore((s) => s.reviewMode)
   const sIndex = useAppStore((s) => s.sIndex)
   const sCorrect = useAppStore((s) => s.sCorrect)
-  const total = SESSION.length
+  const gradeError = useAppStore((s) => s.gradeError)
+  const resetSession = useAppStore((s) => s.resetSession)
+  const setGradeError = useAppStore((s) => s.setGradeError)
+  const { data, isLoading, isError } = useSession()
 
+  // The session cursor (sIndex/sCorrect) is store state that outlives any single
+  // fetched session — it persists across reloads and survives route changes. Reset
+  // it whenever a session with *different content* loads, otherwise a stale cursor
+  // points into the wrong card set (wrong card, carried-over score, or — if the
+  // stale index is past the new end — an instant, inescapable "session complete").
+  const sessionKey = data ? data.map((c) => c.cardId).join('|') : null
+  useEffect(() => {
+    if (sessionKey !== null) resetSession()
+  }, [sessionKey, resetSession])
+
+  if (isLoading) return <ReviewMessage text="Đang tải phiên ôn tập…" />
+  if (isError) return <ReviewMessage text="Không tải được phiên ôn tập. Thử lại sau." onHome={() => nav('/')} />
+
+  const session = data ?? []
+  const total = session.length
+
+  if (total === 0) return <ReviewMessage text="Không có thẻ nào đến hạn ôn tập. Quay lại sau nhé!" onHome={() => nav('/')} />
   if (sIndex >= total) return <SessionComplete correct={sCorrect} total={total} />
 
-  const cur = SESSION[sIndex]
+  const cur = session[sIndex]
   const isLast = sIndex >= total - 1
   const progressPct = Math.round((sIndex / total) * 100)
 
@@ -48,10 +90,10 @@ export default function ReviewScreen() {
         </div>
       </div>
 
-      {/* Deck label + score */}
+      {/* Session label + score */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '9px', marginBottom: '20px' }}>
         <span style={{ fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-          Business English
+          Đến hạn hôm nay
         </span>
         <span style={{ fontSize: '12px', color: 'var(--accent,#2f5d4e)', fontWeight: 700 }}>
           · {sCorrect} đúng
@@ -62,6 +104,31 @@ export default function ReviewScreen() {
       <div style={{ display: 'flex', gap: '9px', justifyContent: 'center', marginBottom: '24px' }}>
         <ModeSwitcher />
       </div>
+
+      {/* Non-blocking grade-save warning (the session keeps advancing optimistically) */}
+      {gradeError && (
+        <div
+          role="alert"
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px',
+            marginBottom: '18px', padding: '11px 16px', borderRadius: '11px',
+            background: '#f6e6e2', border: '1px solid var(--rust)', color: 'var(--rust)',
+            fontSize: '14px', fontWeight: 600,
+          }}
+        >
+          <span>Chưa lưu được kết quả gần nhất — kiểm tra kết nối.</span>
+          <button
+            onClick={() => setGradeError(false)}
+            aria-label="Đóng cảnh báo"
+            style={{
+              border: 'none', background: 'transparent', color: 'var(--rust)',
+              cursor: 'pointer', fontSize: '18px', lineHeight: 1, flex: 'none',
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       {/* Active mode */}
       {reviewMode === 'flash' && <FlashcardMode cur={cur} />}

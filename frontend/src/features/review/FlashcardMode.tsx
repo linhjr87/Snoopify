@@ -1,11 +1,19 @@
 import { useAppStore } from '../../store/useAppStore'
 import { SpacedRepetitionRating } from './SpacedRepetitionRating'
-import type { SessionItem } from '../../data/seed'
+import type { SessionCard } from '../../lib/adapters'
+import type { Rating } from '../../lib/api-types'
+import { useGradeMutation } from './queries'
 
-export function FlashcardMode({ cur }: { cur: SessionItem }) {
+export function FlashcardMode({ cur }: { cur: SessionCard }) {
   const flipped = useAppStore((s) => s.flipped)
   const flip = useAppStore((s) => s.flip)
   const advance = useAppStore((s) => s.advanceSession)
+  const grade = useGradeMutation()
+
+  const handleRate = (rating: Rating) => {
+    grade.mutate({ card_id: cur.cardId, rating, mode: 'flash', is_correct: null })
+    advance(rating !== 'forgot')
+  }
 
   const cardInnerStyle: React.CSSProperties = {
     position: 'relative', width: '100%', minHeight: '340px',
@@ -68,8 +76,8 @@ export function FlashcardMode({ cur }: { cur: SessionItem }) {
         </div>
       </div>
 
-      {/* Rating buttons — always shown (export shows them visible on front face too) */}
-      <SpacedRepetitionRating onRate={(correct) => advance(correct)} />
+      {/* Rating buttons */}
+      <SpacedRepetitionRating onRate={handleRate} disabled={grade.isPending} />
 
       <div style={{ fontSize: '13px', color: 'var(--muted)' }}>
         Tự chấm để tính điểm phiên · spaced repetition

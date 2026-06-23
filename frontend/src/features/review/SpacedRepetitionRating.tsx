@@ -1,15 +1,24 @@
-export function SpacedRepetitionRating({ onRate }: { onRate: (correct: boolean) => void }) {
-  const opts: [string, string, boolean, string, string][] = [
-    ['Quên', 'ôn lại ngay', false, 'var(--rust)', 'var(--rust)'],
-    ['Mơ hồ', 'sau 1 ngày', true, 'var(--gold)', 'var(--gold)'],
-    ['Nhớ', 'sau 4 ngày', true, '#3f8f5b', '#2f6b43'],
+import type { Rating } from '../../lib/api-types'
+
+export function SpacedRepetitionRating({
+  onRate,
+  disabled = false,
+}: {
+  onRate: (rating: Rating) => void
+  disabled?: boolean
+}) {
+  const opts: [string, string, Rating, string, string][] = [
+    ['Quên', 'ôn lại ngay', 'forgot', 'var(--rust)', 'var(--rust)'],
+    ['Mơ hồ', 'sau 1 ngày', 'vague', 'var(--gold)', 'var(--gold)'],
+    ['Nhớ', 'sau 4 ngày', 'remember', '#3f8f5b', '#2f6b43'],
   ]
   return (
     <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
-      {opts.map(([label, sub, correct, borderColor, textColor]) => (
+      {opts.map(([label, sub, rating, borderColor, textColor]) => (
         <button
           key={label}
-          onClick={() => onRate(correct)}
+          disabled={disabled}
+          onClick={() => onRate(rating)}
           style={{
             border: `1px solid ${borderColor}`,
             color: textColor,
@@ -18,9 +27,10 @@ export function SpacedRepetitionRating({ onRate }: { onRate: (correct: boolean) 
             padding: '12px 24px',
             fontFamily: "'Hanken Grotesk', sans-serif",
             fontWeight: 600,
-            cursor: 'pointer',
+            cursor: disabled ? 'not-allowed' : 'pointer',
+            opacity: disabled ? 0.5 : 1,
             textAlign: 'center',
-            transition: 'background .15s ease',
+            transition: 'background .15s ease, opacity .15s ease',
           }}
         >
           {label}

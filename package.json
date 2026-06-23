@@ -1,0 +1,11 @@
+{
+  "name": "snoopify",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c blue,green \"docker compose up db api\" \"npm --prefix frontend run dev\"",
+    "stop": "docker compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

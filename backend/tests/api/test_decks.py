@@ -63,3 +63,19 @@ async def test_update_deck_with_cards_preserves_count(client):
     body = r.json()
     assert body["name"] == "Travel English"
     assert body["count"] == 2
+
+
+async def test_list_decks_includes_mastery_and_last_reviewed(client):
+    r = await client.post("/decks", json={"name": "Mastery", "topic": "t"})
+    did = r.json()["id"]
+    # create response already carries the new fields
+    assert r.json()["mastery_pct"] == 0.0
+    assert r.json()["last_reviewed_at"] is None
+
+    # one brand-new card: 1 card, 0 proficient -> 0.0%, never reviewed
+    await client.post(f"/decks/{did}/cards", json={"word": "w"})
+    r = await client.get("/decks")
+    d = next(x for x in r.json() if x["id"] == did)
+    assert d["count"] == 1
+    assert d["mastery_pct"] == 0.0
+    assert d["last_reviewed_at"] is None

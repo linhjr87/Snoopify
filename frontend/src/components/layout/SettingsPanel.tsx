@@ -1,5 +1,6 @@
 import { useAppStore } from '../../store/useAppStore'
 import { useT } from '../../i18n/useT'
+import { useResetProgress } from '../../features/progress/queries'
 
 export function SettingsPanel() {
   const t = useT()
@@ -11,6 +12,12 @@ export function SettingsPanel() {
   const setPanel = useAppStore((s) => s.setPanel)
   const toggleDark = useAppStore((s) => s.toggleDark)
   const resetProgress = useAppStore((s) => s.resetProgress)
+  const resetMutation = useResetProgress()
+
+  const handleReset = () => {
+    resetMutation.mutate()   // server: wipe logs + reset schedules, invalidate queries
+    resetProgress()          // UI: reset session counters + close panels
+  }
 
   if (!settingsOpen) return null
 
@@ -115,7 +122,7 @@ export function SettingsPanel() {
             <div style={{ fontSize: 13, color: 'var(--ink)', marginBottom: 10 }}>{t.resetConfirm}</div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button
-                onClick={() => resetProgress()}
+                onClick={handleReset}
                 style={{
                   flex: 1,
                   border: 'none',

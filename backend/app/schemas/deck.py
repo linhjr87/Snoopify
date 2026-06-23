@@ -22,6 +22,8 @@ class DeckOut(BaseModel):
     topic: str
     count: int
     due_count: int
+    mastery_pct: float
+    last_reviewed_at: datetime | None
     created_at: datetime
     updated_at: datetime
 

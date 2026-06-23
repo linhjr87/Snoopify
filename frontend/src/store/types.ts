@@ -1,8 +1,6 @@
-export type ReviewMode = 'flash' | 'quiz' | 'fill'
+export type { ReviewMode } from '../lib/api-types'
 export type Lang = 'vn' | 'en'
 
-export interface Card { word: string; phonetic: string; pos: string; meaning: string; example: string }
-export interface Deck { name: string; topic: string; count: number; cards: Card[] }
 export interface ImportStatus { ok: boolean; msg: string }
 
 export interface AppState {
@@ -13,6 +11,7 @@ export interface AppState {
   fillChecked: boolean
   sIndex: number
   sCorrect: number
+  gradeError: boolean
   dark: boolean
   lang: Lang
   collapsed: boolean
@@ -22,8 +21,6 @@ export interface AppState {
   notifOpen: boolean
   langMenuOpen: boolean
   importText: string
-  importStatus: ImportStatus | null
-  importedDecks: Deck[]
 }
 
 export interface AppActions {
@@ -34,12 +31,12 @@ export interface AppActions {
   checkFill(): void
   advanceSession(correct: boolean): void
   resetSession(): void
+  setGradeError(value: boolean): void
   toggleDark(): void
   setLang(lang: Lang): void
   toggleCollapsed(): void
   setPanel(panel: 'settingsOpen' | 'confirmReset' | 'importOpen' | 'notifOpen' | 'langMenuOpen', open: boolean): void
   setImportText(text: string): void
-  parseAndImport(text: string): void
   resetProgress(): void
 }
 

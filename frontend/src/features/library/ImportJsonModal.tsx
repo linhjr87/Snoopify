@@ -1,31 +1,59 @@
+import { useState, type ChangeEvent, type CSSProperties } from 'react'
 import { useAppStore } from '../../store/useAppStore'
 import { sampleJson } from '../../data/seed'
+import type { ImportStatus } from '../../store/types'
+import { useImportDeck } from './queries'
+
+const INVALID_MSG = 'JSON không hợp lệ hoặc thiếu trường bắt buộc (deck, cards[].word).'
 
 export function ImportJsonModal() {
   const importOpen = useAppStore((s) => s.importOpen)
   const importText = useAppStore((s) => s.importText)
-  const importStatus = useAppStore((s) => s.importStatus)
   const setPanel = useAppStore((s) => s.setPanel)
   const setImportText = useAppStore((s) => s.setImportText)
-  const parseAndImport = useAppStore((s) => s.parseAndImport)
+  const importDeck = useImportDeck()
+  const [status, setStatus] = useState<ImportStatus | null>(null)
 
-  const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFile = (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]; if (!f) return
     const r = new FileReader()
     r.onload = () => setImportText(String(r.result || ''))
-    r.onerror = () => parseAndImport('')
+    r.onerror = () => setStatus({ ok: false, msg: INVALID_MSG })
     r.readAsText(f)
   }
 
-  const copySample = () => {
-    try { navigator.clipboard.writeText(sampleJson) } catch (_) {}
+  const copySample = async () => {
+    try { await navigator.clipboard.writeText(sampleJson) } catch (_) {}
   }
 
   if (!importOpen) return null
 
-  const statusStyle: React.CSSProperties = {
+  const onImport = () => {
+    let payload: unknown
+    try {
+      payload = JSON.parse(importText)
+    } catch {
+      setStatus({ ok: false, msg: INVALID_MSG })
+      return
+    }
+
+    importDeck.mutate(payload, {
+      onSuccess: (result) => {
+        setStatus({ ok: result.ok, msg: result.msg })
+        if (result.ok) setImportText('')
+      },
+      onError: (err: unknown) => {
+        const msg = err instanceof TypeError
+          ? 'Lỗi kết nối — kiểm tra mạng và thử lại.'
+          : INVALID_MSG
+        setStatus({ ok: false, msg })
+      },
+    })
+  }
+
+  const statusStyle: CSSProperties = {
     fontSize: '13px', fontWeight: 600,
-    color: importStatus && importStatus.ok ? '#2f6b43' : 'var(--rust)',
+    color: status && status.ok ? '#2f6b43' : 'var(--rust)',
   }
 
   return (
@@ -99,14 +127,16 @@ export function ImportJsonModal() {
         />
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <button
-            onClick={() => parseAndImport(importText)}
+            onClick={onImport}
+            disabled={importDeck.isPending}
             style={{
               border: 'none', borderRadius: '10px', background: 'var(--ink)',
               color: '#fff', padding: '10px 22px', fontFamily: "'Hanken Grotesk',sans-serif",
-              fontWeight: 600, fontSize: '14px', cursor: 'pointer',
+              fontWeight: 600, fontSize: '14px', cursor: importDeck.isPending ? 'default' : 'pointer',
+              opacity: importDeck.isPending ? 0.7 : 1,
             }}
           >Nhập</button>
-          {importStatus && <span style={statusStyle}>{importStatus.msg}</span>}
+          {status && <span style={statusStyle}>{status.msg}</span>}
         </div>
       </div>
     </div>

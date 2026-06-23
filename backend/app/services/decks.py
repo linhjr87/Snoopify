@@ -5,8 +5,9 @@ from fastapi import HTTPException
 from sqlalchemy import select
 
 from app.db.models import Deck
-from app.schemas.deck import DeckCreate, DeckDetailOut, DeckOut, DeckUpdate
 from app.schemas.card import CardOut
+from app.schemas.deck import DeckCreate, DeckDetailOut, DeckOut, DeckUpdate
+from app.services.srs import mastery
 
 
 def _due_count(deck: Deck, now: datetime) -> int:
@@ -14,12 +15,20 @@ def _due_count(deck: Deck, now: datetime) -> int:
 
 
 def _to_out(deck: Deck, now: datetime) -> DeckOut:
+    cards = deck.cards
+    total = len(cards)
+    proficient = sum(1 for c in cards if mastery(c.repetitions, c.interval_days) == "proficient")
+    mastery_pct = round(proficient / total * 100.0, 1) if total else 0.0
+    reviewed = [c.last_reviewed_at for c in cards if c.last_reviewed_at is not None]
+    last_reviewed_at = max(reviewed) if reviewed else None
     return DeckOut(
         id=deck.id,
         name=deck.name,
         topic=deck.topic,
-        count=len(deck.cards),
+        count=total,
         due_count=_due_count(deck, now),
+        mastery_pct=mastery_pct,
+        last_reviewed_at=last_reviewed_at,
         created_at=deck.created_at,
         updated_at=deck.updated_at,
     )
