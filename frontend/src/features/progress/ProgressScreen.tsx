@@ -3,9 +3,12 @@ import { Calendar } from './Calendar'
 import { ReviewBars } from './ReviewBars'
 import { MasteryLevels } from './MasteryLevels'
 import { NeedsReview } from './NeedsReview'
+import { useProgressSummary } from './queries'
 
 export default function ProgressScreen() {
   const t = useT()
+  const { data } = useProgressSummary()
+  const s = data
   return (
     <div style={{ animation: 'fadeUp .45s ease both' }}>
       {/* Header */}
@@ -18,12 +21,12 @@ export default function ProgressScreen() {
         </h1>
       </div>
 
-      {/* 4 stat tiles */}
+      {/* 4 stat tiles (API-backed) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 22 }}>
-        <StatTile value="12"    label="ngày liên tục"  color="var(--clay, #a96440)" />
-        <StatTile value="486"   label="thẻ đã học" />
-        <StatTile value="88%"   label="độ chính xác"   color="var(--accent)" />
-        <StatTile value="1.640" label="lượt ôn tổng" />
+        <StatTile value={String(s?.streak ?? 0)} label="ngày liên tục" color="var(--clay, #a96440)" />
+        <StatTile value={String(s?.mastery.proficient ?? 0)} label="đã thành thạo" color="var(--accent)" />
+        <StatTile value={String(s?.due_total ?? 0)} label="thẻ đến hạn" />
+        <StatTile value={String(s?.reviews_today ?? 0)} label="ôn hôm nay" />
       </div>
 
       {/* Two-column body */}
