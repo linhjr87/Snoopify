@@ -4,23 +4,40 @@ import { useT } from '../../i18n/useT'
 import { DeckList } from './DeckList'
 import { GroupBySelector, type GroupBy } from './GroupBySelector'
 import { ImportJsonModal } from './ImportJsonModal'
-import { seedDecks } from '../../data/seed'
+import { useCreateDeck, useDecks } from './queries'
+import { toDeckCard } from './deck-view'
 import type { DeckCardProps } from './DeckCard'
+import type { DeckOut } from '../../lib/api-types'
 
 export default function LibraryScreen() {
   const t = useT()
-  const imported = useAppStore((s) => s.importedDecks)
   const setPanel = useAppStore((s) => s.setPanel)
+  const decksQuery = useDecks()
+  const createDeck = useCreateDeck()
   const [group, setGroup] = useState<GroupBy>('topic')
   const [filterText, setFilterText] = useState('')
 
-  const decks: DeckCardProps[] = useMemo(() => {
-    const all: DeckCardProps[] = [...seedDecks]
-    if (group === 'mastery') return [...all].sort((a, b) => parseInt(b.barW, 10) - parseInt(a.barW, 10))
-    return all
-  }, [imported, group])
+  const apiDecks = decksQuery.data ?? []
 
-  const totalDecks = seedDecks.length + imported.length
+  const decks: DeckCardProps[] = useMemo(() => {
+    const needle = filterText.trim().toLowerCase()
+    const sorted = [...apiDecks].sort((a: DeckOut, b: DeckOut) => {
+      if (group === 'mastery') return b.mastery_pct - a.mastery_pct
+      if (group === 'date') return b.created_at.localeCompare(a.created_at)
+      return a.topic.localeCompare(b.topic)
+    })
+    return sorted
+      .filter((d) => d.name.toLowerCase().includes(needle))
+      .map(toDeckCard)
+  }, [apiDecks, filterText, group])
+
+  const totalCards = apiDecks.reduce((sum, deck) => sum + deck.count, 0)
+  const totalDecks = apiDecks.length
+
+  const onNewDeck = () => {
+    const name = window.prompt('Tên bộ thẻ mới')?.trim()
+    if (name) createDeck.mutate({ name })
+  }
 
   return (
     <div style={{ animation: 'fadeUp .45s ease both' }}>
@@ -28,7 +45,7 @@ export default function LibraryScreen() {
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: '18px', marginBottom: '24px', flexWrap: 'wrap' }}>
         <div>
           <div style={{ fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '6px' }}>
-            281 thẻ · {totalDecks} bộ
+            {totalCards} thẻ · {totalDecks} bộ
           </div>
           <h1 style={{ margin: 0, fontFamily: "'Newsreader',serif", fontWeight: 500, fontSize: '32px' }}>
             {t.libraryTitle}
@@ -70,6 +87,7 @@ export default function LibraryScreen() {
           </button>
           {/* New deck CTA */}
           <button
+            onClick={onNewDeck}
             style={{
               border: 'none', borderRadius: '11px', background: 'var(--accent)',
               color: '#fff', padding: '11px 20px', fontFamily: "'Hanken Grotesk',sans-serif",
@@ -80,7 +98,9 @@ export default function LibraryScreen() {
       </div>
 
       <GroupBySelector value={group} onChange={setGroup} />
-      <DeckList decks={decks} />
+      {decksQuery.isLoading && <div style={{ color: 'var(--muted)', fontSize: '14px' }}>Đang tải bộ thẻ…</div>}
+      {decksQuery.isError && <div style={{ color: 'var(--rust)', fontSize: '14px' }}>Không tải được bộ thẻ. Thử lại sau.</div>}
+      {!decksQuery.isLoading && !decksQuery.isError && <DeckList decks={decks} onNewDeck={onNewDeck} />}
       <ImportJsonModal />
     </div>
   )
