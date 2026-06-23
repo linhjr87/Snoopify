@@ -77,7 +77,7 @@ export function FlashcardMode({ cur }: { cur: SessionCard }) {
       </div>
 
       {/* Rating buttons */}
-      <SpacedRepetitionRating onRate={handleRate} />
+      <SpacedRepetitionRating onRate={handleRate} disabled={grade.isPending} />
 
       <div style={{ fontSize: '13px', color: 'var(--muted)' }}>
         Tự chấm để tính điểm phiên · spaced repetition
