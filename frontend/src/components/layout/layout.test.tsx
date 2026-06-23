@@ -36,4 +36,15 @@ describe('layout', () => {
     await userEvent.click(screen.getByText('Đặt lại tiến độ'))
     expect(screen.getByText('Xoá hết')).toBeInTheDocument()
   })
+  it('confirming reset POSTs /progress/reset', async () => {
+    useAppStore.setState({ settingsOpen: true, confirmReset: true })
+    renderWithProviders(<App />)
+    await userEvent.click(screen.getByText('Xoá hết'))
+    await vi.waitFor(() => {
+      const calls = (globalThis.fetch as unknown as { mock: { calls: unknown[][] } }).mock.calls
+      const posted = calls.some((c) =>
+        String(c[0]).includes('/progress/reset') && ((c[1] as RequestInit | undefined)?.method ?? 'GET') === 'POST')
+      expect(posted).toBe(true)
+    })
+  })
 })
