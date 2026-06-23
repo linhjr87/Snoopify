@@ -55,6 +55,7 @@ describe('LibraryScreen', () => {
 
     expect(await screen.findByText('Business English')).toBeInTheDocument()
     expect(screen.getByText('Bộ thẻ khởi động')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Tạo bộ thẻ mới' })).toBeInTheDocument()
   })
 
   it('invalid pasted JSON shows JSON không hợp lệ without needing API success', async () => {
