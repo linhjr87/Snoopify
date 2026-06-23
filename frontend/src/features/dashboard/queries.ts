@@ -2,6 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 import { apiGet } from '../../lib/api'
 import type { WordOfDayOut, CardOut } from '../../lib/api-types'
 
+export { useProgressSummary } from '../progress/queries'
+
 export function useWordOfDay() {
   return useQuery({
     queryKey: ['dashboard', 'word-of-day'],
