@@ -25,6 +25,7 @@ export function useGradeMutation() {
       useAppStore.getState().setGradeError(false)
       qc.invalidateQueries({ queryKey: ['progress'] })
       qc.invalidateQueries({ queryKey: ['decks'] })
+      qc.invalidateQueries({ queryKey: ['review'] })
     },
     // The session keeps advancing optimistically; surface the failure (non-blocking)
     // so the user knows their last grade did not persist server-side.
