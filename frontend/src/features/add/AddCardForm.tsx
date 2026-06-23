@@ -1,5 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CardPreview, type PreviewData } from './CardPreview'
+import { useDecks, useCreateDeck } from '../library/queries'
+import { useAddCard } from './queries'
+import type { CardCreate } from '../../lib/api-types'
 
 const TYPES = ['Từ vựng', 'Cụm từ', 'Ngữ pháp', 'Câu mẫu', 'Ghi chú', 'Lỗi']
 
@@ -15,18 +18,37 @@ export function AddCardForm() {
   const [type, setType] = useState(TYPES[0])
   const [data, setData] = useState<PreviewData>(empty)
   const [saved, setSaved] = useState<string[]>([])
+  const [deckId, setDeckId] = useState<string>('')
+
+  const { data: decks } = useDecks()
+  const createDeck = useCreateDeck()
+  const addCard = useAddCard()
+
+  // default the picker to the first deck once decks load
+  useEffect(() => {
+    if (!deckId && decks && decks.length > 0) setDeckId(decks[0].id)
+  }, [decks, deckId])
 
   const set = (k: keyof PreviewData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setData((d) => ({ ...d, [k]: e.target.value }))
 
   const handleSave = () => {
-    if (data.word.trim()) setSaved((prev) => [data.word.trim(), ...prev].slice(0, 10))
-    setData(empty)
+    const word = data.word.trim()
+    if (!word || !deckId) return
+    const card: CardCreate = {
+      word, phonetic: data.phonetic, pos: data.pos, meaning: data.meaning, example: data.example,
+    }
+    addCard.mutate({ deckId, card }, {
+      onSuccess: () => { setSaved((prev) => [word, ...prev].slice(0, 10)); setData(empty) },
+    })
   }
-  const handleSaveMore = () => {
-    if (data.word.trim()) setSaved((prev) => [data.word.trim(), ...prev].slice(0, 10))
-    setData(empty)
+
+  const onNewDeck = () => {
+    const name = window.prompt('Tên bộ thẻ mới')?.trim()
+    if (name) createDeck.mutate({ name }, { onSuccess: (deck) => setDeckId(deck.id) })
   }
+
+  const canSave = !!deckId && data.word.trim().length > 0 && !addCard.isPending
 
   return (
     <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
@@ -64,78 +86,54 @@ export function AddCardForm() {
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 14 }}>
           <div style={{ flex: 1, minWidth: 180 }}>
             <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Từ / cụm từ</div>
-            <input
-              aria-label="word"
-              className="field"
-              style={fieldStyle}
-              placeholder="resilient"
-              value={data.word}
-              onChange={set('word')}
-            />
+            <input aria-label="word" className="field" style={fieldStyle} placeholder="resilient" value={data.word} onChange={set('word')} />
           </div>
           <div style={{ width: 170 }}>
             <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Phiên âm</div>
-            <input
-              aria-label="phonetic"
-              className="field"
-              style={{ ...fieldStyle, fontFamily: 'monospace', fontSize: 13 }}
-              placeholder="/rɪˈzɪl.i.ənt/"
-              value={data.phonetic}
-              onChange={set('phonetic')}
-            />
+            <input aria-label="phonetic" className="field" style={{ ...fieldStyle, fontFamily: 'monospace', fontSize: 13 }} placeholder="/rɪˈzɪl.i.ənt/" value={data.phonetic} onChange={set('phonetic')} />
           </div>
         </div>
 
         {/* Meaning */}
         <div style={{ marginBottom: 14 }}>
           <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Nghĩa</div>
-          <input
-            aria-label="meaning"
-            className="field"
-            style={fieldStyle}
-            placeholder="có khả năng phục hồi nhanh; kiên cường"
-            value={data.meaning}
-            onChange={set('meaning')}
-          />
+          <input aria-label="meaning" className="field" style={fieldStyle} placeholder="có khả năng phục hồi nhanh; kiên cường" value={data.meaning} onChange={set('meaning')} />
         </div>
 
         {/* Example */}
         <div style={{ marginBottom: 14 }}>
           <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Ví dụ</div>
-          <textarea
-            aria-label="example"
-            className="field"
-            rows={2}
-            style={{ ...fieldStyle, resize: 'vertical' }}
-            placeholder="She is so resilient — she bounced back within a week."
-            value={data.example}
-            onChange={set('example')}
-          />
+          <textarea aria-label="example" className="field" rows={2} style={{ ...fieldStyle, resize: 'vertical' }} placeholder="She is so resilient — she bounced back within a week." value={data.example} onChange={set('example')} />
         </div>
 
-        {/* Deck + Tags row */}
+        {/* Deck picker + Tags row */}
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 24 }}>
           <div style={{ flex: 1, minWidth: 160 }}>
             <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Bộ thẻ</div>
-            <input
-              aria-label="deck"
-              className="field"
-              style={fieldStyle}
-              placeholder="Business English ▾"
-              value={data.deck}
-              onChange={set('deck')}
-            />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <select
+                aria-label="deck"
+                className="field"
+                style={{ ...fieldStyle, flex: 1 }}
+                value={deckId}
+                onChange={(e) => setDeckId(e.target.value)}
+              >
+                {(!decks || decks.length === 0) && <option value="">(chưa có bộ thẻ)</option>}
+                {decks?.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+              </select>
+              <button
+                onClick={onNewDeck}
+                style={{
+                  border: '1px solid var(--line)', borderRadius: 10, background: 'var(--surface)',
+                  padding: '0 14px', fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 600,
+                  fontSize: 14, color: 'var(--muted)', cursor: 'pointer', whiteSpace: 'nowrap',
+                }}
+              >+ Bộ mới</button>
+            </div>
           </div>
           <div style={{ flex: 1, minWidth: 160 }}>
             <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Tags</div>
-            <input
-              aria-label="tags"
-              className="field"
-              style={fieldStyle}
-              placeholder="#adjective  #work"
-              value={data.tags}
-              onChange={set('tags')}
-            />
+            <input aria-label="tags" className="field" style={fieldStyle} placeholder="#adjective  #work" value={data.tags} onChange={set('tags')} />
           </div>
         </div>
 
@@ -143,23 +141,27 @@ export function AddCardForm() {
         <div style={{ display: 'flex', gap: 12 }}>
           <button
             onClick={handleSave}
+            disabled={!canSave}
             style={{
               border: 'none', borderRadius: 11, background: 'var(--accent)',
               color: '#fff', padding: '12px 26px',
               fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 600, fontSize: 15,
-              cursor: 'pointer', transition: 'transform .18s ease, box-shadow .18s ease',
+              cursor: canSave ? 'pointer' : 'not-allowed', opacity: canSave ? 1 : 0.5,
+              transition: 'transform .18s ease, box-shadow .18s ease',
             }}
             className="cta"
           >
             Lưu thẻ
           </button>
           <button
-            onClick={handleSaveMore}
+            onClick={handleSave}
+            disabled={!canSave}
             style={{
               border: '1px solid var(--line)', borderRadius: 11, background: 'var(--surface)',
               padding: '12px 22px',
               fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 600, fontSize: 15,
-              color: 'var(--muted)', cursor: 'pointer', transition: 'background .15s ease',
+              color: 'var(--muted)', cursor: canSave ? 'pointer' : 'not-allowed', opacity: canSave ? 1 : 0.5,
+              transition: 'background .15s ease',
             }}
             className="ghost"
           >
