@@ -33,3 +33,21 @@ export interface GradeResult {
   due_at: string
   last_reviewed_at: string
 }
+
+export interface DeckOut {
+  id: string
+  name: string
+  topic: string
+  count: number
+  due_count: number
+  mastery_pct: number
+  last_reviewed_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ImportResult {
+  ok: boolean
+  msg: string
+  deck?: DeckOut
+}

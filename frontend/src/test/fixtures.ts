@@ -1,4 +1,4 @@
-import type { ReviewItemOut } from '../lib/api-types'
+import type { DeckOut, ReviewItemOut } from '../lib/api-types'
 
 // Mirrors the 5 seed cards, shaped as the /review/session response.
 export const reviewSessionFixture: ReviewItemOut[] = [
@@ -56,5 +56,18 @@ export const reviewSessionFixture: ReviewItemOut[] = [
       { key: 'C', text: 'bắt đầu' },
       { key: 'D', text: 'tăng tốc' }], correct_key: 'B' },
     fill: { before: "Don't", after: 'until tomorrow what you can do today.', answer: 'put off', hint: 'p__ o__' },
+  },
+]
+
+export const decksFixture: DeckOut[] = [
+  {
+    id: 'd1', name: 'Bộ thẻ khởi động', topic: 'từ vựng', count: 5, due_count: 5,
+    mastery_pct: 0, last_reviewed_at: null,
+    created_at: '2026-06-20T00:00:00Z', updated_at: '2026-06-20T00:00:00Z',
+  },
+  {
+    id: 'd2', name: 'Business English', topic: 'chủ đề', count: 92, due_count: 12,
+    mastery_pct: 72, last_reviewed_at: '2026-06-21T00:00:00Z',
+    created_at: '2026-06-10T00:00:00Z', updated_at: '2026-06-21T00:00:00Z',
   },
 ]
