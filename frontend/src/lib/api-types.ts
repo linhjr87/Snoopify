@@ -51,3 +51,29 @@ export interface ImportResult {
   msg: string
   deck?: DeckOut
 }
+
+export interface CardCreate {
+  word: string
+  phonetic?: string
+  pos?: string
+  meaning?: string
+  example?: string
+}
+
+export interface CardOut {
+  id: string
+  deck_id: string
+  word: string
+  phonetic: string
+  pos: string
+  meaning: string
+  example: string
+  ease_factor: number
+  interval_days: number
+  repetitions: number
+  lapses: number
+  due_at: string
+  last_reviewed_at: string | null
+  created_at: string
+  updated_at: string
+}
