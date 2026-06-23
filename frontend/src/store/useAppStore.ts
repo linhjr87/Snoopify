@@ -5,7 +5,7 @@ import { applyTheme } from '../theme/tokens'
 
 export const initialState: AppState = {
   reviewMode: 'flash', flipped: false, quizPick: null, fillValue: '', fillChecked: false,
-  sIndex: 0, sCorrect: 0, dark: false, lang: 'vn', collapsed: false,
+  sIndex: 0, sCorrect: 0, gradeError: false, dark: false, lang: 'vn', collapsed: false,
   settingsOpen: false, confirmReset: false, importOpen: false, notifOpen: false, langMenuOpen: false,
   importText: '', importStatus: null, importedDecks: [],
 }
@@ -28,7 +28,8 @@ export const useAppStore = create<AppStore>()(
         sCorrect: s.sCorrect + (correct ? 1 : 0), sIndex: s.sIndex + 1,
         flipped: false, quizPick: null, fillValue: '', fillChecked: false,
       })),
-      resetSession: () => set({ sIndex: 0, sCorrect: 0, flipped: false, quizPick: null, fillValue: '', fillChecked: false }),
+      resetSession: () => set({ sIndex: 0, sCorrect: 0, flipped: false, quizPick: null, fillValue: '', fillChecked: false, gradeError: false }),
+      setGradeError: (value) => set({ gradeError: value }),
       toggleDark: () => { const dark = !get().dark; set({ dark }); applyTheme(dark) },
       setLang: (lang) => set({ lang, langMenuOpen: false }),
       toggleCollapsed: () => set((s) => ({ collapsed: !s.collapsed })),

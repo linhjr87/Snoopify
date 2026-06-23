@@ -1,13 +1,21 @@
 import { useAppStore } from '../../store/useAppStore'
 import { quizIsRight } from '../../lib/grading'
-import type { SessionItem } from '../../data/seed'
+import type { SessionCard } from '../../lib/adapters'
+import { useGradeMutation } from './queries'
 
-export function QuizMode({ cur, isLast }: { cur: SessionItem; isLast: boolean }) {
+export function QuizMode({ cur, isLast }: { cur: SessionCard; isLast: boolean }) {
   const pick = useAppStore((s) => s.quizPick)
   const pickQuiz = useAppStore((s) => s.pickQuiz)
   const advance = useAppStore((s) => s.advanceSession)
+  const grade = useGradeMutation()
   const answered = pick != null
   const right = quizIsRight(pick, cur.quiz.correct)
+
+  const handleNext = () => {
+    grade.mutate({ card_id: cur.cardId, rating: right ? 'remember' : 'forgot', mode: 'quiz', is_correct: right })
+    advance(right)
+  }
+
   const correctLabel = (cur.quiz.options.find((o) => o[0] === cur.quiz.correct) || ['', ''])[1]
   const nextLabel = isLast ? 'Xem kết quả →' : 'Tiếp theo →'
 
@@ -83,7 +91,7 @@ export function QuizMode({ cur, isLast }: { cur: SessionItem; isLast: boolean })
             {quizResultText}
           </span>
           <button
-            onClick={() => advance(right)}
+            onClick={handleNext}
             style={{
               border: 'none', borderRadius: '9px', background: 'var(--ink,#211f1b)', color: '#fff',
               padding: '9px 18px', fontFamily: "'Hanken Grotesk',sans-serif",

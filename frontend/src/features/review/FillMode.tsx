@@ -1,13 +1,15 @@
 import { useAppStore } from '../../store/useAppStore'
 import { fillIsRight } from '../../lib/grading'
-import type { SessionItem } from '../../data/seed'
+import type { SessionCard } from '../../lib/adapters'
+import { useGradeMutation } from './queries'
 
-export function FillMode({ cur, isLast }: { cur: SessionItem; isLast: boolean }) {
+export function FillMode({ cur, isLast }: { cur: SessionCard; isLast: boolean }) {
   const value = useAppStore((s) => s.fillValue)
   const checked = useAppStore((s) => s.fillChecked)
   const setFill = useAppStore((s) => s.setFill)
   const checkFill = useAppStore((s) => s.checkFill)
   const advance = useAppStore((s) => s.advanceSession)
+  const grade = useGradeMutation()
   const right = fillIsRight(value, cur.fill.answer)
   const fillDisplay = value || '______'
   const nextLabel = isLast ? 'Xem kết quả →' : 'Tiếp theo →'
@@ -27,9 +29,14 @@ export function FillMode({ cur, isLast }: { cur: SessionItem; isLast: boolean })
     ? `Chính xác — "${cur.fill.answer}".`
     : `Chưa đúng. Đáp án: "${cur.fill.answer}".`
 
+  const handleNext = () => {
+    grade.mutate({ card_id: cur.cardId, rating: right ? 'remember' : 'forgot', mode: 'fill', is_correct: right })
+    advance(right)
+  }
+
   const handleKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      if (checked) { advance(right) }
+      if (checked) { handleNext() }
       else if (value.trim()) { checkFill() }
     }
   }
@@ -97,7 +104,7 @@ export function FillMode({ cur, isLast }: { cur: SessionItem; isLast: boolean })
             {fillResultText}
           </span>
           <button
-            onClick={() => advance(right)}
+            onClick={handleNext}
             style={{
               border: 'none', borderRadius: '9px', background: 'var(--ink,#211f1b)', color: '#fff',
               padding: '9px 18px', fontFamily: "'Hanken Grotesk',sans-serif",

@@ -1,15 +1,17 @@
-export function SpacedRepetitionRating({ onRate }: { onRate: (correct: boolean) => void }) {
-  const opts: [string, string, boolean, string, string][] = [
-    ['Quên', 'ôn lại ngay', false, 'var(--rust)', 'var(--rust)'],
-    ['Mơ hồ', 'sau 1 ngày', true, 'var(--gold)', 'var(--gold)'],
-    ['Nhớ', 'sau 4 ngày', true, '#3f8f5b', '#2f6b43'],
+import type { Rating } from '../../lib/api-types'
+
+export function SpacedRepetitionRating({ onRate }: { onRate: (rating: Rating) => void }) {
+  const opts: [string, string, Rating, string, string][] = [
+    ['Quên', 'ôn lại ngay', 'forgot', 'var(--rust)', 'var(--rust)'],
+    ['Mơ hồ', 'sau 1 ngày', 'vague', 'var(--gold)', 'var(--gold)'],
+    ['Nhớ', 'sau 4 ngày', 'remember', '#3f8f5b', '#2f6b43'],
   ]
   return (
     <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
-      {opts.map(([label, sub, correct, borderColor, textColor]) => (
+      {opts.map(([label, sub, rating, borderColor, textColor]) => (
         <button
           key={label}
-          onClick={() => onRate(correct)}
+          onClick={() => onRate(rating)}
           style={{
             border: `1px solid ${borderColor}`,
             color: textColor,

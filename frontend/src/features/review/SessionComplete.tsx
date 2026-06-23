@@ -1,10 +1,20 @@
 import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { useAppStore } from '../../store/useAppStore'
 
 export function SessionComplete({ correct, total }: { correct: number; total: number }) {
   const nav = useNavigate()
+  const qc = useQueryClient()
   const resetSession = useAppStore((s) => s.resetSession)
   const accuracy = total ? Math.round((correct / total) * 100) : 0
+
+  // Starting a fresh session must refetch the due cards — the cached list still
+  // holds the cards just graded (grading does not invalidate the session per-card).
+  // Resetting the cursor alone would replay the same, now-rescheduled cards.
+  const reviewAgain = () => {
+    resetSession()
+    qc.invalidateQueries({ queryKey: ['review', 'session'] })
+  }
 
   return (
     <div style={{ maxWidth: '680px', margin: '0 auto', animation: 'fadeUp .45s ease both' }}>
@@ -25,7 +35,7 @@ export function SessionComplete({ correct, total }: { correct: number; total: nu
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '28px' }}>
           <button
             className="cta"
-            onClick={() => resetSession()}
+            onClick={reviewAgain}
             style={{
               border: 'none', borderRadius: '11px', background: 'var(--accent,#2f5d4e)', color: '#fff',
               padding: '12px 26px', fontFamily: "'Hanken Grotesk',sans-serif",
