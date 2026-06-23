@@ -1,32 +1,31 @@
-import { mastery } from '../../data/seed'
+import { useProgressSummary } from './queries'
 
 const COLORS = ['var(--rust)', '#c9a23a', '#3f8f5b'] // Mới, Đang học, Thành thạo
 
 export function MasteryLevels() {
+  const { data, isError } = useProgressSummary()
+  const m = data?.mastery ?? { new: 0, learning: 0, proficient: 0 }
+  const rows = [
+    { label: 'Mới', n: m.new },
+    { label: 'Đang học', n: m.learning },
+    { label: 'Thành thạo', n: m.proficient },
+  ]
+  const total = Math.max(1, m.new + m.learning + m.proficient)
   return (
-    <section style={{
-      border: '1px solid var(--line)', borderRadius: 18,
-      background: 'var(--surface)', padding: 22,
-      boxShadow: '0 1px 2px rgba(40,35,25,0.03)',
-    }}>
-      <h2 style={{ margin: '0 0 16px', fontFamily: "'Newsreader', serif", fontWeight: 500, fontSize: 18 }}>
-        Mức độ thành thạo
-      </h2>
+    <section style={{ border: '1px solid var(--line)', borderRadius: 18, background: 'var(--surface)', padding: 22, boxShadow: '0 1px 2px rgba(40,35,25,0.03)' }}>
+      <h2 style={{ margin: '0 0 16px', fontFamily: "'Newsreader', serif", fontWeight: 500, fontSize: 18 }}>Mức độ thành thạo</h2>
+      {isError && !data && (
+        <div style={{ fontSize: 14, color: 'var(--rust)', marginBottom: 8 }}>Không tải được dữ liệu.</div>
+      )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        {mastery.map((m, i) => (
-          <div key={m.label}>
+        {rows.map((m2, i) => (
+          <div key={m2.label}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 5 }}>
-              <span style={{ color: 'var(--ink)' }}>{m.label}</span>
-              <span style={{ color: 'var(--muted)' }}>{m.n}</span>
+              <span style={{ color: 'var(--ink)' }}>{m2.label}</span>
+              <span style={{ color: 'var(--muted)' }}>{m2.n}</span>
             </div>
-            {/* Export values: Mới=20%, Đang học=37%, Thành thạo=44% */}
             <div style={{ height: 9, borderRadius: 999, background: 'var(--track)', overflow: 'hidden' }}>
-              <div style={{
-                width: i === 0 ? '20%' : i === 1 ? '37%' : '44%',
-                height: '100%',
-                background: COLORS[i],
-                borderRadius: 999,
-              }} />
+              <div style={{ width: `${Math.round((m2.n / total) * 100)}%`, height: '100%', background: COLORS[i], borderRadius: 999 }} />
             </div>
           </div>
         ))}
