@@ -37,6 +37,7 @@ export function TodaySession() {
         <div style={{ fontFamily: "'Newsreader',serif", fontSize: '27px', fontWeight: 500, letterSpacing: '-0.01em', marginBottom: '20px' }}>Còn {due} thẻ đến hạn</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
           <button
+            data-tour="review"
             onClick={() => nav('/review')}
             style={{ border: 'none', borderRadius: '11px', background: 'var(--accent,#2f5d4e)', color: '#fff', padding: '13px 26px', fontFamily: "'Hanken Grotesk',sans-serif", fontWeight: 600, fontSize: '15px', cursor: 'pointer', transition: 'transform .18s ease, box-shadow .18s ease', display: 'flex', alignItems: 'center', gap: '9px' }}
           >

@@ -1,5 +1,3 @@
-import { Sidebar } from './components/layout/Sidebar'
-import { Topbar } from './components/layout/Topbar'
 import { AppRoutes } from './routes'
 import { useAppStore } from './store/useAppStore'
 
@@ -18,7 +16,6 @@ export default function App() {
         ['--accent' as string]: accent,
         ['--accent-soft' as string]: accentSoft,
         ['--sidebar' as string]: sidebarBg,
-        display: 'flex',
         minHeight: '100vh',
         background: 'var(--paper)',
         color: 'var(--ink)',
@@ -27,18 +24,7 @@ export default function App() {
         transition: 'background .3s ease, color .3s ease',
       }}
     >
-      <Sidebar />
-      <main
-        style={{
-          flex: 1,
-          minWidth: 0,
-          padding: '34px 46px 60px',
-          maxWidth: 1200,
-        }}
-      >
-        <Topbar />
-        <AppRoutes />
-      </main>
+      <AppRoutes />
     </div>
   )
 }
