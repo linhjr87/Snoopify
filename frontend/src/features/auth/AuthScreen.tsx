@@ -9,9 +9,23 @@ export default function AuthScreen() {
   const navigate = useNavigate()
   
   const [isLogin, setIsLogin] = useState(true)
+  const [pw, setPw] = useState('')
+  const [confirmPw, setConfirmPw] = useState('')
+  const [pwError, setPwError] = useState('')
+
+  const switchMode = (toLogin: boolean) => {
+    setIsLogin(toLogin)
+    setPwError('')
+    setPw('')
+    setConfirmPw('')
+  }
 
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!isLogin && pw !== confirmPw) {
+      setPwError(t.pwMismatch)
+      return
+    }
     login()
     navigate('/')
   }
@@ -52,15 +66,23 @@ export default function AuthScreen() {
             </div>
             <div style={{ marginBottom: 8 }}>
               <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.pwL}</div>
-              <input required className="field" type="password" placeholder={t.pwPh} style={{ width: '100%', border: '1px solid var(--line)', borderRadius: 10, padding: '11px 13px', fontFamily: "'Hanken Grotesk', sans-serif", fontSize: 15, color: 'var(--ink)', background: 'var(--paper)', outline: 'none' }} />
+              <input required className="field" type="password" placeholder={t.pwPh} value={pw} onChange={(e) => setPw(e.target.value)} style={{ width: '100%', border: '1px solid var(--line)', borderRadius: 10, padding: '11px 13px', fontFamily: "'Hanken Grotesk', sans-serif", fontSize: 15, color: 'var(--ink)', background: 'var(--paper)', outline: 'none' }} />
             </div>
-            
+
+            {!isLogin && (
+              <div style={{ marginBottom: 8 }}>
+                <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.confirmPwL}</div>
+                <input required className="field" type="password" placeholder={t.confirmPwPh} value={confirmPw} onChange={(e) => { setConfirmPw(e.target.value); if (pwError) setPwError('') }} style={{ width: '100%', border: `1px solid ${pwError ? 'var(--rust)' : 'var(--line)'}`, borderRadius: 10, padding: '11px 13px', fontFamily: "'Hanken Grotesk', sans-serif", fontSize: 15, color: 'var(--ink)', background: 'var(--paper)', outline: 'none' }} />
+                {pwError && <div style={{ fontSize: 12, color: 'var(--rust)', marginTop: 5 }}>{pwError}</div>}
+              </div>
+            )}
+
             {isLogin && (
               <div style={{ textAlign: 'right', marginBottom: 18 }}>
                 <span style={{ fontSize: 13, color: 'var(--accent)', cursor: 'pointer' }}>{t.forgot}</span>
               </div>
             )}
-            {!isLogin && <div style={{ height: 18 }}></div>}
+            {!isLogin && <div style={{ height: 10 }}></div>}
 
             <button type="submit" style={{ width: '100%', border: 'none', borderRadius: 12, background: 'var(--accent)', color: '#fff', padding: 13, fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 600, fontSize: 15, cursor: 'pointer' }}>
               {isLogin ? t.loginTitle : t.signupTitle}
@@ -69,9 +91,9 @@ export default function AuthScreen() {
 
           <div style={{ textAlign: 'center', marginTop: 20, fontSize: 14, color: 'var(--muted)' }}>
             {isLogin ? (
-              <span>{t.noAcc} <span onClick={() => setIsLogin(false)} style={{ color: 'var(--accent)', fontWeight: 600, cursor: 'pointer' }}>{t.signUp}</span></span>
+              <span>{t.noAcc} <span onClick={() => switchMode(false)} style={{ color: 'var(--accent)', fontWeight: 600, cursor: 'pointer' }}>{t.signUp}</span></span>
             ) : (
-              <span>{t.haveAcc} <span onClick={() => setIsLogin(true)} style={{ color: 'var(--accent)', fontWeight: 600, cursor: 'pointer' }}>{t.signIn}</span></span>
+              <span>{t.haveAcc} <span onClick={() => switchMode(true)} style={{ color: 'var(--accent)', fontWeight: 600, cursor: 'pointer' }}>{t.signIn}</span></span>
             )}
           </div>
         </div>
