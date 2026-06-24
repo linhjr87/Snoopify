@@ -1,3 +1,4 @@
+'use client'
 import { useState, type ChangeEvent, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
@@ -46,6 +47,8 @@ export function ImportJsonModal() {
       const result = (await res.json()) as ImportResult
       setStatus({ ok: result.ok, msg: result.msg })
       if (result.ok) { setImportText(''); setPanel('importOpen', false); router.refresh() }
+    } catch {
+      setStatus({ ok: false, msg: 'Lỗi kết nối — kiểm tra mạng và thử lại.' })
     } finally {
       setIsPending(false)
     }

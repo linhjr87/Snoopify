@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CardPreview, type PreviewData } from './CardPreview'
 import { apiPost } from '../../lib/api'
@@ -17,6 +17,7 @@ const fieldStyle: React.CSSProperties = {
 
 export function AddCardForm({ decks }: { decks: DeckOut[] }) {
   const router = useRouter()
+  const wordInputRef = useRef<HTMLInputElement>(null)
   const [type, setType] = useState(TYPES[0])
   const [data, setData] = useState<PreviewData>(empty)
   const [saved, setSaved] = useState<string[]>([])
@@ -27,17 +28,33 @@ export function AddCardForm({ decks }: { decks: DeckOut[] }) {
   const set = (k: keyof PreviewData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setData((d) => ({ ...d, [k]: e.target.value }))
 
-  const handleSave = async () => {
+  const doSave = async (): Promise<string | null> => {
     const word = data.word.trim()
-    if (!word || !selectedDeckId) return
+    if (!word || !selectedDeckId) return null
     const card: CardCreate = { word, phonetic: data.phonetic, pos: data.pos, meaning: data.meaning, example: data.example }
     setSaveError(false)
     try {
       await apiPost<CardOut>(`/decks/${selectedDeckId}/cards`, card)
       setSaved((prev) => [word, ...prev].slice(0, 10))
       setData(empty)
+      return word
+    } catch {
+      setSaveError(true)
+      return null
+    }
+  }
+
+  const handleSave = async () => {
+    const saved = await doSave()
+    if (saved) router.refresh()
+  }
+
+  const handleSaveAndNext = async () => {
+    const saved = await doSave()
+    if (saved) {
       router.refresh()
-    } catch { setSaveError(true) }
+      wordInputRef.current?.focus()
+    }
   }
 
   const onNewDeck = async () => {
@@ -47,7 +64,9 @@ export function AddCardForm({ decks }: { decks: DeckOut[] }) {
       const deck = await apiPost<DeckOut>('/decks', { name })
       setDeckId(deck.id)
       router.refresh()
-    } catch { /* creation failed — do not refresh */ }
+    } catch {
+      window.alert('Tạo bộ thẻ thất bại — kiểm tra kết nối và thử lại.')
+    }
   }
 
   const canSave = !!selectedDeckId && data.word.trim().length > 0
@@ -88,7 +107,7 @@ export function AddCardForm({ decks }: { decks: DeckOut[] }) {
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 14 }}>
           <div style={{ flex: 1, minWidth: 180 }}>
             <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Từ / cụm từ</div>
-            <input aria-label="word" className="field" style={fieldStyle} placeholder="resilient" value={data.word} onChange={set('word')} />
+            <input ref={wordInputRef} aria-label="word" className="field" style={fieldStyle} placeholder="resilient" value={data.word} onChange={set('word')} />
           </div>
           <div style={{ width: 170 }}>
             <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Phiên âm</div>
@@ -161,7 +180,7 @@ export function AddCardForm({ decks }: { decks: DeckOut[] }) {
             Lưu thẻ
           </button>
           <button
-            onClick={handleSave}
+            onClick={handleSaveAndNext}
             disabled={!canSave}
             style={{
               border: '1px solid var(--line)', borderRadius: 11, background: 'var(--surface)',

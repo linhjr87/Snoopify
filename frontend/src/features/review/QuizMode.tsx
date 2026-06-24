@@ -1,3 +1,4 @@
+'use client'
 import { useAppStore } from '../../store/useAppStore'
 import { quizIsRight } from '../../lib/grading'
 import type { SessionCard } from '../../lib/adapters'

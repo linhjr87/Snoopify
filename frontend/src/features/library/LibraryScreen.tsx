@@ -38,7 +38,7 @@ export default function LibraryScreen({ decks: apiDecks }: { decks: DeckOut[] })
       await apiPost<DeckOut>('/decks', { name })
       router.refresh()
     } catch {
-      // creation failed — do not refresh; surface nothing for now (parity with prior silent behavior, but no unhandled rejection)
+      window.alert('Tạo bộ thẻ thất bại — kiểm tra kết nối và thử lại.')
     }
   }
 

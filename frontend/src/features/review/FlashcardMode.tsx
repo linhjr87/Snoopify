@@ -1,3 +1,4 @@
+'use client'
 import { useAppStore } from '../../store/useAppStore'
 import { SpacedRepetitionRating } from './SpacedRepetitionRating'
 import type { SessionCard } from '../../lib/adapters'

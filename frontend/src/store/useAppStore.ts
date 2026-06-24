@@ -8,7 +8,7 @@ export const initialState: AppState = {
   sIndex: 0, sCorrect: 0, gradeError: false, dark: false, lang: 'vn', collapsed: false,
   settingsOpen: false, confirmReset: false, importOpen: false, notifOpen: false, langMenuOpen: false,
   importText: '',
-  isAuthenticated: false, hasOnboarded: false,
+  isAuthenticated: false, hasOnboarded: false, _hasHydrated: false,
 }
 
 const PERSIST_KEYS: (keyof AppState)[] = ['dark', 'lang', 'collapsed', 'isAuthenticated', 'hasOnboarded']
@@ -44,7 +44,10 @@ export const useAppStore = create<AppStore>()(
     {
       name: 'snoopify_v1',
       partialize: (s) => Object.fromEntries(PERSIST_KEYS.map((k) => [k, s[k]])) as Partial<AppState>,
-      onRehydrateStorage: () => (state) => { if (state) applyTheme(state.dark) },
+      onRehydrateStorage: () => (state) => {
+        if (state) applyTheme(state.dark)
+        useAppStore.setState({ _hasHydrated: true })
+      },
     },
   ),
 )

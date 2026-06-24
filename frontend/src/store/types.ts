@@ -24,6 +24,7 @@ export interface AppState {
   importText: string
   isAuthenticated: boolean
   hasOnboarded: boolean
+  _hasHydrated: boolean
 }
 
 export interface AppActions {
