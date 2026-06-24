@@ -1,8 +1,9 @@
+'use client'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { CardPreview, type PreviewData } from './CardPreview'
-import { useDecks, useCreateDeck } from '../library/queries'
-import { useAddCard } from './queries'
-import type { CardCreate } from '../../lib/api-types'
+import { apiPost } from '../../lib/api'
+import type { CardCreate, CardOut, DeckOut } from '../../lib/api-types'
 
 const TYPES = ['Từ vựng', 'Cụm từ', 'Ngữ pháp', 'Câu mẫu', 'Ghi chú', 'Lỗi']
 
@@ -14,40 +15,42 @@ const fieldStyle: React.CSSProperties = {
   fontSize: 15, color: 'var(--ink)', background: 'var(--paper)', outline: 'none',
 }
 
-export function AddCardForm() {
+export function AddCardForm({ decks }: { decks: DeckOut[] }) {
+  const router = useRouter()
   const [type, setType] = useState(TYPES[0])
   const [data, setData] = useState<PreviewData>(empty)
   const [saved, setSaved] = useState<string[]>([])
   const [deckId, setDeckId] = useState<string>('')
   const [saveError, setSaveError] = useState(false)
-
-  const { data: decks } = useDecks()
-  const createDeck = useCreateDeck()
-  const addCard = useAddCard()
-  const selectedDeckId = deckId || decks?.[0]?.id || ''
+  const selectedDeckId = deckId || decks[0]?.id || ''
 
   const set = (k: keyof PreviewData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setData((d) => ({ ...d, [k]: e.target.value }))
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const word = data.word.trim()
     if (!word || !selectedDeckId) return
-    const card: CardCreate = {
-      word, phonetic: data.phonetic, pos: data.pos, meaning: data.meaning, example: data.example,
-    }
+    const card: CardCreate = { word, phonetic: data.phonetic, pos: data.pos, meaning: data.meaning, example: data.example }
     setSaveError(false)
-    addCard.mutate({ deckId: selectedDeckId, card }, {
-      onSuccess: () => { setSaved((prev) => [word, ...prev].slice(0, 10)); setData(empty) },
-      onError: () => setSaveError(true),
-    })
+    try {
+      await apiPost<CardOut>(`/decks/${selectedDeckId}/cards`, card)
+      setSaved((prev) => [word, ...prev].slice(0, 10))
+      setData(empty)
+      router.refresh()
+    } catch { setSaveError(true) }
   }
 
-  const onNewDeck = () => {
+  const onNewDeck = async () => {
     const name = window.prompt('Tên bộ thẻ mới')?.trim()
-    if (name) createDeck.mutate({ name }, { onSuccess: (deck) => setDeckId(deck.id) })
+    if (!name) return
+    try {
+      const deck = await apiPost<DeckOut>('/decks', { name })
+      setDeckId(deck.id)
+      router.refresh()
+    } catch { /* creation failed — do not refresh */ }
   }
 
-  const canSave = !!selectedDeckId && data.word.trim().length > 0 && !addCard.isPending
+  const canSave = !!selectedDeckId && data.word.trim().length > 0
 
   return (
     <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
@@ -117,8 +120,8 @@ export function AddCardForm() {
                 value={selectedDeckId}
                 onChange={(e) => setDeckId(e.target.value)}
               >
-                {(!decks || decks.length === 0) && <option value="">(chưa có bộ thẻ)</option>}
-                {decks?.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+                {decks.length === 0 && <option value="">(chưa có bộ thẻ)</option>}
+                {decks.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
               <button
                 onClick={onNewDeck}
