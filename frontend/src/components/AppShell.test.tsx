@@ -8,7 +8,7 @@ const pushMock = vi.fn()
 let currentPathname = '/'
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: pushMock }),
+  useRouter: () => ({ push: pushMock, replace: vi.fn() }),
   usePathname: () => currentPathname,
 }))
 
@@ -18,6 +18,7 @@ describe('AppShell', () => {
     pushMock.mockReset()
     currentPathname = '/'
     useAppStore.setState({ ...initialState })
+    useAppStore.setState({ isAuthenticated: true })
   })
 
   it('renders the layout shell around children', () => {

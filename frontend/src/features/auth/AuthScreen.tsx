@@ -1,12 +1,14 @@
+'use client'
+
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import { useT } from '../../i18n/useT'
 import { useAppStore } from '../../store/useAppStore'
 
 export default function AuthScreen() {
   const t = useT()
   const login = useAppStore((s) => s.login)
-  const navigate = useNavigate()
+  const router = useRouter()
   
   const [isLogin, setIsLogin] = useState(true)
   const [pw, setPw] = useState('')
@@ -27,7 +29,7 @@ export default function AuthScreen() {
       return
     }
     login()
-    navigate('/')
+    router.push('/')
   }
 
   return (
@@ -42,7 +44,7 @@ export default function AuthScreen() {
           <h1 style={{ margin: '0 0 6px', fontFamily: "'Newsreader', serif", fontWeight: 500, fontSize: 28, color: 'var(--ink)' }}>{isLogin ? t.loginTitle : t.signupTitle}</h1>
           <p style={{ margin: '0 0 24px', color: 'var(--muted)', fontSize: 15, lineHeight: 1.5 }}>{isLogin ? t.loginSub : t.signupSub}</p>
 
-          <button onClick={() => { login(); navigate('/') }} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 11, border: '1px solid var(--line)', borderRadius: 12, background: 'var(--paper)', color: 'var(--ink)', padding: 12, fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 600, fontSize: 15, cursor: 'pointer', marginBottom: 18 }}>
+          <button onClick={() => { login(); router.push('/') }} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 11, border: '1px solid var(--line)', borderRadius: 12, background: 'var(--paper)', color: 'var(--ink)', padding: 12, fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 600, fontSize: 15, cursor: 'pointer', marginBottom: 18 }}>
             <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.6 9.2c0-.6 0-1.1-.2-1.7H9v3.2h4.8a4.1 4.1 0 0 1-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.4z"></path><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H.9v2.3A9 9 0 0 0 9 18z"></path><path fill="#FBBC05" d="M3.9 10.7a5.4 5.4 0 0 1 0-3.4V5H.9a9 9 0 0 0 0 8z"></path><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.4 1.3l2.6-2.6A9 9 0 0 0 .9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"></path></svg>
             {t.google}
           </button>
