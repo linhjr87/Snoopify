@@ -1,17 +1,13 @@
-import { useProgressSummary } from './queries'
+import type { ProgressSummary } from '../../lib/api-types'
 
-export function ReviewBars() {
-  const { data, isError } = useProgressSummary()
-  const bars = data?.weekly_bars ?? []
+export function ReviewBars({ summary }: { summary: ProgressSummary | null }) {
+  const bars = summary?.weekly_bars ?? []
   const max = Math.max(1, ...bars.map((b) => b.count))
   return (
     <div style={{ marginTop: 26 }}>
       <h2 style={{ margin: '0 0 14px', fontFamily: "'Newsreader', serif", fontWeight: 500, fontSize: 19 }}>
         Lượt ôn mỗi ngày · tuần này
       </h2>
-      {isError && !data && (
-        <div style={{ fontSize: 14, color: 'var(--rust)', marginBottom: 8 }}>Không tải được dữ liệu.</div>
-      )}
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 14, height: 140 }}>
         {bars.map((b, i) => (
           <div key={b.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7, height: '100%', justifyContent: 'flex-end' }}>

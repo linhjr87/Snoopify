@@ -1,7 +1,9 @@
+'use client'
 import { useT } from '../../i18n/useT'
 import { AddCardForm } from './AddCardForm'
+import type { DeckOut } from '../../lib/api-types'
 
-export default function AddScreen() {
+export default function AddScreen({ decks }: { decks: DeckOut[] }) {
   const t = useT()
   return (
     <div style={{ animation: 'fadeUp .45s ease both' }}>
@@ -28,7 +30,7 @@ export default function AddScreen() {
           {t.importJson}
         </button>
       </div>
-      <AddCardForm />
+      <AddCardForm decks={decks} />
     </div>
   )
 }

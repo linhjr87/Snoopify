@@ -1,7 +1,7 @@
 import { useAppStore } from '../../store/useAppStore'
 import { fillIsRight } from '../../lib/grading'
 import type { SessionCard } from '../../lib/adapters'
-import { useGradeMutation } from './queries'
+import { submitGrade } from './grade'
 
 export function FillMode({ cur, isLast }: { cur: SessionCard; isLast: boolean }) {
   const value = useAppStore((s) => s.fillValue)
@@ -9,7 +9,6 @@ export function FillMode({ cur, isLast }: { cur: SessionCard; isLast: boolean })
   const setFill = useAppStore((s) => s.setFill)
   const checkFill = useAppStore((s) => s.checkFill)
   const advance = useAppStore((s) => s.advanceSession)
-  const grade = useGradeMutation()
   const right = fillIsRight(value, cur.fill.answer)
   const fillDisplay = value || '______'
   const nextLabel = isLast ? 'Xem kết quả →' : 'Tiếp theo →'
@@ -30,7 +29,7 @@ export function FillMode({ cur, isLast }: { cur: SessionCard; isLast: boolean })
     : `Chưa đúng. Đáp án: "${cur.fill.answer}".`
 
   const handleNext = () => {
-    grade.mutate({ card_id: cur.cardId, rating: right ? 'remember' : 'forgot', mode: 'fill', is_correct: right })
+    void submitGrade({ card_id: cur.cardId, rating: right ? 'remember' : 'forgot', mode: 'fill', is_correct: right })
     advance(right)
   }
 

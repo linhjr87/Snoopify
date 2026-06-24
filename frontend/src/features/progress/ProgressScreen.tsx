@@ -1,14 +1,18 @@
+'use client'
 import { useT } from '../../i18n/useT'
 import { Calendar } from './Calendar'
 import { ReviewBars } from './ReviewBars'
 import { MasteryLevels } from './MasteryLevels'
 import { NeedsReview } from './NeedsReview'
-import { useProgressSummary } from './queries'
+import type { ProgressSummary, HeatmapOut, NeedsReviewItem } from '../../lib/api-types'
 
-export default function ProgressScreen() {
+export default function ProgressScreen({ summary, heatmap, needsReview }: {
+  summary: ProgressSummary | null
+  heatmap: HeatmapOut | null
+  needsReview: NeedsReviewItem[]
+}) {
   const t = useT()
-  const { data, isError } = useProgressSummary()
-  const s = data
+  const s = summary
   return (
     <div style={{ animation: 'fadeUp .45s ease both' }}>
       {/* Header */}
@@ -20,12 +24,6 @@ export default function ProgressScreen() {
           {t.progressTitle}
         </h1>
       </div>
-
-      {isError && (
-        <div role="alert" style={{ padding: '10px 16px', marginBottom: 16, borderRadius: 12, background: '#f6e6e2', border: '1px solid var(--rust)', color: 'var(--rust)', fontSize: 14, fontWeight: 600 }}>
-          Không tải được dữ liệu — số liệu có thể không chính xác.
-        </div>
-      )}
 
       {/* 4 stat tiles (API-backed) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 22 }}>
@@ -44,14 +42,14 @@ export default function ProgressScreen() {
           background: 'var(--surface)', padding: 24,
           boxShadow: '0 1px 2px rgba(40,35,25,0.03)',
         }}>
-          <Calendar />
-          <ReviewBars />
+          <Calendar heatmap={heatmap} />
+          <ReviewBars summary={summary} />
         </section>
 
         {/* Right: mastery + needs-review (340px) */}
         <div style={{ width: 340, flex: 'none', display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <MasteryLevels />
-          <NeedsReview />
+          <MasteryLevels summary={summary} />
+          <NeedsReview items={needsReview} />
         </div>
       </div>
     </div>

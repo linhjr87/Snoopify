@@ -8,7 +8,7 @@ const pushMock = vi.fn()
 let currentPathname = '/'
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: pushMock }),
+  useRouter: () => ({ push: pushMock, replace: vi.fn() }),
   usePathname: () => currentPathname,
 }))
 
@@ -18,6 +18,7 @@ describe('AppShell', () => {
     pushMock.mockReset()
     currentPathname = '/'
     useAppStore.setState({ ...initialState })
+    useAppStore.setState({ isAuthenticated: true })
   })
 
   it('renders the layout shell around children', () => {
@@ -42,5 +43,12 @@ describe('AppShell', () => {
     await userEvent.click(screen.getByText('Thư viện'))
 
     expect(pushMock).toHaveBeenCalledWith('/library')
+  })
+
+  it('mounts the guided tour overlay', () => {
+    render(<AppShell><div>child</div></AppShell>)
+    // GuidedTourOverlay renders nothing until active, but the auto-start effect must run
+    // without throwing when localStorage has no tour flag.
+    expect(screen.getByText('child')).toBeInTheDocument()
   })
 })

@@ -1,0 +1,12 @@
+import { apiFetch } from '../../lib/api'
+import type { ProgressSummary, HeatmapOut, NeedsReviewItem } from '../../lib/api-types'
+import ProgressScreen from '../../features/progress/ProgressScreen'
+
+export default async function ProgressPage() {
+  const [summary, heatmap, needsReview] = await Promise.all([
+    apiFetch<ProgressSummary>('/progress/summary').catch(() => null),
+    apiFetch<HeatmapOut>('/progress/heatmap').catch(() => null),
+    apiFetch<NeedsReviewItem[]>('/progress/needs-review').catch(() => [] as NeedsReviewItem[]),
+  ])
+  return <ProgressScreen summary={summary} heatmap={heatmap} needsReview={needsReview} />
+}

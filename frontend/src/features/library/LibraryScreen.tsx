@@ -1,43 +1,45 @@
+'use client'
 import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
 import { useT } from '../../i18n/useT'
+import { apiPost } from '../../lib/api'
 import { DeckList } from './DeckList'
 import { GroupBySelector, type GroupBy } from './GroupBySelector'
 import { ImportJsonModal } from './ImportJsonModal'
-import { useCreateDeck, useDecks } from './queries'
 import { toDeckCard } from './deck-view'
 import type { DeckCardProps } from './DeckCard'
 import type { DeckOut } from '../../lib/api-types'
 
-export default function LibraryScreen() {
+export default function LibraryScreen({ decks: apiDecks }: { decks: DeckOut[] }) {
   const t = useT()
+  const router = useRouter()
   const setPanel = useAppStore((s) => s.setPanel)
-  const decksQuery = useDecks()
-  const createDeck = useCreateDeck()
   const [group, setGroup] = useState<GroupBy>('topic')
   const [filterText, setFilterText] = useState('')
 
-  const apiDecks = decksQuery.data
-
   const decks: DeckCardProps[] = useMemo(() => {
-    const sourceDecks = apiDecks ?? []
     const needle = filterText.trim().toLowerCase()
-    const sorted = [...sourceDecks].sort((a: DeckOut, b: DeckOut) => {
+    const sorted = [...apiDecks].sort((a: DeckOut, b: DeckOut) => {
       if (group === 'mastery') return b.mastery_pct - a.mastery_pct
       if (group === 'date') return b.created_at.localeCompare(a.created_at)
       return a.topic.localeCompare(b.topic)
     })
-    return sorted
-      .filter((d) => d.name.toLowerCase().includes(needle))
-      .map(toDeckCard)
+    return sorted.filter((d) => d.name.toLowerCase().includes(needle)).map(toDeckCard)
   }, [apiDecks, filterText, group])
 
-  const totalCards = (apiDecks ?? []).reduce((sum, deck) => sum + deck.count, 0)
-  const totalDecks = apiDecks?.length ?? 0
+  const totalCards = apiDecks.reduce((sum, deck) => sum + deck.count, 0)
+  const totalDecks = apiDecks.length
 
-  const onNewDeck = () => {
+  const onNewDeck = async () => {
     const name = window.prompt('Tên bộ thẻ mới')?.trim()
-    if (name) createDeck.mutate({ name })
+    if (!name) return
+    try {
+      await apiPost<DeckOut>('/decks', { name })
+      router.refresh()
+    } catch {
+      // creation failed — do not refresh; surface nothing for now (parity with prior silent behavior, but no unhandled rejection)
+    }
   }
 
   return (
@@ -99,9 +101,7 @@ export default function LibraryScreen() {
       </div>
 
       <GroupBySelector value={group} onChange={setGroup} />
-      {decksQuery.isLoading && <div style={{ color: 'var(--muted)', fontSize: '14px' }}>Đang tải bộ thẻ…</div>}
-      {decksQuery.isError && <div style={{ color: 'var(--rust)', fontSize: '14px' }}>Không tải được bộ thẻ. Thử lại sau.</div>}
-      {!decksQuery.isLoading && !decksQuery.isError && <DeckList decks={decks} onNewDeck={onNewDeck} />}
+      <DeckList decks={decks} onNewDeck={onNewDeck} />
       <ImportJsonModal />
     </div>
   )

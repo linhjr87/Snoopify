@@ -1,18 +1,25 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import App from '../../App'
+import { AppShell } from '../AppShell'
 import { useAppStore, initialState } from '../../store/useAppStore'
-import { renderWithProviders } from '../../test/renderWithProviders'
 import { progressSummaryFixture, wordOfDayFixture, recentCardsFixture } from '../../test/fixtures'
 import { fakeResponse } from '../../test/fakeResponse'
 
 const pushMock = vi.fn()
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: pushMock, refresh: vi.fn() }),
+  useRouter: () => ({ push: pushMock, replace: vi.fn(), refresh: vi.fn() }),
   usePathname: () => '/',
 }))
+
+function renderShell() {
+  return render(
+    <AppShell>
+      <section>Page body</section>
+    </AppShell>,
+  )
+}
 
 function mockApi() {
   vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
@@ -30,30 +37,30 @@ describe('layout', () => {
     pushMock.mockReset()
     // Skip the onboarding tour auto-start so it doesn't interfere with assertions.
     localStorage.setItem('myenglish_tour_done', '1')
-    // Routes are auth-gated now; the layout only renders when authenticated.
+    // Routes are auth-gated now; the AppShell only renders when authenticated.
     useAppStore.setState({ ...initialState, isAuthenticated: true })
     mockApi()
   })
   afterEach(() => { vi.restoreAllMocks() })
 
   it('shows Snoopify brand', () => {
-    renderWithProviders(<App />)
+    renderShell()
     expect(screen.getByText('Snoopify')).toBeInTheDocument()
   })
   it('settings trigger opens panel with logout action', async () => {
-    renderWithProviders(<App />)
+    renderShell()
     await userEvent.click(screen.getByLabelText('Cài đặt'))
     expect(screen.getByText('Đăng xuất')).toBeInTheDocument()
   })
   it('reset requires confirm step', async () => {
     useAppStore.setState({ settingsOpen: true })
-    renderWithProviders(<App />)
+    renderShell()
     await userEvent.click(screen.getByText('Đặt lại tiến độ'))
     expect(screen.getByText('Xoá hết')).toBeInTheDocument()
   })
   it('confirming reset POSTs /progress/reset', async () => {
     useAppStore.setState({ settingsOpen: true, confirmReset: true })
-    renderWithProviders(<App />)
+    renderShell()
     await userEvent.click(screen.getByText('Xoá hết'))
     await vi.waitFor(() => {
       const calls = (globalThis.fetch as unknown as { mock: { calls: unknown[][] } }).mock.calls
@@ -72,7 +79,7 @@ describe('layout', () => {
       if (url.includes('/cards/recent')) return fakeResponse(recentCardsFixture)
       return fakeResponse([], 200)
     }))
-    renderWithProviders(<App />)
+    renderShell()
     await userEvent.click(screen.getByText('Xoá hết'))
     expect(await screen.findByText('Không xoá được tiến độ. Thử lại sau.')).toBeInTheDocument()
     // resetProgress() must NOT have run, so the panel stays open
