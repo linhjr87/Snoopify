@@ -1,3 +1,5 @@
+import type { ReviewMode } from '../lib/api-types'
+
 export type { ReviewMode } from '../lib/api-types'
 export type Lang = 'vn' | 'en'
 
