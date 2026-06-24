@@ -1,11 +1,12 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
 import { useT } from '../../i18n/useT'
-import { useResetProgress } from '../../features/progress/queries'
 
 export function SettingsPanel() {
   const t = useT()
+  const router = useRouter()
   const { settingsOpen, dark, confirmReset } = useAppStore((s) => ({
     settingsOpen: s.settingsOpen,
     dark: s.dark,
@@ -14,11 +15,11 @@ export function SettingsPanel() {
   const setPanel = useAppStore((s) => s.setPanel)
   const toggleDark = useAppStore((s) => s.toggleDark)
   const resetProgress = useAppStore((s) => s.resetProgress)
-  const resetMutation = useResetProgress()
 
-  const handleReset = () => {
-    resetMutation.mutate()   // server: wipe logs + reset schedules, invalidate queries
-    resetProgress()          // UI: reset session counters + close panels
+  const handleReset = async () => {
+    await fetch('/api/progress/reset', { method: 'POST' })
+    resetProgress()        // existing Zustand UI reset
+    router.refresh()       // re-run server fetches
   }
 
   if (!settingsOpen) return null

@@ -1,10 +1,9 @@
-import { useProgressSummary } from './queries'
+import type { ProgressSummary } from '../../lib/api-types'
 
-export function WeekProgress() {
-  const { data } = useProgressSummary()
-  const m = data?.mastery ?? { new: 0, learning: 0, proficient: 0 }
+export function WeekProgress({ summary }: { summary: ProgressSummary | null }) {
+  const m = summary?.mastery ?? { new: 0, learning: 0, proficient: 0 }
   const learned = m.learning + m.proficient
-  const bars = data?.weekly_bars ?? []
+  const bars = summary?.weekly_bars ?? []
   const daysActive = bars.filter((b) => b.count > 0).length
   const weekPct = Math.round((daysActive / 7) * 100)
 

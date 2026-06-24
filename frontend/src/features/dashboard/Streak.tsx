@@ -1,9 +1,8 @@
-import { useProgressSummary } from './queries'
+import type { ProgressSummary } from '../../lib/api-types'
 
-export function Streak() {
-  const { data } = useProgressSummary()
-  const streak = data?.streak ?? 0
-  const bars = data?.weekly_bars ?? []
+export function Streak({ summary }: { summary: ProgressSummary | null }) {
+  const streak = summary?.streak ?? 0
+  const bars = summary?.weekly_bars ?? []
   const todayIdx = (new Date().getDay() + 6) % 7 // Mon=0 .. Sun=6
   const chips = bars.map((b, i) => ({ label: b.label, filled: b.count > 0, today: i === todayIdx }))
 

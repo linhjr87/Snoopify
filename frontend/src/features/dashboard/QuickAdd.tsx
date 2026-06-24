@@ -1,11 +1,12 @@
+'use client'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 
 const TYPES = ['Từ vựng', 'Cụm từ', 'Ngữ pháp', 'Lỗi']
 
 export function QuickAdd() {
   const [selected, setSelected] = useState('Từ vựng')
-  const nav = useNavigate()
+  const router = useRouter()
 
   return (
     <section style={{ border: '1px solid var(--line)', borderRadius: '14px', background: 'var(--surface)', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '22px', flexWrap: 'wrap', boxShadow: '0 1px 2px rgba(40,35,25,0.03)', animation: 'fadeUp .6s ease both', animationDelay: '.18s' }}>
@@ -26,7 +27,7 @@ export function QuickAdd() {
         ))}
       </div>
       <button
-        onClick={() => nav('/add')}
+        onClick={() => router.push('/add')}
         style={{ border: '1px solid var(--line)', borderRadius: '9px', background: 'var(--surface)', padding: '8px 16px', fontFamily: "'Hanken Grotesk',sans-serif", fontWeight: 600, fontSize: '14px', cursor: 'pointer', transition: 'background .15s ease' }}
       >
         Lưu

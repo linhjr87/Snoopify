@@ -1,4 +1,7 @@
 import { useT } from '../../i18n/useT'
+import { useProgressSummary } from './queries'
+import { useWordOfDay } from './queries'
+import { useRecentCards } from './queries'
 import { TodaySession } from './TodaySession'
 import { Streak } from './Streak'
 import { QuickAdd } from './QuickAdd'
@@ -8,6 +11,10 @@ import { WeekProgress } from './WeekProgress'
 
 export default function DashboardScreen() {
   const t = useT()
+  const { data: summary } = useProgressSummary()
+  const { data: word } = useWordOfDay()
+  const { data: cards } = useRecentCards()
+
   return (
     <div style={{ animation: 'fadeUp .5s ease both' }}>
       {/* Greeting row */}
@@ -24,8 +31,8 @@ export default function DashboardScreen() {
 
       {/* Row 1: TodaySession + Streak */}
       <div style={{ display: 'flex', gap: '22px', marginBottom: '22px', flexWrap: 'wrap' }}>
-        <TodaySession />
-        <Streak />
+        <TodaySession summary={summary ?? null} />
+        <Streak summary={summary ?? null} />
       </div>
 
       {/* Quick Add */}
@@ -33,10 +40,10 @@ export default function DashboardScreen() {
 
       {/* Row 2: RecentlyAdded + right column */}
       <div style={{ display: 'flex', gap: '22px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-        <RecentlyAdded />
+        <RecentlyAdded cards={cards ?? []} />
         <div style={{ width: '330px', flex: 'none', display: 'flex', flexDirection: 'column', gap: '22px' }}>
-          <WordOfDay />
-          <WeekProgress />
+          <WordOfDay word={word ?? null} />
+          <WeekProgress summary={summary ?? null} />
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@ import { fakeResponse } from '../../test/fakeResponse'
 const pushMock = vi.fn()
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: pushMock }),
+  useRouter: () => ({ push: pushMock, refresh: vi.fn() }),
   usePathname: () => '/',
 }))
 
