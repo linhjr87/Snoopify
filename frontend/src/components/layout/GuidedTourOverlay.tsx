@@ -119,9 +119,9 @@ export function GuidedTourOverlay() {
           {curContent.body}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span onClick={endTour} style={{ fontSize: 13, color: 'var(--muted)', cursor: 'pointer' }}>
+          <button type="button" onClick={endTour} style={{ border: 'none', background: 'transparent', padding: 0, fontFamily: "'Hanken Grotesk', sans-serif", fontSize: 13, color: 'var(--muted)', cursor: 'pointer' }}>
             {tourSkipLabel}
-          </span>
+          </button>
           <div style={{ display: 'flex', gap: 8 }}>
             {tourStep > 0 && (
               <button onClick={tourBack} style={{ border: '1px solid var(--line)', background: 'transparent', color: 'var(--ink)', borderRadius: 9, padding: '8px 15px', fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>

@@ -35,7 +35,10 @@ export const useAppStore = create<AppStore>()(
       setImportText: (text) => set({ importText: text }),
       resetProgress: () => set({ sIndex: 0, sCorrect: 0, flipped: false, quizPick: null, fillValue: '', fillChecked: false, confirmReset: false, settingsOpen: false }),
       login: () => set({ isAuthenticated: true }),
-      logout: () => set({ isAuthenticated: false, hasOnboarded: false }),
+      logout: () => set({
+        isAuthenticated: false, hasOnboarded: false,
+        settingsOpen: false, confirmReset: false, importOpen: false, notifOpen: false, langMenuOpen: false,
+      }),
       completeOnboarding: () => set({ hasOnboarded: true }),
     }),
     {

@@ -1,3 +1,4 @@
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAppStore } from '../../store/useAppStore'
 import { useTourStore } from '../../store/useTourStore'
 import { useT } from '../../i18n/useT'
@@ -40,6 +41,15 @@ export function Topbar() {
   const setPanel = useAppStore((s) => s.setPanel)
   
   const startTour = useTourStore((s) => s.startTour)
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  // The tour highlights dashboard-only anchors (search/review/streak/decks),
+  // so always land on the dashboard before starting it.
+  const handleGuide = () => {
+    if (location.pathname !== '/') navigate('/')
+    startTour()
+  }
 
   const currentFlag = lang === 'en' ? '🇬🇧' : '🇻🇳'
   const currentLangName = lang === 'en' ? 'English' : 'Tiếng Việt'
@@ -56,7 +66,7 @@ export function Topbar() {
     >
       {/* Guide button */}
       <button
-        onClick={startTour}
+        onClick={handleGuide}
         aria-label="guide"
         style={{
           marginRight: 'auto',

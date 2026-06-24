@@ -12,6 +12,9 @@ interface TourState {
   tourStep: number
   tourRect: TourRect | null
   tourSels: string[]
+  // Bumped on every start/end so stale setTimeout callbacks can detect they are
+  // no longer current and bail out instead of mutating tourRect after endTour().
+  tourGen: number
   startTour: () => void
   endTour: () => void
   tourNext: () => void
@@ -24,6 +27,7 @@ export const useTourStore = create<TourState>((set, get) => ({
   tourActive: false,
   tourStep: 0,
   tourRect: null,
+  tourGen: 0,
   tourSels: ['nav', 'search', 'review', 'add', 'streak', 'decks'],
 
   syncTourRect: () => {
@@ -39,8 +43,11 @@ export const useTourStore = create<TourState>((set, get) => ({
   },
 
   goTour: (step: number) => {
+    const gen = get().tourGen
+    const stale = () => get().tourGen !== gen || !get().tourActive
     set({ tourStep: step })
     setTimeout(() => {
+      if (stale()) return
       const { tourSels, syncTourRect } = get()
       const sel = tourSels[step]
       const el = sel ? document.querySelector(`[data-tour="${sel}"]`) : null
@@ -48,7 +55,7 @@ export const useTourStore = create<TourState>((set, get) => ({
         const r = el.getBoundingClientRect()
         if (r.top < 96 || r.bottom > window.innerHeight - 150) {
           window.scrollTo({ top: Math.max(0, window.scrollY + r.top - 150), behavior: 'smooth' })
-          setTimeout(syncTourRect, 380)
+          setTimeout(() => { if (!stale()) syncTourRect() }, 380)
           return
         }
       }
@@ -57,16 +64,20 @@ export const useTourStore = create<TourState>((set, get) => ({
   },
 
   startTour: () => {
-    try { window.scrollTo({ top: 0, behavior: 'smooth' }) } catch (e) {}
-    set({ tourActive: true, tourStep: 0 })
-    setTimeout(() => get().goTour(0), 180)
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }) } catch { /* ignore */ }
+    set((s) => ({ tourActive: true, tourStep: 0, tourRect: null, tourGen: s.tourGen + 1 }))
+    const gen = get().tourGen
+    setTimeout(() => {
+      if (get().tourGen !== gen || !get().tourActive) return
+      get().goTour(0)
+    }, 180)
   },
 
   endTour: () => {
-    try { 
-      localStorage.setItem('myenglish_tour_done', '1') 
-    } catch (e) {}
-    set({ tourActive: false, tourStep: 0, tourRect: null })
+    try {
+      localStorage.setItem('myenglish_tour_done', '1')
+    } catch { /* ignore */ }
+    set((s) => ({ tourActive: false, tourStep: 0, tourRect: null, tourGen: s.tourGen + 1 }))
   },
 
   tourNext: () => {

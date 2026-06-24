@@ -17,9 +17,12 @@ function ProtectedLayout() {
   const startTour = useTourStore(s => s.startTour)
 
   useEffect(() => {
-    if (isAuthenticated && localStorage.getItem('myenglish_tour_done') !== '1') {
-      setTimeout(startTour, 450)
-    }
+    if (!isAuthenticated) return
+    let tourDone: string | null
+    try { tourDone = localStorage.getItem('myenglish_tour_done') } catch { tourDone = '1' }
+    if (tourDone === '1') return
+    const id = setTimeout(startTour, 450)
+    return () => clearTimeout(id)
   }, [isAuthenticated, startTour])
 
   if (!isAuthenticated) return <Navigate to="/login" replace />

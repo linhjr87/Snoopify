@@ -91,9 +91,9 @@ export default function AuthScreen() {
 
           <div style={{ textAlign: 'center', marginTop: 20, fontSize: 14, color: 'var(--muted)' }}>
             {isLogin ? (
-              <span>{t.noAcc} <span onClick={() => switchMode(false)} style={{ color: 'var(--accent)', fontWeight: 600, cursor: 'pointer' }}>{t.signUp}</span></span>
+              <span>{t.noAcc} <button type="button" onClick={() => switchMode(false)} style={{ border: 'none', background: 'none', padding: 0, font: 'inherit', color: 'var(--accent)', fontWeight: 600, cursor: 'pointer' }}>{t.signUp}</button></span>
             ) : (
-              <span>{t.haveAcc} <span onClick={() => switchMode(true)} style={{ color: 'var(--accent)', fontWeight: 600, cursor: 'pointer' }}>{t.signIn}</span></span>
+              <span>{t.haveAcc} <button type="button" onClick={() => switchMode(true)} style={{ border: 'none', background: 'none', padding: 0, font: 'inherit', color: 'var(--accent)', fontWeight: 600, cursor: 'pointer' }}>{t.signIn}</button></span>
             )}
           </div>
         </div>
