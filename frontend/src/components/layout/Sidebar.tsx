@@ -140,7 +140,7 @@ export function Sidebar() {
       </button>
 
       {/* Nav */}
-      <nav className="nav-main" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <nav className="nav-main" data-tour="nav" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <div
           className="nav-heading"
           style={{
@@ -161,6 +161,7 @@ export function Sidebar() {
             <div
               key={item.to}
               className="navitem"
+              data-tour={item.to === '/add' ? 'add' : undefined}
               onClick={() => navigate(item.to)}
               style={{
                 display: 'flex',
@@ -183,7 +184,7 @@ export function Sidebar() {
       </nav>
 
       {/* Decks */}
-      <div className="side-decks" style={{ marginTop: 6, padding: '0 10px' }}>
+      <div className="side-decks" data-tour="decks" style={{ marginTop: 6, padding: '0 10px' }}>
         <div
           style={{
             fontSize: 11,

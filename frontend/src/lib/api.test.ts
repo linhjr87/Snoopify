@@ -21,7 +21,7 @@ describe('api client', () => {
   })
 
   it('apiPatch sends a JSON body with method PATCH', async () => {
-    const spy = vi.fn(async () => fakeResponse({ patched: true }, 200))
+    const spy = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) => fakeResponse({ patched: true }, 200))
     vi.stubGlobal('fetch', spy)
     await apiPatch('/item/1', { name: 'updated' })
     const init = spy.mock.calls[0][1] as RequestInit
@@ -30,7 +30,7 @@ describe('api client', () => {
   })
 
   it('apiDelete sends DELETE with no body', async () => {
-    const spy = vi.fn(async () => fakeResponse({}, 200))
+    const spy = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) => fakeResponse({}, 200))
     vi.stubGlobal('fetch', spy)
     await apiDelete('/item/1')
     const init = spy.mock.calls[0][1] as RequestInit

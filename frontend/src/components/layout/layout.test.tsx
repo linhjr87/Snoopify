@@ -18,17 +18,24 @@ function mockApi() {
 }
 
 describe('layout', () => {
-  beforeEach(() => { localStorage.clear(); useAppStore.setState({ ...initialState }); mockApi() })
+  beforeEach(() => {
+    localStorage.clear()
+    // Skip the onboarding tour auto-start so it doesn't interfere with assertions.
+    localStorage.setItem('myenglish_tour_done', '1')
+    // Routes are auth-gated now; the layout only renders when authenticated.
+    useAppStore.setState({ ...initialState, isAuthenticated: true })
+    mockApi()
+  })
   afterEach(() => { vi.restoreAllMocks() })
 
   it('shows Snoopify brand', () => {
     renderWithProviders(<App />)
     expect(screen.getByText('Snoopify')).toBeInTheDocument()
   })
-  it('settings trigger opens panel with dark toggle', async () => {
+  it('settings trigger opens panel with logout action', async () => {
     renderWithProviders(<App />)
     await userEvent.click(screen.getByLabelText('Cài đặt'))
-    expect(screen.getByText('Chế độ tối')).toBeInTheDocument()
+    expect(screen.getByText('Đăng xuất')).toBeInTheDocument()
   })
   it('reset requires confirm step', async () => {
     useAppStore.setState({ settingsOpen: true })
