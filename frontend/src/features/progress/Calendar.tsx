@@ -1,4 +1,4 @@
-import { useHeatmap } from './queries'
+import type { HeatmapOut } from '../../lib/api-types'
 
 function heatColor(lv: number): string {
   if (lv === 0) return 'var(--track)'
@@ -7,9 +7,8 @@ function heatColor(lv: number): string {
   return 'var(--accent)'
 }
 
-export function Calendar() {
-  const { data } = useHeatmap()
-  const levels = data?.cells ?? Array.from({ length: 126 }, () => 0)
+export function Calendar({ heatmap }: { heatmap: HeatmapOut | null }) {
+  const levels = heatmap?.cells ?? Array.from({ length: 126 }, () => 0)
   return (
     <div>
       <h2 style={{ margin: '0 0 16px', fontFamily: "'Newsreader', serif", fontWeight: 500, fontSize: 19 }}>
