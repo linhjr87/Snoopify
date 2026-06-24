@@ -14,9 +14,11 @@ describe('AddCardForm (props-driven)', () => {
     // The word field uses aria-label="word"; the save button text is "Lưu thẻ".
     fireEvent.change(screen.getByLabelText('word'), { target: { value: 'serendipity' } })
     fireEvent.click(screen.getByText('Lưu thẻ'))
-    expect(spy).toHaveBeenCalledWith(
-      `/decks/${decksFixture[0].id}/cards`,
-      expect.objectContaining({ word: 'serendipity' }),
+    await vi.waitFor(() =>
+      expect(spy).toHaveBeenCalledWith(
+        `/decks/${decksFixture[0].id}/cards`,
+        expect.objectContaining({ word: 'serendipity' }),
+      )
     )
   })
 })
