@@ -1,3 +1,4 @@
+'use client'
 import { useRouter } from 'next/navigation'
 import type { NeedsReviewItem } from '../../lib/api-types'
 
