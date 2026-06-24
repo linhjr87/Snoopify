@@ -12,7 +12,6 @@ export function TodaySession({ summary }: { summary: ProgressSummary | null }) {
   const due = summary?.due_total ?? 0
   const target = reviewed + due
   const offset = target > 0 ? CIRC * (1 - reviewed / target) : CIRC
-  const isError = false
 
   return (
     <section style={{ flex: '1.7', minWidth: '420px', border: '1px solid var(--line)', borderRadius: '18px', background: 'var(--surface)', padding: '30px', display: 'flex', gap: '32px', alignItems: 'center', boxShadow: '0 1px 2px rgba(40,35,25,0.03)', animation: 'fadeUp .6s ease both', animationDelay: '.05s' }}>
@@ -22,14 +21,8 @@ export function TodaySession({ summary }: { summary: ProgressSummary | null }) {
           <circle cx="72" cy="72" r="60" fill="none" stroke="var(--accent,#2f5d4e)" strokeWidth="11" strokeLinecap="round" strokeDasharray={CIRC} strokeDashoffset={offset} transform="rotate(-90 72 72)" />
         </svg>
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          {isError && !summary ? (
-            <div style={{ fontSize: '12px', color: 'var(--rust)', textAlign: 'center', padding: '0 8px' }}>Lỗi tải</div>
-          ) : (
-            <>
-              <div style={{ fontFamily: 'var(--num-font)', fontSize: '34px', fontWeight: 600, lineHeight: 1 }}>{reviewed}<span style={{ color: 'var(--muted)', fontSize: '20px' }}>/{target}</span></div>
-              <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '3px' }}>đã ôn</div>
-            </>
-          )}
+          <div style={{ fontFamily: 'var(--num-font)', fontSize: '34px', fontWeight: 600, lineHeight: 1 }}>{reviewed}<span style={{ color: 'var(--muted)', fontSize: '20px' }}>/{target}</span></div>
+          <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '3px' }}>đã ôn</div>
         </div>
       </div>
 
