@@ -45,7 +45,7 @@ export function ImportJsonModal() {
       })
       const result = (await res.json()) as ImportResult
       setStatus({ ok: result.ok, msg: result.msg })
-      if (result.ok) { setPanel('importOpen', false); router.refresh() }
+      if (result.ok) { setImportText(''); setPanel('importOpen', false); router.refresh() }
     } finally {
       setIsPending(false)
     }

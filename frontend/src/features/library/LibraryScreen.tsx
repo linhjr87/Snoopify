@@ -34,8 +34,12 @@ export default function LibraryScreen({ decks: apiDecks }: { decks: DeckOut[] })
   const onNewDeck = async () => {
     const name = window.prompt('Tên bộ thẻ mới')?.trim()
     if (!name) return
-    await apiPost<DeckOut>('/decks', { name })
-    router.refresh()
+    try {
+      await apiPost<DeckOut>('/decks', { name })
+      router.refresh()
+    } catch {
+      // creation failed — do not refresh; surface nothing for now (parity with prior silent behavior, but no unhandled rejection)
+    }
   }
 
   return (
