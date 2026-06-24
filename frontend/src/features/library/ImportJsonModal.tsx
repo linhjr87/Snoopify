@@ -23,7 +23,11 @@ export function ImportJsonModal() {
   }
 
   const copySample = async () => {
-    try { await navigator.clipboard.writeText(sampleJson) } catch (_) {}
+    try {
+      await navigator.clipboard.writeText(sampleJson)
+    } catch {
+      return
+    }
   }
 
   if (!importOpen) return null

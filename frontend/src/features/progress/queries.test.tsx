@@ -8,9 +8,13 @@ import { fakeResponse } from '../../test/fakeResponse'
 
 function makeWrapper() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } })
-  return ({ children }: { children: ReactNode }) => (
+  function Wrapper({ children }: { children: ReactNode }) {
+    return (
     <QueryClientProvider client={qc}>{children}</QueryClientProvider>
-  )
+    )
+  }
+  Wrapper.displayName = 'ProgressQueryClientWrapper'
+  return Wrapper
 }
 afterEach(() => { vi.restoreAllMocks() })
 

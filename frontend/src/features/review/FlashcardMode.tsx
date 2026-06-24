@@ -70,7 +70,7 @@ export function FlashcardMode({ cur }: { cur: SessionCard }) {
               {cur.meaning}
             </div>
             <div style={{ fontSize: '16px', color: 'var(--muted)', fontStyle: 'italic', maxWidth: '440px' }}>
-              "{cur.example}"
+              &quot;{cur.example}&quot;
             </div>
           </div>
         </div>

@@ -17,11 +17,12 @@ export default function LibraryScreen() {
   const [group, setGroup] = useState<GroupBy>('topic')
   const [filterText, setFilterText] = useState('')
 
-  const apiDecks = decksQuery.data ?? []
+  const apiDecks = decksQuery.data
 
   const decks: DeckCardProps[] = useMemo(() => {
+    const sourceDecks = apiDecks ?? []
     const needle = filterText.trim().toLowerCase()
-    const sorted = [...apiDecks].sort((a: DeckOut, b: DeckOut) => {
+    const sorted = [...sourceDecks].sort((a: DeckOut, b: DeckOut) => {
       if (group === 'mastery') return b.mastery_pct - a.mastery_pct
       if (group === 'date') return b.created_at.localeCompare(a.created_at)
       return a.topic.localeCompare(b.topic)
@@ -31,8 +32,8 @@ export default function LibraryScreen() {
       .map(toDeckCard)
   }, [apiDecks, filterText, group])
 
-  const totalCards = apiDecks.reduce((sum, deck) => sum + deck.count, 0)
-  const totalDecks = apiDecks.length
+  const totalCards = (apiDecks ?? []).reduce((sum, deck) => sum + deck.count, 0)
+  const totalDecks = apiDecks?.length ?? 0
 
   const onNewDeck = () => {
     const name = window.prompt('Tên bộ thẻ mới')?.trim()
