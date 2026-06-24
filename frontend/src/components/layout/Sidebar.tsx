@@ -1,4 +1,6 @@
-import { useNavigate, useLocation } from 'react-router-dom'
+'use client'
+
+import { useRouter, usePathname } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
 import { useT } from '../../i18n/useT'
 import { SettingsPanel } from './SettingsPanel'
@@ -48,8 +50,8 @@ const navItems = (t: ReturnType<typeof useT>) => [
 
 export function Sidebar() {
   const t = useT()
-  const navigate = useNavigate()
-  const location = useLocation()
+  const router = useRouter()
+  const pathname = usePathname()
   const collapsed = useAppStore((s) => s.collapsed)
   const toggleCollapsed = useAppStore((s) => s.toggleCollapsed)
   const settingsOpen = useAppStore((s) => s.settingsOpen)
@@ -155,14 +157,14 @@ export function Sidebar() {
         </div>
         {items.map((item) => {
           const isActive = item.to === '/'
-            ? location.pathname === '/'
-            : location.pathname.startsWith(item.to)
+            ? pathname === '/'
+            : pathname.startsWith(item.to)
           return (
             <div
               key={item.to}
               className="navitem"
               data-tour={item.to === '/add' ? 'add' : undefined}
-              onClick={() => navigate(item.to)}
+              onClick={() => router.push(item.to)}
               style={{
                 display: 'flex',
                 alignItems: 'center',

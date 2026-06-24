@@ -16,6 +16,6 @@ export function applyTheme(dark: boolean, accent: AccentName = 'Evergreen'): voi
   for (const [k, v] of Object.entries(pal)) root.style.setProperty(`--${k}`, v)
   const a = ACCENTS[accent] ?? ACCENTS.Evergreen
   root.style.setProperty('--accent', a.accent)
-  root.style.setProperty('--accent-soft', dark ? `color-mix(in srgb, ${a.accent} 26%, ${pal.surface})` : a.soft)
-  root.style.setProperty('--rust', '#9c5a3c')
+  root.style.setProperty('--accent-soft', dark ? '#1e3a30' : a.soft)
+  root.style.setProperty('--rust', '#a8503f')
 }

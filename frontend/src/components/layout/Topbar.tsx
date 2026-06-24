@@ -1,4 +1,6 @@
-import { useNavigate, useLocation } from 'react-router-dom'
+'use client'
+
+import { useRouter, usePathname } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
 import { useTourStore } from '../../store/useTourStore'
 import { useT } from '../../i18n/useT'
@@ -39,15 +41,15 @@ export function Topbar() {
   const langMenuOpen = useAppStore((s) => s.langMenuOpen)
   const toggleDark = useAppStore((s) => s.toggleDark)
   const setPanel = useAppStore((s) => s.setPanel)
-  
+
   const startTour = useTourStore((s) => s.startTour)
-  const navigate = useNavigate()
-  const location = useLocation()
+  const router = useRouter()
+  const pathname = usePathname()
 
   // The tour highlights dashboard-only anchors (search/review/streak/decks),
   // so always land on the dashboard before starting it.
   const handleGuide = () => {
-    if (location.pathname !== '/') navigate('/')
+    if (pathname !== '/') router.push('/')
     startTour()
   }
 

@@ -13,9 +13,13 @@ const gradeResult = {
 
 function makeWrapper() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  return ({ children }: { children: ReactNode }) => (
+  function Wrapper({ children }: { children: ReactNode }) {
+    return (
     <QueryClientProvider client={qc}>{children}</QueryClientProvider>
-  )
+    )
+  }
+  Wrapper.displayName = 'ReviewQueryClientWrapper'
+  return Wrapper
 }
 
 afterEach(() => { vi.restoreAllMocks() })
@@ -56,10 +60,11 @@ describe('useGradeMutation', () => {
     })))
     const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
     const spy = vi.spyOn(qc, 'invalidateQueries')
-    const wrapper = ({ children }: { children: ReactNode }) => (
-      <QueryClientProvider client={qc}>{children}</QueryClientProvider>
-    )
-    const { result } = renderHook(() => useGradeMutation(), { wrapper })
+    function Wrapper({ children }: { children: ReactNode }) {
+      return <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+    }
+    Wrapper.displayName = 'ReviewInvalidateWrapper'
+    const { result } = renderHook(() => useGradeMutation(), { wrapper: Wrapper })
     await result.current.mutateAsync({ card_id: 'c1', rating: 'remember', mode: 'flash', is_correct: null })
     expect(spy).toHaveBeenCalledWith({ queryKey: ['progress'] })
     expect(spy).toHaveBeenCalledWith({ queryKey: ['decks'] })

@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper:#f6f4ee; --surface:#fffdf9; --ink:#211f1b; --muted:#6f6a61;
+  --line:#e8e3d8; --track:#ece7da; --rust:#a8503f;
+  --accent:#2f5d4e; --accent-soft:#e7efea;
+  --clay:#a96440; --gold:#8a6d12; --sidebar:var(--paper);
+}
+html.dark {
+  --paper:#191712; --surface:#221f18; --ink:#efe9df; --muted:#a39b8d;
+  --line:#36322a; --track:#322e26;
+  --accent-soft:#1e3a30; --sidebar:var(--surface);
+}
+body { margin:0; background:var(--paper); color:var(--ink); font-family:'Hanken Grotesk',sans-serif; }
+
+/* Chrome layout */
+* { box-sizing: border-box; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.navitem:hover { background: var(--accent-soft, #e9f0ec); }
+.sidebar.collapsed { width: 78px !important; padding-left: 12px !important; padding-right: 12px !important; }
+.sidebar.collapsed .brand { justify-content: center; padding: 0 !important; }
+.sidebar.collapsed .brand-text { display: none !important; }
+.sidebar.collapsed .nav-heading { display: none !important; }
+.sidebar.collapsed .nav-main .navitem { justify-content: center; padding: 9px 0 !important; }
+.sidebar.collapsed .nav-main .navitem > span { display: none !important; }
+.sidebar.collapsed .side-decks { display: none !important; }
+.sidebar.collapsed .side-user-info, .sidebar.collapsed .user-dots { display: none !important; }
+.sidebar.collapsed .side-user > button { justify-content: center; }
+.topbar { position: sticky; top: 0; z-index: 40; background: var(--paper); margin: -34px -46px 24px; padding: 14px 46px 16px; border-bottom: 1px solid var(--line); }
+@media (max-width: 760px) {
+  .sidebar { position: fixed !important; left: 0; right: 0; bottom: 0; top: auto !important; width: auto !important; height: auto !important; flex-direction: row !important; border-right: none !important; border-top: 1px solid var(--line) !important; padding: 10px 12px !important; gap: 0 !important; z-index: 50; }
+  .brand, .nav-heading, .side-decks, .side-user { display: none !important; }
+  .nav-main { flex: 1; flex-direction: row !important; justify-content: space-around; gap: 0 !important; }
+  .collapse-fab { display: none !important; }
+  .topbar { margin: -34px -46px 18px; padding: 12px 14px 14px; }
+  main { padding: 16px 14px 88px !important; max-width: 100% !important; }
+}

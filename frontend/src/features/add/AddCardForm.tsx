@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { CardPreview, type PreviewData } from './CardPreview'
 import { useDecks, useCreateDeck } from '../library/queries'
 import { useAddCard } from './queries'
@@ -24,23 +24,19 @@ export function AddCardForm() {
   const { data: decks } = useDecks()
   const createDeck = useCreateDeck()
   const addCard = useAddCard()
-
-  // default the picker to the first deck once decks load
-  useEffect(() => {
-    if (!deckId && decks && decks.length > 0) setDeckId(decks[0].id)
-  }, [decks, deckId])
+  const selectedDeckId = deckId || decks?.[0]?.id || ''
 
   const set = (k: keyof PreviewData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setData((d) => ({ ...d, [k]: e.target.value }))
 
   const handleSave = () => {
     const word = data.word.trim()
-    if (!word || !deckId) return
+    if (!word || !selectedDeckId) return
     const card: CardCreate = {
       word, phonetic: data.phonetic, pos: data.pos, meaning: data.meaning, example: data.example,
     }
     setSaveError(false)
-    addCard.mutate({ deckId, card }, {
+    addCard.mutate({ deckId: selectedDeckId, card }, {
       onSuccess: () => { setSaved((prev) => [word, ...prev].slice(0, 10)); setData(empty) },
       onError: () => setSaveError(true),
     })
@@ -51,7 +47,7 @@ export function AddCardForm() {
     if (name) createDeck.mutate({ name }, { onSuccess: (deck) => setDeckId(deck.id) })
   }
 
-  const canSave = !!deckId && data.word.trim().length > 0 && !addCard.isPending
+  const canSave = !!selectedDeckId && data.word.trim().length > 0 && !addCard.isPending
 
   return (
     <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
@@ -118,7 +114,7 @@ export function AddCardForm() {
                 aria-label="deck"
                 className="field"
                 style={{ ...fieldStyle, flex: 1 }}
-                value={deckId}
+                value={selectedDeckId}
                 onChange={(e) => setDeckId(e.target.value)}
               >
                 {(!decks || decks.length === 0) && <option value="">(chưa có bộ thẻ)</option>}

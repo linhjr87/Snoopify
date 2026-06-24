@@ -2,7 +2,7 @@ import type { Lang } from '../store/types'
 
 export const dict = {
   vn: { learn:'Học tập', decks:'Bộ thẻ', home:'Trang chủ', library:'Thư viện', review:'Ôn tập', add:'Thêm kiến thức', progress:'Tiến độ',
-    settings:'Cài đặt', resetProgress:'Đặt lại tiến độ', resetConfirm:'Xoá toàn bộ tiến độ, điểm và phiên đang học?', deleteAll:'Xoá hết', cancel:'Huỷ',
+    settings:'Cài đặt', resetProgress:'Đặt lại tiến độ', resetConfirm:'Xoá toàn bộ tiến độ, điểm và phiên đang học?', deleteAll:'Xoá hết', cancel:'Huỷ', resetError:'Không xoá được tiến độ. Thử lại sau.',
     darkMode:'Chế độ tối', language:'Ngôn ngữ',
     greeting:'Chào buổi sáng, Minh.', searchPh:'tìm từ, cụm từ, ghi chú…',
     todaySession:'Phiên ôn tập hôm nay', startReview:'Bắt đầu ôn tập', addTitle:'Thêm kiến thức', importJson:'Nhập từ JSON', newDeck:'+ Bộ thẻ mới',
@@ -17,7 +17,7 @@ export const dict = {
     obGoalT:'Mục tiêu học tập của bạn là gì?', obLevelT:'Trình độ hiện tại của bạn?', obDailyT:'Mục tiêu mỗi ngày?', obTopicT:'Bạn quan tâm chủ đề nào?', obTopicSub:'Chọn 1 hoặc nhiều chủ đề để nhận gợi ý từ vựng phù hợp.',
     obBack:'Quay lại', obNext:'Tiếp tục', obFinish:'Hoàn thành', obSkip:'Bỏ qua' },
   en: { learn:'Learn', decks:'Decks', home:'Home', library:'Library', review:'Review', add:'Add knowledge', progress:'Progress',
-    settings:'Settings', resetProgress:'Reset progress', resetConfirm:'Erase all progress, scores and the current session?', deleteAll:'Erase all', cancel:'Cancel',
+    settings:'Settings', resetProgress:'Reset progress', resetConfirm:'Erase all progress, scores and the current session?', deleteAll:'Erase all', cancel:'Cancel', resetError:'Could not reset progress. Try again.',
     darkMode:'Dark mode', language:'Language',
     greeting:'Good morning, Minh.', searchPh:'search words, phrases, notes…',
     todaySession:"Today's review session", startReview:'Start review', addTitle:'Add knowledge', importJson:'Import JSON', newDeck:'+ New deck',

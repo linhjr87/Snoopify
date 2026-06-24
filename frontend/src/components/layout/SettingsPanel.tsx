@@ -1,9 +1,13 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
 import { useT } from '../../i18n/useT'
-import { useResetProgress } from '../../features/progress/queries'
 
 export function SettingsPanel() {
   const t = useT()
+  const router = useRouter()
   const { settingsOpen, confirmReset } = useAppStore((s) => ({
     settingsOpen: s.settingsOpen,
     confirmReset: s.confirmReset,
@@ -11,11 +15,18 @@ export function SettingsPanel() {
   const setPanel = useAppStore((s) => s.setPanel)
   const resetProgress = useAppStore((s) => s.resetProgress)
   const logout = useAppStore((s) => s.logout)
-  const resetMutation = useResetProgress()
+  const [resetError, setResetError] = useState(false)
 
-  const handleReset = () => {
-    resetMutation.mutate()   // server: wipe logs + reset schedules, invalidate queries
-    resetProgress()          // UI: reset session counters + close panels
+  const handleReset = async () => {
+    setResetError(false)
+    try {
+      const res = await fetch('/api/progress/reset', { method: 'POST' })
+      if (!res.ok) throw new Error(String(res.status))
+      resetProgress()        // success: reset UI state + close panels
+      router.refresh()       // re-run server fetches
+    } catch {
+      setResetError(true)    // keep the panel open and surface the failure
+    }
   }
 
   if (!settingsOpen) return null
@@ -143,6 +154,9 @@ export function SettingsPanel() {
                 {t.cancel}
               </button>
             </div>
+            {resetError && (
+              <div style={{ color: 'var(--rust)', fontSize: 12, marginTop: 8 }}>{t.resetError}</div>
+            )}
           </div>
         )}
       </div>
