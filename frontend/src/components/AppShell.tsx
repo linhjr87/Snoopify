@@ -13,6 +13,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const isAuthenticated = useAppStore((s) => s.isAuthenticated)
+  const hasHydrated = useAppStore((s) => s._hasHydrated)
 
   useEffect(() => {
     if (pathname === '/login') return
@@ -24,10 +25,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [startTour, pathname])
 
   useEffect(() => {
+    if (!hasHydrated) return
     if (!isAuthenticated) router.replace('/login')
-  }, [isAuthenticated, router])
+  }, [hasHydrated, isAuthenticated, router])
 
   if (pathname === '/login') return <>{children}</>
+  if (!hasHydrated) return null
   if (!isAuthenticated) return null
 
   return (

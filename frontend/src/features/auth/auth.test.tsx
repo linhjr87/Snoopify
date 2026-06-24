@@ -5,13 +5,13 @@ import { initialState, useAppStore } from '../../store/useAppStore'
 
 const push = vi.fn()
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push, replace: vi.fn() }) }))
-beforeEach(() => { localStorage.clear(); useAppStore.setState({ ...initialState }); push.mockClear() })
+beforeEach(() => { localStorage.clear(); useAppStore.setState({ ...initialState, _hasHydrated: true }); push.mockClear() })
 afterEach(() => { vi.restoreAllMocks() })
 
 describe('AuthScreen (Next routing)', () => {
-  it('logs in and navigates home', () => {
-    render(<AuthScreen />)
-    fireEvent.click(screen.getAllByRole('button', { name: /Tiếp tục|Đăng nhập/i })[0])
+  it('logs in via form submit and navigates home', () => {
+    const { container } = render(<AuthScreen />)
+    fireEvent.submit(container.querySelector('form')!)
     expect(useAppStore.getState().isAuthenticated).toBe(true)
     expect(push).toHaveBeenCalledWith('/')
   })

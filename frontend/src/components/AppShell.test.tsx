@@ -5,10 +5,11 @@ import { initialState, useAppStore } from '../store/useAppStore'
 import { AppShell } from './AppShell'
 
 const pushMock = vi.fn()
+const replaceMock = vi.fn()
 let currentPathname = '/'
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: pushMock, replace: vi.fn() }),
+  useRouter: () => ({ push: pushMock, replace: replaceMock }),
   usePathname: () => currentPathname,
 }))
 
@@ -16,9 +17,9 @@ describe('AppShell', () => {
   beforeEach(() => {
     localStorage.clear()
     pushMock.mockReset()
+    replaceMock.mockReset()
     currentPathname = '/'
-    useAppStore.setState({ ...initialState })
-    useAppStore.setState({ isAuthenticated: true })
+    useAppStore.setState({ ...initialState, isAuthenticated: true, _hasHydrated: true })
   })
 
   it('renders the layout shell around children', () => {
@@ -50,5 +51,19 @@ describe('AppShell', () => {
     // GuidedTourOverlay renders nothing until active, but the auto-start effect must run
     // without throwing when localStorage has no tour flag.
     expect(screen.getByText('child')).toBeInTheDocument()
+  })
+
+  it('redirects to /login when not authenticated after hydration', () => {
+    useAppStore.setState({ isAuthenticated: false, _hasHydrated: true })
+    render(<AppShell><div>protected</div></AppShell>)
+    expect(replaceMock).toHaveBeenCalledWith('/login')
+    expect(screen.queryByText('protected')).not.toBeInTheDocument()
+  })
+
+  it('renders nothing until store has hydrated', () => {
+    useAppStore.setState({ isAuthenticated: true, _hasHydrated: false })
+    render(<AppShell><div>protected</div></AppShell>)
+    expect(screen.queryByText('protected')).not.toBeInTheDocument()
+    expect(replaceMock).not.toHaveBeenCalled()
   })
 })

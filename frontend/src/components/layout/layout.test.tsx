@@ -38,7 +38,7 @@ describe('layout', () => {
     // Skip the onboarding tour auto-start so it doesn't interfere with assertions.
     localStorage.setItem('myenglish_tour_done', '1')
     // Routes are auth-gated now; the AppShell only renders when authenticated.
-    useAppStore.setState({ ...initialState, isAuthenticated: true })
+    useAppStore.setState({ ...initialState, isAuthenticated: true, _hasHydrated: true })
     mockApi()
   })
   afterEach(() => { vi.restoreAllMocks() })
