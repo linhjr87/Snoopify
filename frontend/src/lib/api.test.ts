@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { apiGet, apiPost, apiPatch, apiDelete, ApiError } from './api'
+import { apiGet, apiPost, apiPatch, apiDelete, ApiError, apiFetch } from './api'
 import { fakeResponse } from '../test/fakeResponse'
 
 afterEach(() => { vi.restoreAllMocks() })
@@ -60,5 +60,14 @@ describe('api client', () => {
       json: async () => { throw new SyntaxError('bad json') },
     } as unknown as Response)))
     await expect(apiGet('/x')).rejects.toBeInstanceOf(ApiError)
+  })
+
+  it('apiFetch hits BACKEND_URL directly and returns JSON', async () => {
+    const spy = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) => fakeResponse({ ok: 1 }, 200))
+    vi.stubGlobal('fetch', spy)
+    const data = await apiFetch<{ ok: number }>('/review/session')
+    expect(data).toEqual({ ok: 1 })
+    expect(String(spy.mock.calls[0][0])).toContain('/review/session')
+    expect(String(spy.mock.calls[0][0])).not.toContain('/api/')
   })
 })
