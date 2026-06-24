@@ -69,5 +69,6 @@ describe('api client', () => {
     expect(data).toEqual({ ok: 1 })
     expect(String(spy.mock.calls[0][0])).toContain('/review/session')
     expect(String(spy.mock.calls[0][0])).not.toContain('/api/')
+    expect(String(spy.mock.calls[0][0])).toContain('http://localhost:8000')
   })
 })
