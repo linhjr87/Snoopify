@@ -7,6 +7,13 @@ import { renderWithProviders } from '../../test/renderWithProviders'
 import { progressSummaryFixture, wordOfDayFixture, recentCardsFixture } from '../../test/fixtures'
 import { fakeResponse } from '../../test/fakeResponse'
 
+const pushMock = vi.fn()
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: pushMock }),
+  usePathname: () => '/',
+}))
+
 function mockApi() {
   vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
     const url = String(input)
@@ -18,7 +25,7 @@ function mockApi() {
 }
 
 describe('layout', () => {
-  beforeEach(() => { localStorage.clear(); useAppStore.setState({ ...initialState }); mockApi() })
+  beforeEach(() => { localStorage.clear(); pushMock.mockReset(); useAppStore.setState({ ...initialState }); mockApi() })
   afterEach(() => { vi.restoreAllMocks() })
 
   it('shows Snoopify brand', () => {

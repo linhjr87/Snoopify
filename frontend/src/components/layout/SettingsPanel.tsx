@@ -1,3 +1,5 @@
+'use client'
+
 import { useAppStore } from '../../store/useAppStore'
 import { useT } from '../../i18n/useT'
 import { useResetProgress } from '../../features/progress/queries'
