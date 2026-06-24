@@ -1,5 +1,6 @@
+'use client'
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
 import { useT } from '../../i18n/useT'
 import { ModeSwitcher } from './ModeSwitcher'
@@ -7,7 +8,7 @@ import { FlashcardMode } from './FlashcardMode'
 import { QuizMode } from './QuizMode'
 import { FillMode } from './FillMode'
 import { SessionComplete } from './SessionComplete'
-import { useSession } from './queries'
+import type { SessionCard } from '../../lib/adapters'
 
 function ReviewMessage({ text, onHome }: { text: string; onHome?: () => void }) {
   return (
@@ -30,34 +31,27 @@ function ReviewMessage({ text, onHome }: { text: string; onHome?: () => void }) 
   )
 }
 
-export default function ReviewScreen() {
+export default function ReviewScreen({ session }: { session: SessionCard[] }) {
   const t = useT()
-  const nav = useNavigate()
+  const router = useRouter()
   const reviewMode = useAppStore((s) => s.reviewMode)
   const sIndex = useAppStore((s) => s.sIndex)
   const sCorrect = useAppStore((s) => s.sCorrect)
   const gradeError = useAppStore((s) => s.gradeError)
   const resetSession = useAppStore((s) => s.resetSession)
   const setGradeError = useAppStore((s) => s.setGradeError)
-  const { data, isLoading, isError } = useSession()
 
   // The session cursor (sIndex/sCorrect) is store state that outlives any single
   // fetched session — it persists across reloads and survives route changes. Reset
   // it whenever a session with *different content* loads, otherwise a stale cursor
   // points into the wrong card set (wrong card, carried-over score, or — if the
   // stale index is past the new end — an instant, inescapable "session complete").
-  const sessionKey = data ? data.map((c) => c.cardId).join('|') : null
-  useEffect(() => {
-    if (sessionKey !== null) resetSession()
-  }, [sessionKey, resetSession])
+  const sessionKey = session.length ? session.map((c) => c.cardId).join('|') : null
+  useEffect(() => { if (sessionKey !== null) resetSession() }, [sessionKey, resetSession])
 
-  if (isLoading) return <ReviewMessage text="Đang tải phiên ôn tập…" />
-  if (isError) return <ReviewMessage text="Không tải được phiên ôn tập. Thử lại sau." onHome={() => nav('/')} />
-
-  const session = data ?? []
   const total = session.length
 
-  if (total === 0) return <ReviewMessage text="Không có thẻ nào đến hạn ôn tập. Quay lại sau nhé!" onHome={() => nav('/')} />
+  if (total === 0) return <ReviewMessage text="Không có thẻ nào đến hạn ôn tập. Quay lại sau nhé!" onHome={() => router.push('/')} />
   if (sIndex >= total) return <SessionComplete correct={sCorrect} total={total} />
 
   const cur = session[sIndex]
@@ -70,7 +64,7 @@ export default function ReviewScreen() {
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
         <button
           className="ghost"
-          onClick={() => nav('/')}
+          onClick={() => router.push('/')}
           style={{
             border: '1px solid var(--line)', borderRadius: '9px', background: 'var(--surface)',
             padding: '7px 12px', fontFamily: "'Hanken Grotesk',sans-serif", fontSize: '13px',

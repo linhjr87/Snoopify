@@ -1,18 +1,17 @@
 import { useAppStore } from '../../store/useAppStore'
 import { quizIsRight } from '../../lib/grading'
 import type { SessionCard } from '../../lib/adapters'
-import { useGradeMutation } from './queries'
+import { submitGrade } from './grade'
 
 export function QuizMode({ cur, isLast }: { cur: SessionCard; isLast: boolean }) {
   const pick = useAppStore((s) => s.quizPick)
   const pickQuiz = useAppStore((s) => s.pickQuiz)
   const advance = useAppStore((s) => s.advanceSession)
-  const grade = useGradeMutation()
   const answered = pick != null
   const right = quizIsRight(pick, cur.quiz.correct)
 
   const handleNext = () => {
-    grade.mutate({ card_id: cur.cardId, rating: right ? 'remember' : 'forgot', mode: 'quiz', is_correct: right })
+    void submitGrade({ card_id: cur.cardId, rating: right ? 'remember' : 'forgot', mode: 'quiz', is_correct: right })
     advance(right)
   }
 

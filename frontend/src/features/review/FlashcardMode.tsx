@@ -2,16 +2,15 @@ import { useAppStore } from '../../store/useAppStore'
 import { SpacedRepetitionRating } from './SpacedRepetitionRating'
 import type { SessionCard } from '../../lib/adapters'
 import type { Rating } from '../../lib/api-types'
-import { useGradeMutation } from './queries'
+import { submitGrade } from './grade'
 
 export function FlashcardMode({ cur }: { cur: SessionCard }) {
   const flipped = useAppStore((s) => s.flipped)
   const flip = useAppStore((s) => s.flip)
   const advance = useAppStore((s) => s.advanceSession)
-  const grade = useGradeMutation()
 
   const handleRate = (rating: Rating) => {
-    grade.mutate({ card_id: cur.cardId, rating, mode: 'flash', is_correct: null })
+    void submitGrade({ card_id: cur.cardId, rating, mode: 'flash', is_correct: null })
     advance(rating !== 'forgot')
   }
 
@@ -77,7 +76,7 @@ export function FlashcardMode({ cur }: { cur: SessionCard }) {
       </div>
 
       {/* Rating buttons */}
-      <SpacedRepetitionRating onRate={handleRate} disabled={grade.isPending} />
+      <SpacedRepetitionRating onRate={handleRate} />
 
       <div style={{ fontSize: '13px', color: 'var(--muted)' }}>
         Tự chấm để tính điểm phiên · spaced repetition
