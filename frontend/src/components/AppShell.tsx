@@ -1,9 +1,21 @@
 'use client'
 
+import { useEffect } from 'react'
 import { Sidebar } from './layout/Sidebar'
 import { Topbar } from './layout/Topbar'
+import { GuidedTourOverlay } from './layout/GuidedTourOverlay'
+import { useTourStore } from '../store/useTourStore'
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const startTour = useTourStore((s) => s.startTour)
+  useEffect(() => {
+    let tourDone: string | null
+    try { tourDone = localStorage.getItem('myenglish_tour_done') } catch { tourDone = '1' }
+    if (tourDone === '1') return
+    const id = setTimeout(startTour, 450)
+    return () => clearTimeout(id)
+  }, [startTour])
+
   return (
     <div
       style={{
@@ -28,6 +40,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <Topbar />
         {children}
       </main>
+      <GuidedTourOverlay />
     </div>
   )
 }

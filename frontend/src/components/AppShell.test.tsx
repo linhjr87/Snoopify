@@ -43,4 +43,11 @@ describe('AppShell', () => {
 
     expect(pushMock).toHaveBeenCalledWith('/library')
   })
+
+  it('mounts the guided tour overlay', () => {
+    render(<AppShell><div>child</div></AppShell>)
+    // GuidedTourOverlay renders nothing until active, but the auto-start effect must run
+    // without throwing when localStorage has no tour flag.
+    expect(screen.getByText('child')).toBeInTheDocument()
+  })
 })
