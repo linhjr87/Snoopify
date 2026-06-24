@@ -1,6 +1,5 @@
 import type { ReviewMode } from '../lib/api-types'
-
-export type { ReviewMode } from '../lib/api-types'
+export type { ReviewMode }
 export type Lang = 'vn' | 'en'
 
 export interface ImportStatus { ok: boolean; msg: string }
@@ -23,6 +22,8 @@ export interface AppState {
   notifOpen: boolean
   langMenuOpen: boolean
   importText: string
+  isAuthenticated: boolean
+  hasOnboarded: boolean
 }
 
 export interface AppActions {
@@ -40,6 +41,9 @@ export interface AppActions {
   setPanel(panel: 'settingsOpen' | 'confirmReset' | 'importOpen' | 'notifOpen' | 'langMenuOpen', open: boolean): void
   setImportText(text: string): void
   resetProgress(): void
+  login(): void
+  logout(): void
+  completeOnboarding(): void
 }
 
 export type AppStore = AppState & AppActions

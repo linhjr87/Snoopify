@@ -8,14 +8,13 @@ import { useT } from '../../i18n/useT'
 export function SettingsPanel() {
   const t = useT()
   const router = useRouter()
-  const { settingsOpen, dark, confirmReset } = useAppStore((s) => ({
+  const { settingsOpen, confirmReset } = useAppStore((s) => ({
     settingsOpen: s.settingsOpen,
-    dark: s.dark,
     confirmReset: s.confirmReset,
   }))
   const setPanel = useAppStore((s) => s.setPanel)
-  const toggleDark = useAppStore((s) => s.toggleDark)
   const resetProgress = useAppStore((s) => s.resetProgress)
+  const logout = useAppStore((s) => s.logout)
   const [resetError, setResetError] = useState(false)
 
   const handleReset = async () => {
@@ -60,48 +59,37 @@ export function SettingsPanel() {
         {t.settings}
       </div>
 
-      {/* Dark mode row */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '6px 8px 10px',
-        }}
-      >
-        <span style={{ fontSize: 14, color: 'var(--ink)' }}>{t.darkMode}</span>
+      {/* Logout */}
+      <div style={{ borderBottom: '1px solid var(--line)', paddingBottom: 8, marginBottom: 4 }}>
         <button
-          onClick={() => toggleDark()}
-          aria-label={t.darkMode}
+          onClick={logout}
           style={{
-            position: 'relative',
-            width: 44,
-            height: 22,
-            borderRadius: 999,
-            background: dark ? 'var(--accent)' : '#cfcabd',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 7,
+            width: '100%',
             border: 'none',
+            background: 'transparent',
+            color: 'var(--ink)',
             cursor: 'pointer',
-            flex: 'none',
-            padding: 0,
+            fontSize: 14,
+            padding: '7px 8px',
+            borderRadius: 8,
+            textAlign: 'left',
+            fontFamily: "'Hanken Grotesk', sans-serif",
           }}
         >
-          <span
-            style={{
-              position: 'absolute',
-              top: 2,
-              left: dark ? 22 : 2,
-              width: 18,
-              height: 18,
-              borderRadius: '50%',
-              background: '#fff',
-              transition: 'left .2s ease',
-            }}
-          />
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5.5 12H2.5a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3" />
+            <path d="M9.5 10l3-3-3-3" />
+            <path d="M12.5 7H5.5" />
+          </svg>
+          {t.logoutBtn}
         </button>
       </div>
 
       {/* Reset section */}
-      <div style={{ borderTop: '1px solid var(--line)', paddingTop: 8 }}>
+      <div style={{ paddingTop: 4 }}>
         {!confirmReset ? (
           <button
             onClick={() => setPanel('confirmReset', true)}

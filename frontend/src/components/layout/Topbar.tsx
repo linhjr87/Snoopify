@@ -1,6 +1,8 @@
 'use client'
 
+import { useRouter, usePathname } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
+import { useTourStore } from '../../store/useTourStore'
 import { useT } from '../../i18n/useT'
 import { NotificationsMenu } from './NotificationsMenu'
 import { LangMenu } from './LangMenu'
@@ -40,6 +42,17 @@ export function Topbar() {
   const toggleDark = useAppStore((s) => s.toggleDark)
   const setPanel = useAppStore((s) => s.setPanel)
 
+  const startTour = useTourStore((s) => s.startTour)
+  const router = useRouter()
+  const pathname = usePathname()
+
+  // The tour highlights dashboard-only anchors (search/review/streak/decks),
+  // so always land on the dashboard before starting it.
+  const handleGuide = () => {
+    if (pathname !== '/') router.push('/')
+    startTour()
+  }
+
   const currentFlag = lang === 'en' ? '🇬🇧' : '🇻🇳'
   const currentLangName = lang === 'en' ? 'English' : 'Tiếng Việt'
 
@@ -53,6 +66,33 @@ export function Topbar() {
         gap: 24,
       }}
     >
+      {/* Guide button */}
+      <button
+        onClick={handleGuide}
+        aria-label="guide"
+        style={{
+          marginRight: 'auto',
+          border: '1px solid var(--line)',
+          background: 'var(--surface)',
+          color: 'var(--muted)',
+          cursor: 'pointer',
+          padding: '7px 14px',
+          borderRadius: 999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 7,
+          fontFamily: "'Hanken Grotesk',sans-serif",
+          fontSize: 13,
+          fontWeight: 600,
+        }}
+      >
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="8" cy="8" r="6.5"/>
+          <path d="M8 11V8M8 5h.01"/>
+        </svg>
+        {lang === 'en' ? 'Guide' : 'Hướng dẫn'}
+      </button>
+
       {/* Dark toggle */}
       <button
         onClick={toggleDark}
