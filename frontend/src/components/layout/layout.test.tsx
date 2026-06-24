@@ -54,4 +54,20 @@ describe('layout', () => {
       expect(posted).toBe(true)
     })
   })
+  it('failed reset surfaces an error and keeps progress', async () => {
+    useAppStore.setState({ settingsOpen: true, confirmReset: true })
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input)
+      if (url.includes('/progress/reset')) return fakeResponse({ detail: 'boom' }, 500)
+      if (url.includes('/progress/summary')) return fakeResponse(progressSummaryFixture)
+      if (url.includes('/dashboard/word-of-day')) return fakeResponse(wordOfDayFixture)
+      if (url.includes('/cards/recent')) return fakeResponse(recentCardsFixture)
+      return fakeResponse([], 200)
+    }))
+    renderWithProviders(<App />)
+    await userEvent.click(screen.getByText('Xoá hết'))
+    expect(await screen.findByText('Không xoá được tiến độ. Thử lại sau.')).toBeInTheDocument()
+    // resetProgress() must NOT have run, so the panel stays open
+    expect(useAppStore.getState().settingsOpen).toBe(true)
+  })
 })

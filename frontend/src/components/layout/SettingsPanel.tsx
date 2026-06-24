@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
 import { useT } from '../../i18n/useT'
@@ -15,11 +16,18 @@ export function SettingsPanel() {
   const setPanel = useAppStore((s) => s.setPanel)
   const toggleDark = useAppStore((s) => s.toggleDark)
   const resetProgress = useAppStore((s) => s.resetProgress)
+  const [resetError, setResetError] = useState(false)
 
   const handleReset = async () => {
-    await fetch('/api/progress/reset', { method: 'POST' })
-    resetProgress()        // existing Zustand UI reset
-    router.refresh()       // re-run server fetches
+    setResetError(false)
+    try {
+      const res = await fetch('/api/progress/reset', { method: 'POST' })
+      if (!res.ok) throw new Error(String(res.status))
+      resetProgress()        // success: reset UI state + close panels
+      router.refresh()       // re-run server fetches
+    } catch {
+      setResetError(true)    // keep the panel open and surface the failure
+    }
   }
 
   if (!settingsOpen) return null
@@ -158,6 +166,9 @@ export function SettingsPanel() {
                 {t.cancel}
               </button>
             </div>
+            {resetError && (
+              <div style={{ color: 'var(--rust)', fontSize: 12, marginTop: 8 }}>{t.resetError}</div>
+            )}
           </div>
         )}
       </div>
