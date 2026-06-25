@@ -70,4 +70,10 @@ describe('Sidebar', () => {
     await userEvent.click(screen.getByText('Business English'))
     expect(pushMock).toHaveBeenCalledWith('/library')
   })
+
+  it('navigates to /progress when the "my mistakes" row is clicked', async () => {
+    render(<Sidebar />)
+    await userEvent.click(screen.getByText('Lỗi của tôi'))
+    expect(pushMock).toHaveBeenCalledWith('/progress')
+  })
 })

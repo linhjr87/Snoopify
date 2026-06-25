@@ -240,7 +240,10 @@ export function Sidebar({ displayName, summary, decks }: {
               {t.viewAll}
             </div>
           )}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer', color: 'var(--rust)' }}>
+          <div
+            onClick={() => router.push('/progress')}
+            style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer', color: 'var(--rust)' }}
+          >
             <span style={{ width: 8, height: 8, borderRadius: 2, background: 'var(--rust)', display: 'inline-block' }} />
             {t.myMistakesDeck}
           </div>
