@@ -32,7 +32,6 @@ services:
     command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"  # dev only — remove --reload for production
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-snoopify}:${POSTGRES_PASSWORD:-snoopify}@db:5432/${POSTGRES_DB:-snoopify}
-      SEED_ON_STARTUP: "true"
       CORS_ORIGINS: '["http://localhost:3000"]'
       REDIS_URL: "redis://redis:6379/0"
       COOKIE_SECURE: "false"

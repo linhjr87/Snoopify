@@ -1,9 +1,7 @@
-import uuid
 from typing import Annotated
 
 from fastapi import Cookie, Depends, HTTPException
 from redis.asyncio import Redis
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import User

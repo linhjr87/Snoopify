@@ -6,6 +6,7 @@ from app.config import get_settings
 from app.db.models import User
 from app.redis import create_session, delete_session
 from app.schemas.auth import LoginRequest, RegisterRequest, UserOut
+from app.seed import seed_starter_deck
 from app.services.auth import hash_password, verify_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -28,7 +29,6 @@ async def register(data: RegisterRequest, response: Response, session: SessionDe
     session.add(user)
     await session.commit()
     await session.refresh(user)
-    from app.seed import seed_starter_deck
     await seed_starter_deck(session, user.id)
     sid = await create_session(redis, user.id)
     _set_cookie(response, sid)

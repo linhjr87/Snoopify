@@ -10,7 +10,6 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:5173"]
     app_env: str = "dev"
     app_timezone: str = "Asia/Ho_Chi_Minh"
-    seed_on_startup: bool = False
     db_disable_statement_cache: bool = False
     redis_url: str = "redis://localhost:6379/0"
     session_ttl_seconds: int = 60 * 60 * 24 * 7  # 7 days
