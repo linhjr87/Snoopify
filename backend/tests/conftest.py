@@ -54,6 +54,31 @@ async def client(engine):
 
 
 @pytest_asyncio.fixture
+async def client_factory(engine):
+    maker = async_sessionmaker(engine, expire_on_commit=False)
+    fake = FakeRedis(decode_responses=True)
+
+    async def _override():
+        async with maker() as s:
+            yield s
+
+    app.dependency_overrides[get_session] = _override
+    app.dependency_overrides[get_redis] = lambda: fake
+    transport = ASGITransport(app=app)
+    created = []
+
+    async def _make():
+        c = AsyncClient(transport=transport, base_url="http://test")
+        created.append(c)
+        return c
+
+    yield _make
+    for c in created:
+        await c.aclose()
+    app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture
 async def auth_client(client):
     payload = {"email": "a@example.com", "password": "s3cret!", "display_name": "A"}
     res = await client.post("/auth/register", json=payload)

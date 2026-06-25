@@ -1,13 +1,19 @@
+import pytest
 import pytest_asyncio
 
 
+pytestmark = pytest.mark.asyncio
+
+
 @pytest_asyncio.fixture
-async def deck_id(client):
+async def deck_ctx(auth_client):
+    client, _ = auth_client
     r = await client.post("/decks", json={"name": "Deck", "topic": "t"})
-    return r.json()["id"]
+    return client, r.json()["id"]
 
 
-async def test_add_list_get_update_delete_card(client, deck_id):
+async def test_add_list_get_update_delete_card(deck_ctx):
+    client, deck_id = deck_ctx
     payload = {"word": "resilient", "phonetic": "/rɪ/", "pos": "adjective",
                "meaning": "kiên cường", "example": "She is resilient."}
     r = await client.post(f"/decks/{deck_id}/cards", json=payload)
@@ -31,7 +37,8 @@ async def test_add_list_get_update_delete_card(client, deck_id):
     assert r.status_code == 404
 
 
-async def test_add_card_to_missing_deck_404(client):
+async def test_add_card_to_missing_deck_404(auth_client):
+    client, _ = auth_client
     r = await client.post(
         "/decks/00000000-0000-0000-0000-000000000000/cards", json={"word": "x"}
     )

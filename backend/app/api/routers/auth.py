@@ -28,7 +28,8 @@ async def register(data: RegisterRequest, response: Response, session: SessionDe
     session.add(user)
     await session.commit()
     await session.refresh(user)
-    # NOTE: starter-deck seeding is wired in Task 3 (needs Deck.user_id).
+    from app.seed import seed_starter_deck
+    await seed_starter_deck(session, user.id)
     sid = await create_session(redis, user.id)
     _set_cookie(response, sid)
     return user

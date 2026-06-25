@@ -34,36 +34,38 @@ def _to_out(deck: Deck, now: datetime) -> DeckOut:
     )
 
 
-async def _get_or_404(session, deck_id: uuid.UUID) -> Deck:
+async def _get_or_404(session, deck_id: uuid.UUID, user_id: uuid.UUID) -> Deck:
     deck = await session.get(Deck, deck_id)
-    if deck is None:
+    if deck is None or deck.user_id != user_id:
         raise HTTPException(status_code=404, detail="Deck not found")
     return deck
 
 
-async def list_decks(session) -> list[DeckOut]:
+async def list_decks(session, user_id: uuid.UUID) -> list[DeckOut]:
     now = datetime.now(timezone.utc)
-    decks = (await session.execute(select(Deck))).scalars().all()
+    decks = (
+        await session.execute(select(Deck).where(Deck.user_id == user_id))
+    ).scalars().all()
     return [_to_out(d, now) for d in decks]
 
 
-async def create_deck(session, data: DeckCreate) -> DeckOut:
-    deck = Deck(name=data.name, topic=data.topic)
+async def create_deck(session, user_id: uuid.UUID, data: DeckCreate) -> DeckOut:
+    deck = Deck(name=data.name, topic=data.topic, user_id=user_id)
     session.add(deck)
     await session.commit()
     await session.refresh(deck, attribute_names=["cards"])
     return _to_out(deck, datetime.now(timezone.utc))
 
 
-async def get_deck_detail(session, deck_id: uuid.UUID) -> DeckDetailOut:
-    deck = await _get_or_404(session, deck_id)
+async def get_deck_detail(session, deck_id: uuid.UUID, user_id: uuid.UUID) -> DeckDetailOut:
+    deck = await _get_or_404(session, deck_id, user_id)
     now = datetime.now(timezone.utc)
     base = _to_out(deck, now)
     return DeckDetailOut(**base.model_dump(), cards=[CardOut.model_validate(c) for c in deck.cards])
 
 
-async def update_deck(session, deck_id: uuid.UUID, data: DeckUpdate) -> DeckOut:
-    deck = await _get_or_404(session, deck_id)
+async def update_deck(session, deck_id: uuid.UUID, user_id: uuid.UUID, data: DeckUpdate) -> DeckOut:
+    deck = await _get_or_404(session, deck_id, user_id)
     if data.name is not None:
         deck.name = data.name
     if data.topic is not None:
@@ -73,7 +75,7 @@ async def update_deck(session, deck_id: uuid.UUID, data: DeckUpdate) -> DeckOut:
     return _to_out(deck, datetime.now(timezone.utc))
 
 
-async def delete_deck(session, deck_id: uuid.UUID) -> None:
-    deck = await _get_or_404(session, deck_id)
+async def delete_deck(session, deck_id: uuid.UUID, user_id: uuid.UUID) -> None:
+    deck = await _get_or_404(session, deck_id, user_id)
     await session.delete(deck)
     await session.commit()

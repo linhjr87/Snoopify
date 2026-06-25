@@ -5,17 +5,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
 from app.config import get_settings
-from app.db.session import SessionLocal
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    settings = get_settings()
-    if settings.seed_on_startup:
-        from app.seed import seed
-
-        async with SessionLocal() as session:
-            await seed(session)
+    # Per-user starter decks are seeded at register time (see auth router);
+    # there is no global startup seed.
     yield
 
 
