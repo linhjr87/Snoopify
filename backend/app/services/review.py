@@ -4,11 +4,11 @@ from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import select
 
-from app.db.models import Card, ReviewLog
+from fastapi import HTTPException
+
+from app.db.models import Card, Deck, ReviewLog
 from app.schemas.review import FillOut, GradeRequest, GradeResult, QuizOption, QuizOut, ReviewItemOut
 from app.services import srs
-from app.services.cards import get_card_or_404
-from app.services.decks import _get_or_404 as get_deck_or_404
 
 _KEYS = ["A", "B", "C", "D"]
 
@@ -84,28 +84,46 @@ def _to_item(card: Card, pool: list[Card]) -> ReviewItemOut:
     )
 
 
-async def assemble_session(session, deck_id: uuid.UUID | None, limit: int) -> list[ReviewItemOut]:
+async def assemble_session(
+    session, user_id: uuid.UUID, deck_id: uuid.UUID | None, limit: int
+) -> list[ReviewItemOut]:
     now = datetime.now(timezone.utc)
-    stmt = select(Card).where(Card.due_at <= now)
+    stmt = (
+        select(Card).join(Deck).where(Deck.user_id == user_id).where(Card.due_at <= now)
+    )
     if deck_id is not None:
-        await get_deck_or_404(session, deck_id)  # 404 for a bogus deck vs. silently empty
+        # 404 for a bogus / foreign deck vs. silently empty
+        deck = await session.get(Deck, deck_id)
+        if deck is None or deck.user_id != user_id:
+            raise HTTPException(status_code=404, detail="Deck not found")
         stmt = stmt.where(Card.deck_id == deck_id)
     stmt = stmt.order_by(Card.due_at).limit(limit)
     due = list((await session.execute(stmt)).scalars().all())
 
-    # distractor pool: prefer same-deck cards, fall back to all cards
-    pool_stmt = select(Card)
+    # distractor pool: prefer same-deck cards, fall back to all of the user's cards
+    pool_stmt = select(Card).join(Deck).where(Deck.user_id == user_id)
     if deck_id is not None:
         pool_stmt = pool_stmt.where(Card.deck_id == deck_id)
     pool = list((await session.execute(pool_stmt)).scalars().all())
     if len({c.meaning for c in pool}) < 4:
-        pool = list((await session.execute(select(Card))).scalars().all())
+        pool = list(
+            (
+                await session.execute(
+                    select(Card).join(Deck).where(Deck.user_id == user_id)
+                )
+            ).scalars().all()
+        )
 
     return [_to_item(c, pool) for c in due]
 
 
-async def grade_card(session, req: GradeRequest) -> GradeResult:
-    card = await get_card_or_404(session, req.card_id)
+async def grade_card(session, user_id: uuid.UUID, req: GradeRequest) -> GradeResult:
+    card = await session.get(Card, req.card_id)
+    if card is None:
+        raise HTTPException(status_code=404, detail="Card not found")
+    deck = await session.get(Deck, card.deck_id)
+    if deck is None or deck.user_id != user_id:
+        raise HTTPException(status_code=404, detail="Card not found")
     new = srs.review(
         srs.Schedule(
             ease_factor=card.ease_factor,

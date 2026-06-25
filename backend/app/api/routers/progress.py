@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query
 
-from app.api.deps import SessionDep
+from app.api.deps import CurrentUserDep, SessionDep
 from app.schemas.card import CardOut
 from app.schemas.progress import HeatmapOut, NeedsReviewItem, ProgressSummaryOut, WordOfDayOut
 from app.services import progress as svc
@@ -11,33 +11,37 @@ cards_extra_router = APIRouter(prefix="/cards", tags=["cards"])
 
 
 @progress_router.get("/summary", response_model=ProgressSummaryOut)
-async def summary(session: SessionDep):
-    return await svc.summary(session)
+async def summary(session: SessionDep, user: CurrentUserDep):
+    return await svc.summary(session, user.id)
 
 
 @progress_router.get("/heatmap", response_model=HeatmapOut)
-async def heatmap(session: SessionDep):
-    return await svc.heatmap(session)
+async def heatmap(session: SessionDep, user: CurrentUserDep):
+    return await svc.heatmap(session, user.id)
 
 
 @progress_router.get("/needs-review", response_model=list[NeedsReviewItem])
-async def needs_review(session: SessionDep, limit: int = Query(default=10, ge=1, le=50)):
-    return await svc.needs_review(session, limit)
+async def needs_review(
+    session: SessionDep, user: CurrentUserDep, limit: int = Query(default=10, ge=1, le=50)
+):
+    return await svc.needs_review(session, user.id, limit)
 
 
 @dashboard_router.get("/word-of-day", response_model=WordOfDayOut)
-async def word_of_day(session: SessionDep):
-    result = await svc.word_of_day(session)
+async def word_of_day(session: SessionDep, user: CurrentUserDep):
+    result = await svc.word_of_day(session, user.id)
     if result is None:
         raise HTTPException(status_code=404, detail="No cards yet")
     return result
 
 
 @cards_extra_router.get("/recent", response_model=list[CardOut])
-async def recent(session: SessionDep, limit: int = Query(default=3, ge=1, le=20)):
-    return await svc.recent_cards(session, limit)
+async def recent(
+    session: SessionDep, user: CurrentUserDep, limit: int = Query(default=3, ge=1, le=20)
+):
+    return await svc.recent_cards(session, user.id, limit)
 
 
 @progress_router.post("/reset")
-async def reset(session: SessionDep):
-    return await svc.reset_progress(session)
+async def reset(session: SessionDep, user: CurrentUserDep):
+    return await svc.reset_progress(session, user.id)
