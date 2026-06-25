@@ -1,4 +1,4 @@
-import { apiFetch } from '../../lib/api'
+import { apiFetch } from '../../lib/api-server'
 import type { ReviewItemOut } from '../../lib/api-types'
 import { toSessionItem } from '../../lib/adapters'
 import ReviewScreen from '../../features/review/ReviewScreen'

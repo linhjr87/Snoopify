@@ -1,4 +1,4 @@
-import { apiFetch } from '../../lib/api'
+import { apiFetch } from '../../lib/api-server'
 import type { DeckOut } from '../../lib/api-types'
 import LibraryScreen from '../../features/library/LibraryScreen'
 

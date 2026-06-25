@@ -1,4 +1,4 @@
-import { apiFetch } from '../../lib/api'
+import { apiFetch } from '../../lib/api-server'
 import type { ProgressSummary, HeatmapOut, NeedsReviewItem } from '../../lib/api-types'
 import ProgressScreen from '../../features/progress/ProgressScreen'
 

@@ -1,4 +1,4 @@
-import { apiFetch } from '../lib/api'
+import { apiFetch } from '../lib/api-server'
 import type { ProgressSummary, WordOfDayOut, CardOut } from '../lib/api-types'
 import { TodaySession } from '../features/dashboard/TodaySession'
 import { Streak } from '../features/dashboard/Streak'
