@@ -6,8 +6,13 @@ import { Sidebar } from './layout/Sidebar'
 import { Topbar } from './layout/Topbar'
 import { GuidedTourOverlay } from './layout/GuidedTourOverlay'
 import { useTourStore } from '../store/useTourStore'
+import type { ProgressSummary } from '../lib/api-types'
 
-export function AppShell({ children, displayName }: { children: React.ReactNode; displayName?: string | null }) {
+export function AppShell({ children, displayName, summary }: {
+  children: React.ReactNode
+  displayName?: string | null
+  summary?: ProgressSummary | null
+}) {
   const startTour = useTourStore((s) => s.startTour)
   const pathname = usePathname()
 
@@ -34,7 +39,7 @@ export function AppShell({ children, displayName }: { children: React.ReactNode;
         transition: 'background .3s ease, color .3s ease',
       }}
     >
-      <Sidebar displayName={displayName} />
+      <Sidebar displayName={displayName} summary={summary} />
       <main
         style={{
           flex: 1,

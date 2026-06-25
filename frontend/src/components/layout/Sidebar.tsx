@@ -4,6 +4,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
 import { useT } from '../../i18n/useT'
 import { SettingsPanel } from './SettingsPanel'
+import type { ProgressSummary } from '../../lib/api-types'
 
 const navItems = (t: ReturnType<typeof useT>) => [
   {
@@ -48,7 +49,10 @@ const navItems = (t: ReturnType<typeof useT>) => [
   },
 ]
 
-export function Sidebar({ displayName }: { displayName?: string | null }) {
+export function Sidebar({ displayName, summary }: {
+  displayName?: string | null
+  summary?: ProgressSummary | null
+}) {
   const t = useT()
   const router = useRouter()
   const pathname = usePathname()
@@ -56,6 +60,7 @@ export function Sidebar({ displayName }: { displayName?: string | null }) {
   const toggleCollapsed = useAppStore((s) => s.toggleCollapsed)
   const settingsOpen = useAppStore((s) => s.settingsOpen)
   const setPanel = useAppStore((s) => s.setPanel)
+  const streak = summary?.streak ?? 0
 
   const items = navItems(t)
 
@@ -248,7 +253,7 @@ export function Sidebar({ displayName }: { displayName?: string | null }) {
           />
           <div className="side-user-info" style={{ lineHeight: 1.2, flex: 1 }}>
             <div style={{ fontWeight: 600, fontSize: 14 }}>{displayName || t.guestLabel}</div>
-            <div style={{ fontSize: 12, color: 'var(--muted)' }}>{t.streakLabel(12)}</div>
+            <div style={{ fontSize: 12, color: 'var(--muted)' }}>{t.streakLabel(streak)}</div>
           </div>
           <div className="user-dots" style={{ color: 'var(--muted)', flex: 'none' }}>
             <svg width="15" height="15" viewBox="0 0 14 14" fill="currentColor">
