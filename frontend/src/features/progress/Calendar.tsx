@@ -1,3 +1,5 @@
+'use client'
+import { useT } from '../../i18n/useT'
 import type { HeatmapOut } from '../../lib/api-types'
 
 function heatColor(lv: number): string {
@@ -8,11 +10,12 @@ function heatColor(lv: number): string {
 }
 
 export function Calendar({ heatmap }: { heatmap: HeatmapOut | null }) {
+  const t = useT()
   const levels = heatmap?.cells ?? Array.from({ length: 126 }, () => 0)
   return (
     <div>
       <h2 style={{ margin: '0 0 16px', fontFamily: "'Newsreader', serif", fontWeight: 500, fontSize: 19 }}>
-        Lịch học · 18 tuần qua
+        {t.calendarHeading}
       </h2>
       <div style={{ display: 'grid', gridTemplateRows: 'repeat(7, 13px)', gridAutoFlow: 'column', gridAutoColumns: '13px', gap: 4 }}>
         {levels.map((lv, i) => (
@@ -20,12 +23,12 @@ export function Calendar({ heatmap }: { heatmap: HeatmapOut | null }) {
         ))}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 14, fontSize: 12, color: 'var(--muted)' }}>
-        ít
+        {t.legendLess}
         <div style={{ width: 13, height: 13, borderRadius: 3, background: 'var(--track)' }} />
         <div style={{ width: 13, height: 13, borderRadius: 3, background: 'color-mix(in srgb, var(--accent) 30%, #fff)' }} />
         <div style={{ width: 13, height: 13, borderRadius: 3, background: 'color-mix(in srgb, var(--accent) 65%, #fff)' }} />
         <div style={{ width: 13, height: 13, borderRadius: 3, background: 'var(--accent)' }} />
-        nhiều
+        {t.legendMore}
       </div>
     </div>
   )

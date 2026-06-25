@@ -29,7 +29,7 @@ export default function AuthScreen() {
     e.preventDefault()
     setError('')
     if (!isLogin && pw !== confirmPw) {
-      setError('Mật khẩu nhập lại không khớp')
+      setError(t.pwMismatch)
       return
     }
     try {
@@ -41,13 +41,13 @@ export default function AuthScreen() {
       router.push('/')
       router.refresh()
     } catch (err) {
-      if (err instanceof ApiError && err.status === 401) setError('Email hoặc mật khẩu không đúng')
-      else if (err instanceof ApiError && err.status === 409) setError('Email đã được đăng ký')
-      else setError('Lỗi kết nối — thử lại sau')
+      if (err instanceof ApiError && err.status === 401) setError(t.authInvalidCreds)
+      else if (err instanceof ApiError && err.status === 409) setError(t.authEmailTaken)
+      else setError(t.authConnError)
     }
   }
 
-  const isMismatch = error === 'Mật khẩu nhập lại không khớp'
+  const isMismatch = error === t.pwMismatch
 
   return (
     <div data-screen-label="Auth" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, background: 'var(--paper)' }}>

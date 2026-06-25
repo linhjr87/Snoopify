@@ -18,7 +18,7 @@ export default function ProgressScreen({ summary, heatmap, needsReview }: {
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 6 }}>
-          Tổng quan
+          {t.overviewLabel}
         </div>
         <h1 style={{ margin: 0, fontFamily: "'Newsreader', serif", fontWeight: 500, fontSize: 32, letterSpacing: '-0.01em' }}>
           {t.progressTitle}
@@ -27,10 +27,10 @@ export default function ProgressScreen({ summary, heatmap, needsReview }: {
 
       {/* 4 stat tiles (API-backed) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 22 }}>
-        <StatTile value={String(s?.streak ?? 0)} label="ngày liên tục" color="var(--clay, #a96440)" />
-        <StatTile value={String(s?.mastery.proficient ?? 0)} label="đã thành thạo" color="var(--accent)" />
-        <StatTile value={String(s?.due_total ?? 0)} label="thẻ đến hạn" />
-        <StatTile value={String(s?.reviews_today ?? 0)} label="ôn hôm nay" />
+        <StatTile value={String(s?.streak ?? 0)} label={t.consecutiveDays} color="var(--clay, #a96440)" />
+        <StatTile value={String(s?.mastery.proficient ?? 0)} label={t.masteredLabel} color="var(--accent)" />
+        <StatTile value={String(s?.due_total ?? 0)} label={t.dueCardsLabel} />
+        <StatTile value={String(s?.reviews_today ?? 0)} label={t.reviewedTodayLabel} />
       </div>
 
       {/* Two-column body */}

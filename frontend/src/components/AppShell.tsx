@@ -7,7 +7,7 @@ import { Topbar } from './layout/Topbar'
 import { GuidedTourOverlay } from './layout/GuidedTourOverlay'
 import { useTourStore } from '../store/useTourStore'
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({ children, displayName }: { children: React.ReactNode; displayName?: string | null }) {
   const startTour = useTourStore((s) => s.startTour)
   const pathname = usePathname()
 
@@ -34,7 +34,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         transition: 'background .3s ease, color .3s ease',
       }}
     >
-      <Sidebar />
+      <Sidebar displayName={displayName} />
       <main
         style={{
           flex: 1,
