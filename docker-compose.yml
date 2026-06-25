@@ -17,6 +17,8 @@ services:
 
   redis:
     image: redis:7-alpine
+    restart: unless-stopped
+    # sessions are ephemeral in dev (no volume); add a volume for persistence if needed
     ports:
       - "6379:6379"
     healthcheck:
