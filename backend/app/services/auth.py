@@ -8,5 +8,5 @@ def hash_password(pw: str) -> str:
 def verify_password(pw: str, hashed: str) -> bool:
     try:
         return bcrypt.checkpw(pw.encode("utf-8"), hashed.encode("utf-8"))
-    except ValueError:
+    except Exception:
         return False

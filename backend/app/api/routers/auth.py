@@ -11,6 +11,9 @@ from app.services.auth import hash_password, verify_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+# Pre-computed once so login always runs bcrypt regardless of email existence
+_DUMMY_HASH: str = hash_password("_dummy_constant_")
+
 
 def _set_cookie(response: Response, sid: str) -> None:
     s = get_settings()
@@ -27,9 +30,10 @@ async def register(data: RegisterRequest, response: Response, session: SessionDe
         raise HTTPException(status_code=409, detail="Email already registered")
     user = User(email=data.email, password_hash=hash_password(data.password), display_name=data.display_name)
     session.add(user)
-    await session.commit()
-    await session.refresh(user)
+    await session.flush()  # get user.id without committing
     await seed_starter_deck(session, user.id)
+    await session.commit()  # single transaction: user + starter deck
+    await session.refresh(user)
     sid = await create_session(redis, user.id)
     _set_cookie(response, sid)
     return user
@@ -38,7 +42,10 @@ async def register(data: RegisterRequest, response: Response, session: SessionDe
 @router.post("/login", response_model=UserOut)
 async def login(data: LoginRequest, response: Response, session: SessionDep, redis: RedisDep):
     user = (await session.execute(select(User).where(User.email == data.email))).scalar_one_or_none()
-    if user is None or not verify_password(data.password, user.password_hash):
+    if user is None:
+        verify_password(data.password, _DUMMY_HASH)  # constant-time guard: prevent email-oracle timing
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    if not verify_password(data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     sid = await create_session(redis, user.id)
     _set_cookie(response, sid)

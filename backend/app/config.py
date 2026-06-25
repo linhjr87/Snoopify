@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     db_disable_statement_cache: bool = False
     redis_url: str = "redis://localhost:6379/0"
     session_ttl_seconds: int = 60 * 60 * 24 * 7  # 7 days
-    cookie_secure: bool = False
+    cookie_secure: bool = False  # set COOKIE_SECURE=true in production (never ship False)
 
 
 @lru_cache

@@ -17,6 +17,7 @@ async def test_seed_starter_deck_creates_user_owned_deck(session):
     await session.refresh(user)
 
     deck = await seed_starter_deck(session, user.id)
+    await session.commit()
     assert deck.name == SEED_DECK_NAME
     assert deck.user_id == user.id
 

@@ -25,7 +25,13 @@ async def create_session(redis: aioredis.Redis, user_id: uuid.UUID) -> str:
 
 async def get_session_user_id(redis: aioredis.Redis, sid: str) -> uuid.UUID | None:
     raw = await redis.get(_key(sid))
-    return uuid.UUID(raw) if raw else None
+    if not raw:
+        return None
+    try:
+        return uuid.UUID(raw)
+    except (ValueError, AttributeError):
+        await redis.delete(_key(sid))
+        return None
 
 
 async def delete_session(redis: aioredis.Redis, sid: str) -> None:

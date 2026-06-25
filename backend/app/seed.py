@@ -46,6 +46,6 @@ async def seed_starter_deck(session, user_id: uuid.UUID) -> Deck:
             )
         )
     session.add(deck)
-    await session.commit()
+    await session.flush()
     await session.refresh(deck, attribute_names=["cards"])
     return deck

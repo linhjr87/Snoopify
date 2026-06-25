@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -6,11 +7,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.router import api_router
 from app.config import get_settings
 
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Per-user starter decks are seeded at register time (see auth router);
-    # there is no global startup seed.
+    from app.redis import get_redis
+    try:
+        await (await get_redis()).ping()
+    except Exception as exc:
+        logger.warning("Redis unavailable at startup: %s", exc)
     yield
 
 
@@ -20,6 +26,7 @@ def create_app() -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
+        allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )

@@ -18,7 +18,7 @@ export function SettingsPanel() {
   const [resetError, setResetError] = useState(false)
 
   const handleLogout = async () => {
-    try { await apiPost('/auth/logout') } catch { /* ignore */ }
+    try { await apiPost('/auth/logout') } catch (err) { console.error('logout failed:', err) }
     router.push('/login'); router.refresh()
   }
 
