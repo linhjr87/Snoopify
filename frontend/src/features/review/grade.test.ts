@@ -3,7 +3,7 @@ import { submitGrade } from './grade'
 import * as api from '../../lib/api'
 import { initialState, useAppStore } from '../../store/useAppStore'
 
-beforeEach(() => { useAppStore.setState({ ...initialState, _hasHydrated: true }) })
+beforeEach(() => { useAppStore.setState({ ...initialState }) })
 afterEach(() => { vi.restoreAllMocks() })
 
 describe('submitGrade', () => {

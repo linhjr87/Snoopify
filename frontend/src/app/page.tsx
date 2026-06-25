@@ -9,14 +9,15 @@ import { WeekProgress } from '../features/dashboard/WeekProgress'
 import { DashboardHeader } from '../features/dashboard/DashboardHeader'
 
 export default async function DashboardPage() {
-  const [summary, word, cards] = await Promise.all([
+  const [summary, word, cards, me] = await Promise.all([
     apiFetch<ProgressSummary>('/progress/summary').catch(() => null),
     apiFetch<WordOfDayOut>('/dashboard/word-of-day').catch(() => null),
     apiFetch<CardOut[]>('/cards/recent?limit=3').catch(() => [] as CardOut[]),
+    apiFetch<{ display_name: string; email: string }>('/auth/me').catch(() => null),
   ])
   return (
     <div style={{ animation: 'fadeUp .5s ease both' }}>
-      <DashboardHeader />
+      <DashboardHeader displayName={me?.display_name} />
       <div style={{ display: 'flex', gap: '22px', marginBottom: '22px', flexWrap: 'wrap' }}>
         <TodaySession summary={summary} />
         <Streak summary={summary} />

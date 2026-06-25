@@ -8,10 +8,9 @@ export const initialState: AppState = {
   sIndex: 0, sCorrect: 0, gradeError: false, dark: false, lang: 'vn', collapsed: false,
   settingsOpen: false, confirmReset: false, importOpen: false, notifOpen: false, langMenuOpen: false,
   importText: '',
-  isAuthenticated: false, hasOnboarded: false, _hasHydrated: false,
 }
 
-const PERSIST_KEYS: (keyof AppState)[] = ['dark', 'lang', 'collapsed', 'isAuthenticated', 'hasOnboarded']
+const PERSIST_KEYS: (keyof AppState)[] = ['dark', 'lang', 'collapsed']
 
 export const useAppStore = create<AppStore>()(
   persist(
@@ -34,19 +33,12 @@ export const useAppStore = create<AppStore>()(
       setPanel: (panel, open) => set({ [panel]: open } as Partial<AppState>),
       setImportText: (text) => set({ importText: text }),
       resetProgress: () => set({ sIndex: 0, sCorrect: 0, flipped: false, quizPick: null, fillValue: '', fillChecked: false, confirmReset: false, settingsOpen: false }),
-      login: () => set({ isAuthenticated: true }),
-      logout: () => set({
-        isAuthenticated: false, hasOnboarded: false,
-        settingsOpen: false, confirmReset: false, importOpen: false, notifOpen: false, langMenuOpen: false,
-      }),
-      completeOnboarding: () => set({ hasOnboarded: true }),
     }),
     {
       name: 'snoopify_v1',
       partialize: (s) => Object.fromEntries(PERSIST_KEYS.map((k) => [k, s[k]])) as Partial<AppState>,
       onRehydrateStorage: () => (state) => {
         if (state) applyTheme(state.dark)
-        useAppStore.setState({ _hasHydrated: true })
       },
     },
   ),
