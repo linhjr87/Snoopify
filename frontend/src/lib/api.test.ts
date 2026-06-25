@@ -2,6 +2,11 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { apiGet, apiPost, apiPatch, apiDelete, ApiError, apiFetch } from './api'
 import { fakeResponse } from '../test/fakeResponse'
 
+// next/headers cookies() is a Next.js server-only API; mock it for unit tests
+vi.mock('next/headers', () => ({
+  cookies: vi.fn(async () => ({ get: () => undefined })),
+}))
+
 afterEach(() => { vi.restoreAllMocks() })
 
 describe('api client', () => {
