@@ -31,3 +31,8 @@ async def test_logout_clears_session(auth_client):
     client, _ = auth_client
     assert (await client.post("/auth/logout")).status_code == 204
     assert (await client.get("/auth/me")).status_code == 401
+
+@pytest.mark.asyncio
+async def test_login_unknown_email_is_401(client):
+    res = await client.post("/auth/login", json={"email": "nobody@example.com", "password": "whatever"})
+    assert res.status_code == 401

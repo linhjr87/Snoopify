@@ -48,7 +48,8 @@ async def login(data: LoginRequest, response: Response, session: SessionDep, red
 async def logout(response: Response, redis: RedisDep, sid: str | None = Cookie(default=None)):
     if sid:
         await delete_session(redis, sid)
-    response.delete_cookie("sid", path="/")
+    s = get_settings()
+    response.delete_cookie("sid", path="/", httponly=True, samesite="lax", secure=s.cookie_secure)
 
 
 @router.get("/me", response_model=UserOut)
