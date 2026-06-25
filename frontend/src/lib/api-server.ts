@@ -19,7 +19,7 @@ export async function apiFetch<T>(path: string): Promise<T> {
 
 export function orRedirect<T>(fallback: T): (err: unknown) => T {
   return (err: unknown): T => {
-    if (err instanceof ApiError && err.status === 401) redirect('/login')
+    if (err instanceof ApiError && err.status === 401) redirect('/api/signout')
     return fallback
   }
 }
