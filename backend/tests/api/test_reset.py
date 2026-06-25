@@ -2,17 +2,20 @@ import pytest_asyncio
 
 
 @pytest_asyncio.fixture
-async def graded(client):
-    did = (await client.post("/decks", json={"name": "D", "topic": "t"})).json()["id"]
-    cid = (await client.post(f"/decks/{did}/cards",
-           json={"word": "resilient", "meaning": "kiên cường"})).json()["id"]
+async def graded(auth_client):
+    # grade one card from the per-user seeded starter deck
+    client, _ = auth_client
+    did = (await client.get("/decks")).json()[0]["id"]
+    cid = (await client.get(f"/decks/{did}/cards")).json()[0]["id"]
     await client.post("/review/grade", json={"card_id": cid, "rating": "remember", "mode": "flash"})
     return cid
 
 
-async def test_reset_clears_history_and_schedule_but_keeps_cards(client, graded):
+async def test_reset_clears_history_and_schedule_but_keeps_cards(auth_client, graded):
+    client, _ = auth_client
     r = await client.post("/progress/reset")
     assert r.status_code == 200
+    assert r.json()["reset"] == 5  # only this user's 5 starter cards
 
     # card still exists, schedule back to defaults, due again
     card = (await client.get(f"/cards/{graded}")).json()
@@ -24,4 +27,4 @@ async def test_reset_clears_history_and_schedule_but_keeps_cards(client, graded)
 
     summary = (await client.get("/progress/summary")).json()
     assert summary["reviews_today"] == 0
-    assert summary["due_total"] == 1
+    assert summary["due_total"] == 5

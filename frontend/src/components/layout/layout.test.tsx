@@ -5,11 +5,13 @@ import { AppShell } from '../AppShell'
 import { useAppStore, initialState } from '../../store/useAppStore'
 import { progressSummaryFixture, wordOfDayFixture, recentCardsFixture } from '../../test/fixtures'
 import { fakeResponse } from '../../test/fakeResponse'
+import * as api from '../../lib/api'
 
 const pushMock = vi.fn()
+const refreshMock = vi.fn()
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: pushMock, replace: vi.fn(), refresh: vi.fn() }),
+  useRouter: () => ({ push: pushMock, replace: vi.fn(), refresh: refreshMock }),
   usePathname: () => '/',
 }))
 
@@ -35,10 +37,10 @@ describe('layout', () => {
   beforeEach(() => {
     localStorage.clear()
     pushMock.mockReset()
+    refreshMock.mockReset()
     // Skip the onboarding tour auto-start so it doesn't interfere with assertions.
     localStorage.setItem('myenglish_tour_done', '1')
-    // Routes are auth-gated now; the AppShell only renders when authenticated.
-    useAppStore.setState({ ...initialState, isAuthenticated: true, _hasHydrated: true })
+    useAppStore.setState({ ...initialState })
     mockApi()
   })
   afterEach(() => { vi.restoreAllMocks() })
@@ -51,6 +53,16 @@ describe('layout', () => {
     renderShell()
     await userEvent.click(screen.getByLabelText('Cài đặt'))
     expect(screen.getByText('Đăng xuất')).toBeInTheDocument()
+  })
+  it('logout POSTs /auth/logout then routes to /login', async () => {
+    const apiPostSpy = vi.spyOn(api, 'apiPost').mockResolvedValue(undefined as never)
+    useAppStore.setState({ settingsOpen: true })
+    renderShell()
+    await userEvent.click(screen.getByText('Đăng xuất'))
+    await vi.waitFor(() => {
+      expect(apiPostSpy).toHaveBeenCalledWith('/auth/logout')
+      expect(pushMock).toHaveBeenCalledWith('/login')
+    })
   })
   it('reset requires confirm step', async () => {
     useAppStore.setState({ settingsOpen: true })

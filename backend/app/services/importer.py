@@ -1,3 +1,4 @@
+import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
@@ -48,9 +49,9 @@ def parse_import(data: dict) -> ParsedDeck:
     return ParsedDeck(name=str(name), topic=data.get("topic") or "", cards=clean)
 
 
-async def import_deck(session, data: dict) -> DeckOut:
+async def import_deck(session, data: dict, user_id: uuid.UUID) -> DeckOut:
     parsed = parse_import(data)
-    deck = Deck(name=parsed.name, topic=parsed.topic)
+    deck = Deck(name=parsed.name, topic=parsed.topic, user_id=user_id)
     for c in parsed.cards:
         deck.cards.append(
             Card(word=c.word, phonetic=c.phonetic, pos=c.pos, meaning=c.meaning, example=c.example)

@@ -4,7 +4,11 @@ import pytest
 pytestmark = pytest.mark.asyncio
 
 
-async def test_create_list_get_update_delete_deck(client):
+async def test_create_list_get_update_delete_deck(auth_client):
+    client, _ = auth_client
+    # a freshly registered user already has the starter deck
+    assert len((await client.get("/decks")).json()) == 1
+
     # create
     r = await client.post("/decks", json={"name": "Business", "topic": "chủ đề"})
     assert r.status_code == 201
@@ -14,10 +18,10 @@ async def test_create_list_get_update_delete_deck(client):
     assert deck["count"] == 0
     assert deck["due_count"] == 0
 
-    # list
+    # list now has starter + new deck
     r = await client.get("/decks")
     assert r.status_code == 200
-    assert len(r.json()) == 1
+    assert len(r.json()) == 2
 
     # get detail
     r = await client.get(f"/decks/{did}")
@@ -36,12 +40,14 @@ async def test_create_list_get_update_delete_deck(client):
     assert r.status_code == 404
 
 
-async def test_get_missing_deck_404(client):
+async def test_get_missing_deck_404(auth_client):
+    client, _ = auth_client
     r = await client.get("/decks/00000000-0000-0000-0000-000000000000")
     assert r.status_code == 404
 
 
-async def test_update_deck_with_cards_preserves_count(client):
+async def test_update_deck_with_cards_preserves_count(auth_client):
+    client, _ = auth_client
     # create a deck
     r = await client.post("/decks", json={"name": "Travel", "topic": "travel"})
     assert r.status_code == 201
@@ -65,7 +71,8 @@ async def test_update_deck_with_cards_preserves_count(client):
     assert body["count"] == 2
 
 
-async def test_list_decks_includes_mastery_and_last_reviewed(client):
+async def test_list_decks_includes_mastery_and_last_reviewed(auth_client):
+    client, _ = auth_client
     r = await client.post("/decks", json={"name": "Mastery", "topic": "t"})
     did = r.json()["id"]
     # create response already carries the new fields

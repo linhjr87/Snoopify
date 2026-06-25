@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
 import { useT } from '../../i18n/useT'
+import { apiPost } from '../../lib/api'
 
 export function SettingsPanel() {
   const t = useT()
@@ -14,8 +15,12 @@ export function SettingsPanel() {
   }))
   const setPanel = useAppStore((s) => s.setPanel)
   const resetProgress = useAppStore((s) => s.resetProgress)
-  const logout = useAppStore((s) => s.logout)
   const [resetError, setResetError] = useState(false)
+
+  const handleLogout = async () => {
+    try { await apiPost('/auth/logout') } catch (err) { console.error('logout failed:', err) }
+    router.push('/login'); router.refresh()
+  }
 
   const handleReset = async () => {
     setResetError(false)
@@ -62,7 +67,7 @@ export function SettingsPanel() {
       {/* Logout */}
       <div style={{ borderBottom: '1px solid var(--line)', paddingBottom: 8, marginBottom: 4 }}>
         <button
-          onClick={logout}
+          onClick={handleLogout}
           style={{
             display: 'flex',
             alignItems: 'center',

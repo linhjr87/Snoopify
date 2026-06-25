@@ -2,13 +2,15 @@ import pytest_asyncio
 
 
 @pytest_asyncio.fixture
-async def card_id(client):
-    did = (await client.post("/decks", json={"name": "D", "topic": "t"})).json()["id"]
-    return (await client.post(f"/decks/{did}/cards",
-            json={"word": "resilient", "meaning": "kiên cường"})).json()["id"]
+async def card_id(auth_client):
+    client, _ = auth_client
+    # use a card from the per-user seeded starter deck
+    did = (await client.get("/decks")).json()[0]["id"]
+    return (await client.get(f"/decks/{did}/cards")).json()[0]["id"]
 
 
-async def test_grade_remember_advances_schedule(client, card_id):
+async def test_grade_remember_advances_schedule(auth_client, card_id):
+    client, _ = auth_client
     r = await client.post("/review/grade",
                           json={"card_id": card_id, "rating": "remember", "mode": "flash"})
     assert r.status_code == 200
@@ -20,7 +22,8 @@ async def test_grade_remember_advances_schedule(client, card_id):
     assert all(item["card_id"] != card_id for item in s.json())
 
 
-async def test_grade_forgot_increments_lapses(client, card_id):
+async def test_grade_forgot_increments_lapses(auth_client, card_id):
+    client, _ = auth_client
     r = await client.post("/review/grade",
                           json={"card_id": card_id, "rating": "forgot", "mode": "quiz",
                                 "is_correct": False})
@@ -29,7 +32,8 @@ async def test_grade_forgot_increments_lapses(client, card_id):
     assert r.json()["interval_days"] == 1
 
 
-async def test_grade_vague_grows_reps_without_lapse(client, card_id):
+async def test_grade_vague_grows_reps_without_lapse(auth_client, card_id):
+    client, _ = auth_client
     # advance to reps=1 first, then a vague grade
     await client.post("/review/grade",
                       json={"card_id": card_id, "rating": "remember", "mode": "flash"})
@@ -43,7 +47,8 @@ async def test_grade_vague_grows_reps_without_lapse(client, card_id):
     assert body["ease_factor"] < 2.6  # q=3 lowers ease
 
 
-async def test_grade_missing_card_404(client):
+async def test_grade_missing_card_404(auth_client):
+    client, _ = auth_client
     r = await client.post("/review/grade",
                           json={"card_id": "00000000-0000-0000-0000-000000000000",
                                 "rating": "remember", "mode": "flash"})
