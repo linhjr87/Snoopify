@@ -47,6 +47,8 @@ export default function AuthScreen() {
     }
   }
 
+  const isMismatch = error === 'Mật khẩu nhập lại không khớp'
+
   return (
     <div data-screen-label="Auth" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, background: 'var(--paper)' }}>
       <div style={{ width: '100%', maxWidth: 420 }}>
@@ -111,8 +113,8 @@ export default function AuthScreen() {
                   type="password"
                   placeholder={t.confirmPwPh}
                   value={confirmPw}
-                  onChange={(e) => { setConfirmPw(e.target.value); if (error) setError('') }}
-                  style={{ width: '100%', border: `1px solid ${error ? 'var(--rust)' : 'var(--line)'}`, borderRadius: 10, padding: '11px 13px', fontFamily: "'Hanken Grotesk', sans-serif", fontSize: 15, color: 'var(--ink)', background: 'var(--paper)', outline: 'none' }}
+                  onChange={(e) => { setConfirmPw(e.target.value); if (isMismatch) setError('') }}
+                  style={{ width: '100%', border: `1px solid ${isMismatch ? 'var(--rust)' : 'var(--line)'}`, borderRadius: 10, padding: '11px 13px', fontFamily: "'Hanken Grotesk', sans-serif", fontSize: 15, color: 'var(--ink)', background: 'var(--paper)', outline: 'none' }}
                 />
               </div>
             )}
