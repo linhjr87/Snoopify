@@ -163,7 +163,10 @@ async def reset_progress(session, user_id: uuid.UUID) -> dict:
             select(Card.id).join(Deck).where(Deck.user_id == user_id)
         )
     ).scalars().all()
-    await session.execute(delete(ReviewLog).where(ReviewLog.card_id.in_(card_ids)))
+    await session.execute(
+        delete(ReviewLog).where(ReviewLog.card_id.in_(card_ids)),
+        execution_options={"synchronize_session": False},
+    )
     await session.execute(
         update(Card)
         .where(Card.id.in_(card_ids))
@@ -174,7 +177,8 @@ async def reset_progress(session, user_id: uuid.UUID) -> dict:
             lapses=0,
             last_reviewed_at=None,
             due_at=datetime.now(timezone.utc),
-        )
+        ),
+        execution_options={"synchronize_session": False},
     )
     await session.commit()
     return {"reset": len(card_ids)}

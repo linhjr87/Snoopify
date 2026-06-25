@@ -45,6 +45,12 @@ async def test_grade_foreign_card_is_404(client_factory):
 @pytest.mark.asyncio
 async def test_progress_summary_counts_only_own_cards(client_factory):
     ca = await client_factory(); await _register(ca, A)
+    cb = await client_factory(); await _register(cb, B)
+    # B grades one of their own cards — must not bleed into A's summary
+    b_deck = (await cb.get("/decks")).json()[0]
+    b_card = (await cb.get(f"/decks/{b_deck['id']}/cards")).json()[0]["id"]
+    await cb.post("/review/grade", json={
+        "card_id": b_card, "rating": "remember", "mode": "flash", "is_correct": None})
     s = (await ca.get("/progress/summary")).json()
-    # A's starter deck has 5 cards, all new/due; summary reflects only A's data
-    assert s["due_total"] == 5
+    assert s["due_total"] == 5        # A still sees exactly their 5 starter cards
+    assert s["reviews_today"] == 0    # A sees none of B's reviews
