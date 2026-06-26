@@ -7,10 +7,11 @@ export const initialState: AppState = {
   reviewMode: 'flash', flipped: false, quizPick: null, fillValue: '', fillChecked: false,
   sIndex: 0, sCorrect: 0, gradeError: false, dark: false, lang: 'vn', collapsed: false,
   settingsOpen: false, confirmReset: false, importOpen: false, notifOpen: false, langMenuOpen: false,
+  notifRead: false,
   importText: '',
 }
 
-const PERSIST_KEYS: (keyof AppState)[] = ['dark', 'lang', 'collapsed']
+const PERSIST_KEYS: (keyof AppState)[] = ['dark', 'lang', 'collapsed', 'notifRead']
 
 export const useAppStore = create<AppStore>()(
   persist(
@@ -31,6 +32,7 @@ export const useAppStore = create<AppStore>()(
       setLang: (lang) => set({ lang, langMenuOpen: false }),
       toggleCollapsed: () => set((s) => ({ collapsed: !s.collapsed })),
       setPanel: (panel, open) => set({ [panel]: open } as Partial<AppState>),
+      markNotifsRead: () => set({ notifRead: true }),
       setImportText: (text) => set({ importText: text }),
       resetProgress: () => set({ sIndex: 0, sCorrect: 0, flipped: false, quizPick: null, fillValue: '', fillChecked: false, confirmReset: false, settingsOpen: false }),
     }),

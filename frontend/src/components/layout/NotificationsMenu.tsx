@@ -8,6 +8,8 @@ const dotColors = ['var(--rust)', 'var(--clay,#a96440)', 'var(--accent,#2f5d4e)'
 export function NotificationsMenu() {
   const open = useAppStore((s) => s.notifOpen)
   const setPanel = useAppStore((s) => s.setPanel)
+  const notifRead = useAppStore((s) => s.notifRead)
+  const markNotifsRead = useAppStore((s) => s.markNotifsRead)
   const t = useT()
 
   if (!open) return null
@@ -52,7 +54,7 @@ export function NotificationsMenu() {
           {t.notif}
         </span>
         <span
-          onClick={() => setPanel('notifOpen', false)}
+          onClick={() => markNotifsRead()}
           style={{ fontSize: 11, color: 'var(--accent,#2f5d4e)', cursor: 'pointer' }}
         >
           {t.markRead}
@@ -69,17 +71,19 @@ export function NotificationsMenu() {
             borderTop: '1px solid var(--line)',
           }}
         >
-          <span
-            style={{
-              width: 7,
-              height: 7,
-              borderRadius: '50%',
-              background: dotColors[i],
-              flex: 'none',
-              marginTop: 5,
-              display: 'inline-block',
-            }}
-          />
+          {!notifRead && (
+            <span
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: '50%',
+                background: dotColors[i],
+                flex: 'none',
+                marginTop: 5,
+                display: 'inline-block',
+              }}
+            />
+          )}
           <div>
             <div style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.4 }}>{item.msg}</div>
             <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{item.time}</div>

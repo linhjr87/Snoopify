@@ -38,6 +38,7 @@ export function Topbar() {
   const dark = useAppStore((s) => s.dark)
   const lang = useAppStore((s) => s.lang)
   const notifOpen = useAppStore((s) => s.notifOpen)
+  const notifRead = useAppStore((s) => s.notifRead)
   const langMenuOpen = useAppStore((s) => s.langMenuOpen)
   const toggleDark = useAppStore((s) => s.toggleDark)
   const setPanel = useAppStore((s) => s.setPanel)
@@ -153,18 +154,21 @@ export function Topbar() {
           }}
         >
           <BellIcon />
-          <span
-            style={{
-              position: 'absolute',
-              top: 2,
-              right: 3,
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              background: 'var(--rust)',
-              border: '1.5px solid var(--paper)',
-            }}
-          />
+          {!notifRead && (
+            <span
+              data-testid="bell-unread-dot"
+              style={{
+                position: 'absolute',
+                top: 2,
+                right: 3,
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                background: 'var(--rust)',
+                border: '1.5px solid var(--paper)',
+              }}
+            />
+          )}
         </button>
         <NotificationsMenu />
       </div>
