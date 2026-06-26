@@ -48,7 +48,7 @@ const navItems = (t: ReturnType<typeof useT>) => [
   },
 ]
 
-export function Sidebar() {
+export function Sidebar({ displayName }: { displayName?: string | null }) {
   const t = useT()
   const router = useRouter()
   const pathname = usePathname()
@@ -209,7 +209,7 @@ export function Sidebar() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer', color: 'var(--rust)' }}>
             <span style={{ width: 8, height: 8, borderRadius: 2, background: 'var(--rust)', display: 'inline-block' }} />
-            Lỗi của tôi
+            {t.myMistakesDeck}
           </div>
         </div>
       </div>
@@ -247,8 +247,8 @@ export function Sidebar() {
             }}
           />
           <div className="side-user-info" style={{ lineHeight: 1.2, flex: 1 }}>
-            <div style={{ fontWeight: 600, fontSize: 14 }}>Minh</div>
-            <div style={{ fontSize: 12, color: 'var(--muted)' }}>streak 12 ngày</div>
+            <div style={{ fontWeight: 600, fontSize: 14 }}>{displayName || t.guestLabel}</div>
+            <div style={{ fontSize: 12, color: 'var(--muted)' }}>{t.streakLabel(12)}</div>
           </div>
           <div className="user-dots" style={{ color: 'var(--muted)', flex: 'none' }}>
             <svg width="15" height="15" viewBox="0 0 14 14" fill="currentColor">

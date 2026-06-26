@@ -11,6 +11,7 @@ import { SessionComplete } from './SessionComplete'
 import type { SessionCard } from '../../lib/adapters'
 
 function ReviewMessage({ text, onHome }: { text: string; onHome?: () => void }) {
+  const t = useT()
   return (
     <div style={{ maxWidth: '680px', margin: '0 auto', textAlign: 'center', padding: '60px 20px', color: 'var(--muted)' }}>
       <div style={{ fontSize: '17px' }}>{text}</div>
@@ -24,7 +25,7 @@ function ReviewMessage({ text, onHome }: { text: string; onHome?: () => void }) 
             fontFamily: "'Hanken Grotesk',sans-serif", fontWeight: 600, color: 'var(--muted)', cursor: 'pointer',
           }}
         >
-          Về trang chủ
+          {t.goHome}
         </button>
       )}
     </div>
@@ -51,7 +52,7 @@ export default function ReviewScreen({ session }: { session: SessionCard[] }) {
 
   const total = session.length
 
-  if (total === 0) return <ReviewMessage text="Không có thẻ nào đến hạn ôn tập. Quay lại sau nhé!" onHome={() => router.push('/')} />
+  if (total === 0) return <ReviewMessage text={t.noCardsDue} onHome={() => router.push('/')} />
   if (sIndex >= total) return <SessionComplete correct={sCorrect} total={total} />
 
   const cur = session[sIndex]
@@ -87,10 +88,10 @@ export default function ReviewScreen({ session }: { session: SessionCard[] }) {
       {/* Session label + score */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '9px', marginBottom: '20px' }}>
         <span style={{ fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-          Đến hạn hôm nay
+          {t.dueToday}
         </span>
         <span style={{ fontSize: '12px', color: 'var(--accent,#2f5d4e)', fontWeight: 700 }}>
-          · {sCorrect} đúng
+          {t.correctCount(sCorrect)}
         </span>
       </div>
 
@@ -110,10 +111,10 @@ export default function ReviewScreen({ session }: { session: SessionCard[] }) {
             fontSize: '14px', fontWeight: 600,
           }}
         >
-          <span>Chưa lưu được kết quả gần nhất — kiểm tra kết nối.</span>
+          <span>{t.gradeSaveError}</span>
           <button
             onClick={() => setGradeError(false)}
-            aria-label="Đóng cảnh báo"
+            aria-label={t.closeAlert}
             style={{
               border: 'none', background: 'transparent', color: 'var(--rust)',
               cursor: 'pointer', fontSize: '18px', lineHeight: 1, flex: 'none',

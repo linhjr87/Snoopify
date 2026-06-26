@@ -2,13 +2,13 @@
 import { useState, type ChangeEvent, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
+import { useT } from '../../i18n/useT'
 import { sampleJson } from '../../data/seed'
 import type { ImportStatus } from '../../store/types'
 import type { ImportResult } from '../../lib/api-types'
 
-const INVALID_MSG = 'JSON không hợp lệ hoặc thiếu trường bắt buộc (deck, cards[].word).'
-
 export function ImportJsonModal() {
+  const t = useT()
   const importOpen = useAppStore((s) => s.importOpen)
   const importText = useAppStore((s) => s.importText)
   const setPanel = useAppStore((s) => s.setPanel)
@@ -21,7 +21,7 @@ export function ImportJsonModal() {
     const f = e.target.files?.[0]; if (!f) return
     const r = new FileReader()
     r.onload = () => setImportText(String(r.result || ''))
-    r.onerror = () => setStatus({ ok: false, msg: INVALID_MSG })
+    r.onerror = () => setStatus({ ok: false, msg: t.importInvalidJson })
     r.readAsText(f)
   }
 
@@ -37,7 +37,7 @@ export function ImportJsonModal() {
 
   const submitImport = async () => {
     let payload: unknown
-    try { payload = JSON.parse(importText) } catch { setStatus({ ok: false, msg: INVALID_MSG }); return }
+    try { payload = JSON.parse(importText) } catch { setStatus({ ok: false, msg: t.importInvalidJson }); return }
     // /decks/import returns {ok,msg,deck?} for BOTH 200 and 400 — read body on any status.
     setIsPending(true)
     try {
@@ -48,7 +48,7 @@ export function ImportJsonModal() {
       setStatus({ ok: result.ok, msg: result.msg })
       if (result.ok) { setImportText(''); setPanel('importOpen', false); router.refresh() }
     } catch {
-      setStatus({ ok: false, msg: 'Lỗi kết nối — kiểm tra mạng và thử lại.' })
+      setStatus({ ok: false, msg: t.importConnError })
     } finally {
       setIsPending(false)
     }
@@ -79,7 +79,7 @@ export function ImportJsonModal() {
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
           <h2 style={{ margin: 0, fontFamily: "'Newsreader',serif", fontWeight: 500, fontSize: '22px' }}>
-            Nhập bộ thẻ từ JSON
+            {t.importTitle}
           </h2>
           <button
             onClick={() => setPanel('importOpen', false)}
@@ -87,10 +87,10 @@ export function ImportJsonModal() {
           >✕</button>
         </div>
         <p style={{ margin: '0 0 14px', color: 'var(--muted)', fontSize: '14px', lineHeight: 1.5 }}>
-          Chọn file <span style={{ fontFamily: 'monospace' }}>.json</span> theo cấu trúc mẫu bên dưới, hoặc dán trực tiếp rồi bấm Nhập.
+          {t.importInstructionsPre} <span style={{ fontFamily: 'monospace' }}>.json</span> {t.importInstructionsPost}
         </p>
         <div style={{ fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>
-          Cấu trúc mẫu
+          {t.sampleStructure}
         </div>
         <pre style={{
           margin: '0 0 10px', background: 'var(--paper)', border: '1px solid var(--line)',
@@ -104,16 +104,16 @@ export function ImportJsonModal() {
             color: 'var(--muted)', padding: '7px 13px', fontFamily: "'Hanken Grotesk',sans-serif",
             fontSize: '13px', cursor: 'pointer', marginBottom: '18px',
           }}
-        >Sao chép mẫu</button>
+        >{t.copySample}</button>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '14px' }}>
           <label style={{
             border: '1px solid var(--accent)', color: '#fff', background: 'var(--accent)',
             borderRadius: '10px', padding: '10px 18px', fontWeight: 600, fontSize: '14px', cursor: 'pointer',
           }}>
-            Chọn file .json
+            {t.chooseJsonFile}
             <input type="file" accept="application/json,.json" onChange={onFile} style={{ display: 'none' }} />
           </label>
-          <span style={{ fontSize: '13px', color: 'var(--muted)' }}>hoặc dán bên dưới</span>
+          <span style={{ fontSize: '13px', color: 'var(--muted)' }}>{t.orPasteBelow}</span>
         </div>
         <textarea
           aria-label="json"
@@ -138,7 +138,7 @@ export function ImportJsonModal() {
               fontWeight: 600, fontSize: '14px', cursor: isPending ? 'default' : 'pointer',
               opacity: isPending ? 0.7 : 1,
             }}
-          >Nhập</button>
+          >{t.importCta}</button>
           {status && <span style={statusStyle}>{status.msg}</span>}
         </div>
       </div>

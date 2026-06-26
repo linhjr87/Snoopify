@@ -1,3 +1,6 @@
+'use client'
+import { useT } from '../../i18n/useT'
+
 export interface PreviewData {
   word: string
   phonetic: string
@@ -9,6 +12,7 @@ export interface PreviewData {
 }
 
 export function CardPreview({ data }: { data: PreviewData }) {
+  const t = useT()
   const word     = data.word     || 'resilient'
   const phonetic = data.phonetic || '/rɪˈzɪl.i.ənt/'
   const pos      = data.pos      || 'adj'
@@ -22,7 +26,7 @@ export function CardPreview({ data }: { data: PreviewData }) {
       boxShadow: '0 1px 2px rgba(40,35,25,0.03)',
     }}>
       <div style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 14 }}>
-        Xem trước
+        {t.previewLabel}
       </div>
       <div style={{ fontFamily: "'Newsreader', serif", fontSize: 32, fontWeight: 500, letterSpacing: '-0.01em' }}>
         {word}

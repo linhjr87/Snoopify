@@ -1,13 +1,16 @@
 'use client'
 import { useT } from '../../i18n/useT'
+import { useAppStore } from '../../store/useAppStore'
+import { formatHeaderDate } from '../../lib/format'
 
 export function DashboardHeader({ displayName }: { displayName?: string | null }) {
   const t = useT()
+  const lang = useAppStore((s) => s.lang)
   const greetingText = displayName ? `${t.greeting}, ${displayName}` : t.greeting
   return (
     <div style={{ display: 'flex', alignItems: 'flex-end', gap: '20px', marginBottom: '30px' }}>
       <div>
-        <div style={{ fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '6px' }}>Thứ Hai · 22 tháng 6</div>
+        <div suppressHydrationWarning style={{ fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '6px' }}>{formatHeaderDate(lang)}</div>
         <h1 style={{ margin: 0, fontFamily: "'Newsreader',serif", fontWeight: 500, fontSize: '34px', letterSpacing: '-0.01em' }}>{greetingText}</h1>
       </div>
       <div data-tour="search" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid var(--line)', borderRadius: '999px', padding: '8px 15px', background: 'var(--surface)', color: 'var(--muted)', fontSize: '14px', minWidth: '210px' }}>

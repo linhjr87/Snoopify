@@ -1,11 +1,10 @@
 'use client'
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useT } from '../../i18n/useT'
 import { CardPreview, type PreviewData } from './CardPreview'
 import { apiPost } from '../../lib/api'
 import type { CardCreate, CardOut, DeckOut } from '../../lib/api-types'
-
-const TYPES = ['Từ vựng', 'Cụm từ', 'Ngữ pháp', 'Câu mẫu', 'Ghi chú', 'Lỗi']
 
 const empty: PreviewData = { word: '', phonetic: '', pos: '', meaning: '', example: '', deck: '', tags: '' }
 
@@ -16,9 +15,11 @@ const fieldStyle: React.CSSProperties = {
 }
 
 export function AddCardForm({ decks }: { decks: DeckOut[] }) {
+  const t = useT()
+  const TYPES = [t.typeVocab, t.typePhrase, t.typeGrammar, t.typeSentence, t.typeNote, t.typeMistake]
   const router = useRouter()
   const wordInputRef = useRef<HTMLInputElement>(null)
-  const [type, setType] = useState(TYPES[0])
+  const [typeIdx, setTypeIdx] = useState(0)
   const [data, setData] = useState<PreviewData>(empty)
   const [saved, setSaved] = useState<string[]>([])
   const [deckId, setDeckId] = useState<string>('')
@@ -58,14 +59,14 @@ export function AddCardForm({ decks }: { decks: DeckOut[] }) {
   }
 
   const onNewDeck = async () => {
-    const name = window.prompt('Tên bộ thẻ mới')?.trim()
+    const name = window.prompt(t.newDeckPrompt)?.trim()
     if (!name) return
     try {
       const deck = await apiPost<DeckOut>('/decks', { name })
       setDeckId(deck.id)
       router.refresh()
     } catch {
-      window.alert('Tạo bộ thẻ thất bại — kiểm tra kết nối và thử lại.')
+      window.alert(t.newDeckFailed)
     }
   }
 
@@ -82,19 +83,19 @@ export function AddCardForm({ decks }: { decks: DeckOut[] }) {
       }}>
         {/* Type selector */}
         <div style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 10 }}>
-          Loại
+          {t.typeLabel}
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 22 }}>
-          {TYPES.map((tp) => (
+          {TYPES.map((tp, i) => (
             <button
-              key={tp}
-              onClick={() => setType(tp)}
+              key={i}
+              onClick={() => setTypeIdx(i)}
               style={{
                 fontSize: 13,
-                border: tp === type ? '1px solid var(--accent)' : '1px solid var(--line)',
-                color: tp === type ? 'var(--accent)' : 'var(--muted)',
-                background: tp === type ? 'var(--accent-soft)' : 'transparent',
-                borderRadius: 999, padding: '6px 14px', fontWeight: tp === type ? 600 : 400,
+                border: i === typeIdx ? '1px solid var(--accent)' : '1px solid var(--line)',
+                color: i === typeIdx ? 'var(--accent)' : 'var(--muted)',
+                background: i === typeIdx ? 'var(--accent-soft)' : 'transparent',
+                borderRadius: 999, padding: '6px 14px', fontWeight: i === typeIdx ? 600 : 400,
                 fontFamily: "'Hanken Grotesk', sans-serif", cursor: 'pointer',
               }}
             >
@@ -106,31 +107,31 @@ export function AddCardForm({ decks }: { decks: DeckOut[] }) {
         {/* Word + Phonetic row */}
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 14 }}>
           <div style={{ flex: 1, minWidth: 180 }}>
-            <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Từ / cụm từ</div>
+            <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.wordPhraseLabel}</div>
             <input ref={wordInputRef} aria-label="word" className="field" style={fieldStyle} placeholder="resilient" value={data.word} onChange={set('word')} />
           </div>
           <div style={{ width: 170 }}>
-            <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Phiên âm</div>
+            <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.phoneticLabel}</div>
             <input aria-label="phonetic" className="field" style={{ ...fieldStyle, fontFamily: 'monospace', fontSize: 13 }} placeholder="/rɪˈzɪl.i.ənt/" value={data.phonetic} onChange={set('phonetic')} />
           </div>
         </div>
 
         {/* Meaning */}
         <div style={{ marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Nghĩa</div>
+          <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.meaningLabel}</div>
           <input aria-label="meaning" className="field" style={fieldStyle} placeholder="có khả năng phục hồi nhanh; kiên cường" value={data.meaning} onChange={set('meaning')} />
         </div>
 
         {/* Example */}
         <div style={{ marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Ví dụ</div>
+          <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.exampleLabel}</div>
           <textarea aria-label="example" className="field" rows={2} style={{ ...fieldStyle, resize: 'vertical' }} placeholder="She is so resilient — she bounced back within a week." value={data.example} onChange={set('example')} />
         </div>
 
         {/* Deck picker + Tags row */}
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 24 }}>
           <div style={{ flex: 1, minWidth: 160 }}>
-            <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Bộ thẻ</div>
+            <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.deckLabel}</div>
             <div style={{ display: 'flex', gap: 8 }}>
               <select
                 aria-label="deck"
@@ -139,7 +140,7 @@ export function AddCardForm({ decks }: { decks: DeckOut[] }) {
                 value={selectedDeckId}
                 onChange={(e) => setDeckId(e.target.value)}
               >
-                {decks.length === 0 && <option value="">(chưa có bộ thẻ)</option>}
+                {decks.length === 0 && <option value="">{t.noDeckYet}</option>}
                 {decks.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
               <button
@@ -149,7 +150,7 @@ export function AddCardForm({ decks }: { decks: DeckOut[] }) {
                   padding: '0 14px', fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 600,
                   fontSize: 14, color: 'var(--muted)', cursor: 'pointer', whiteSpace: 'nowrap',
                 }}
-              >+ Bộ mới</button>
+              >{t.newDeckShort}</button>
             </div>
           </div>
           <div style={{ flex: 1, minWidth: 160 }}>
@@ -161,7 +162,7 @@ export function AddCardForm({ decks }: { decks: DeckOut[] }) {
         {/* Action buttons */}
         {saveError && (
           <div role="alert" style={{ marginBottom: 10, padding: '8px 14px', borderRadius: 10, background: '#f6e6e2', border: '1px solid var(--rust)', color: 'var(--rust)', fontSize: 13, fontWeight: 600 }}>
-            Lưu thất bại — kiểm tra kết nối và thử lại.
+            {t.saveFailed}
           </div>
         )}
         <div style={{ display: 'flex', gap: 12 }}>
@@ -177,7 +178,7 @@ export function AddCardForm({ decks }: { decks: DeckOut[] }) {
             }}
             className="cta"
           >
-            Lưu thẻ
+            {t.saveCardCta}
           </button>
           <button
             onClick={handleSaveAndNext}
@@ -191,7 +192,7 @@ export function AddCardForm({ decks }: { decks: DeckOut[] }) {
             }}
             className="ghost"
           >
-            Lưu &amp; thêm tiếp
+            {t.saveAndNextCta}
           </button>
         </div>
       </section>
@@ -205,7 +206,7 @@ export function AddCardForm({ decks }: { decks: DeckOut[] }) {
           background: 'var(--paper)', padding: '18px 20px',
         }}>
           <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
-            Đã lưu hôm nay · {saved.length}
+            {t.savedTodayLabel(saved.length)}
           </div>
           <div style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.7 }}>
             {saved.length > 0

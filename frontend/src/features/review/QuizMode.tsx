@@ -1,10 +1,12 @@
 'use client'
 import { useAppStore } from '../../store/useAppStore'
+import { useT } from '../../i18n/useT'
 import { quizIsRight } from '../../lib/grading'
 import type { SessionCard } from '../../lib/adapters'
 import { submitGrade } from './grade'
 
 export function QuizMode({ cur, isLast }: { cur: SessionCard; isLast: boolean }) {
+  const t = useT()
   const pick = useAppStore((s) => s.quizPick)
   const pickQuiz = useAppStore((s) => s.pickQuiz)
   const advance = useAppStore((s) => s.advanceSession)
@@ -17,10 +19,10 @@ export function QuizMode({ cur, isLast }: { cur: SessionCard; isLast: boolean })
   }
 
   const correctLabel = (cur.quiz.options.find((o) => o[0] === cur.quiz.correct) || ['', ''])[1]
-  const nextLabel = isLast ? 'Xem kết quả →' : 'Tiếp theo →'
+  const nextLabel = isLast ? t.seeResultsCta : t.nextCta
 
   const quizResultText = answered
-    ? (right ? `Chính xác — "${cur.word}".` : `Chưa đúng. Đáp án: "${correctLabel}".`)
+    ? (right ? t.correctResult(cur.word) : t.incorrectResult(correctLabel))
     : ''
 
   return (
@@ -31,7 +33,7 @@ export function QuizMode({ cur, isLast }: { cur: SessionCard; isLast: boolean })
         padding: '28px', textAlign: 'center', boxShadow: '0 1px 2px rgba(40,35,25,0.03)',
       }}>
         <div style={{ fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>
-          Chọn nghĩa đúng của
+          {t.chooseMeaningOf}
         </div>
         <div style={{ fontFamily: "'Newsreader', serif", fontSize: '40px', fontWeight: 500 }}>
           {cur.word}

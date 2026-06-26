@@ -13,6 +13,7 @@ import type { DeckOut } from '../../lib/api-types'
 
 export default function LibraryScreen({ decks: apiDecks }: { decks: DeckOut[] }) {
   const t = useT()
+  const lang = useAppStore((s) => s.lang)
   const router = useRouter()
   const setPanel = useAppStore((s) => s.setPanel)
   const [group, setGroup] = useState<GroupBy>('topic')
@@ -25,20 +26,20 @@ export default function LibraryScreen({ decks: apiDecks }: { decks: DeckOut[] })
       if (group === 'date') return b.created_at.localeCompare(a.created_at)
       return a.topic.localeCompare(b.topic)
     })
-    return sorted.filter((d) => d.name.toLowerCase().includes(needle)).map(toDeckCard)
-  }, [apiDecks, filterText, group])
+    return sorted.filter((d) => d.name.toLowerCase().includes(needle)).map((d) => toDeckCard(d, lang))
+  }, [apiDecks, filterText, group, lang])
 
   const totalCards = apiDecks.reduce((sum, deck) => sum + deck.count, 0)
   const totalDecks = apiDecks.length
 
   const onNewDeck = async () => {
-    const name = window.prompt('Tên bộ thẻ mới')?.trim()
+    const name = window.prompt(t.newDeckPrompt)?.trim()
     if (!name) return
     try {
       await apiPost<DeckOut>('/decks', { name })
       router.refresh()
     } catch {
-      window.alert('Tạo bộ thẻ thất bại — kiểm tra kết nối và thử lại.')
+      window.alert(t.newDeckFailed)
     }
   }
 
@@ -48,7 +49,7 @@ export default function LibraryScreen({ decks: apiDecks }: { decks: DeckOut[] })
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: '18px', marginBottom: '24px', flexWrap: 'wrap' }}>
         <div>
           <div style={{ fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '6px' }}>
-            {totalCards} thẻ · {totalDecks} bộ
+            {t.libraryStats(totalCards, totalDecks)}
           </div>
           <h1 style={{ margin: 0, fontFamily: "'Newsreader',serif", fontWeight: 500, fontSize: '32px' }}>
             {t.libraryTitle}
@@ -69,7 +70,7 @@ export default function LibraryScreen({ decks: apiDecks }: { decks: DeckOut[] })
             <input
               value={filterText}
               onChange={(e) => setFilterText(e.target.value)}
-              placeholder="lọc bộ thẻ…"
+              placeholder={t.filterDecksPlaceholder}
               style={{ border: 'none', outline: 'none', background: 'transparent', color: 'var(--muted)', fontSize: '14px', width: '100%' }}
             />
           </div>

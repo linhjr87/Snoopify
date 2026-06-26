@@ -22,13 +22,13 @@ export function TodaySession({ summary }: { summary: ProgressSummary | null }) {
         </svg>
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ fontFamily: 'var(--num-font)', fontSize: '34px', fontWeight: 600, lineHeight: 1 }}>{reviewed}<span style={{ color: 'var(--muted)', fontSize: '20px' }}>/{target}</span></div>
-          <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '3px' }}>đã ôn</div>
+          <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '3px' }}>{t.reviewedLabel}</div>
         </div>
       </div>
 
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '7px' }}>{t.todaySession}</div>
-        <div style={{ fontFamily: "'Newsreader',serif", fontSize: '27px', fontWeight: 500, letterSpacing: '-0.01em', marginBottom: '20px' }}>Còn {due} thẻ đến hạn</div>
+        <div style={{ fontFamily: "'Newsreader',serif", fontSize: '27px', fontWeight: 500, letterSpacing: '-0.01em', marginBottom: '20px' }}>{t.dueCount(due)}</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
           <button
             data-tour="review"
