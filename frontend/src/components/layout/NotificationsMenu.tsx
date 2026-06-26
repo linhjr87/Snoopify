@@ -7,8 +7,7 @@ const dotColors = ['var(--rust)', 'var(--clay,#a96440)', 'var(--accent,#2f5d4e)'
 
 export function NotificationsMenu() {
   const open = useAppStore((s) => s.notifOpen)
-  const setPanel = useAppStore((s) => s.setPanel)
-  const notifRead = useAppStore((s) => s.notifRead)
+const notifRead = useAppStore((s) => s.notifRead)
   const markNotifsRead = useAppStore((s) => s.markNotifsRead)
   const t = useT()
 
