@@ -133,8 +133,8 @@ export function Sidebar({ displayName, summary, decks }: {
         aria-label={t.collapse}
         style={{
           position: 'absolute',
-          top: 60,
-          right: -13,
+          top: 27,
+          right: -14,
           width: 28,
           height: 28,
           borderRadius: '50%',
