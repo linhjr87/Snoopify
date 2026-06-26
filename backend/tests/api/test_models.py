@@ -5,7 +5,7 @@ from app.db.models import Card, Deck, User
 
 async def test_deck_card_roundtrip_and_defaults(session):
     # Deck.user_id is NOT NULL (per-user data); stamp an owner first.
-    user = User(email="roundtrip@example.com", password_hash="x", display_name="R")
+    user = User(email="roundtrip@example.com", username="rounduser", password_hash="x", display_name="R")
     session.add(user)
     await session.commit()
     await session.refresh(user)

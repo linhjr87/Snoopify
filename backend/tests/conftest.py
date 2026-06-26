@@ -80,7 +80,7 @@ async def client_factory(engine):
 
 @pytest_asyncio.fixture
 async def auth_client(client):
-    payload = {"email": "a@example.com", "password": "s3cret!", "display_name": "A"}
+    payload = {"email": "a@example.com", "username": "user_a", "password": "s3cret!", "display_name": "A"}
     res = await client.post("/auth/register", json=payload)
     assert res.status_code == 201, res.text
     return client, res.json()
