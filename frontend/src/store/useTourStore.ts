@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { useAppStore } from './useAppStore'
 
 export interface TourRect {
   top: number
@@ -15,6 +16,7 @@ interface TourState {
   // Bumped on every start/end so stale setTimeout callbacks can detect they are
   // no longer current and bail out instead of mutating tourRect after endTour().
   tourGen: number
+  priorCollapsed: boolean
   startTour: () => void
   endTour: () => void
   tourNext: () => void
@@ -28,6 +30,7 @@ export const useTourStore = create<TourState>((set, get) => ({
   tourStep: 0,
   tourRect: null,
   tourGen: 0,
+  priorCollapsed: false,
   tourSels: ['nav', 'search', 'review', 'add', 'streak', 'decks'],
 
   syncTourRect: () => {
@@ -64,8 +67,10 @@ export const useTourStore = create<TourState>((set, get) => ({
   },
 
   startTour: () => {
+    const priorCollapsed = useAppStore.getState().collapsed
+    if (priorCollapsed) useAppStore.setState({ collapsed: false })
     try { window.scrollTo({ top: 0, behavior: 'smooth' }) } catch { /* ignore */ }
-    set((s) => ({ tourActive: true, tourStep: 0, tourRect: null, tourGen: s.tourGen + 1 }))
+    set((s) => ({ tourActive: true, tourStep: 0, tourRect: null, tourGen: s.tourGen + 1, priorCollapsed }))
     const gen = get().tourGen
     setTimeout(() => {
       if (get().tourGen !== gen || !get().tourActive) return
@@ -77,7 +82,8 @@ export const useTourStore = create<TourState>((set, get) => ({
     try {
       localStorage.setItem('myenglish_tour_done', '1')
     } catch { /* ignore */ }
-    set((s) => ({ tourActive: false, tourStep: 0, tourRect: null, tourGen: s.tourGen + 1 }))
+    if (get().priorCollapsed) useAppStore.setState({ collapsed: true })
+    set((s) => ({ tourActive: false, tourStep: 0, tourRect: null, tourGen: s.tourGen + 1, priorCollapsed: false }))
   },
 
   tourNext: () => {
