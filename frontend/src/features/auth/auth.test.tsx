@@ -69,6 +69,12 @@ describe('AuthScreen (real auth)', () => {
       expect.objectContaining({ username: 'testuser', email: 'new@example.com', display_name: 'Test User' })))
   })
 
+  it('shows the Snoopify brand, not myEnglish', () => {
+    render(<AuthScreen />)
+    expect(screen.getByText('Snoopify')).toBeInTheDocument()
+    expect(screen.queryByText(/myEnglish/i)).not.toBeInTheDocument()
+  })
+
   it('shows mismatch error without calling apiPost when passwords differ', async () => {
     const spy = vi.spyOn(api, 'apiPost').mockResolvedValue({} as never)
     render(<AuthScreen />)

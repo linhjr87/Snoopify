@@ -58,8 +58,8 @@ export default function AuthScreen() {
     <div data-screen-label="Auth" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, background: 'var(--paper)' }}>
       <div style={{ width: '100%', maxWidth: 420 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 11, marginBottom: 30 }}>
-          <div style={{ width: 38, height: 38, borderRadius: 11, background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Newsreader', serif", fontSize: 22, fontWeight: 600 }}>E</div>
-          <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>my<span style={{ color: 'var(--accent)' }}>English</span></div>
+          <div style={{ width: 38, height: 38, borderRadius: 11, background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Newsreader', serif", fontSize: 22, fontWeight: 600 }}>S</div>
+          <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>Snoopify</div>
         </div>
 
         <div style={{ border: '1px solid var(--line)', borderRadius: 20, background: 'var(--surface)', padding: 32, boxShadow: '0 18px 44px -28px rgba(40,35,25,0.4)' }}>
