@@ -3,7 +3,6 @@ import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
 import { useT } from '../../i18n/useT'
-import { apiPost } from '../../lib/api'
 import { DeckList } from './DeckList'
 import { GroupBySelector, type GroupBy } from './GroupBySelector'
 import { ImportJsonModal } from './ImportJsonModal'
@@ -32,16 +31,7 @@ export default function LibraryScreen({ decks: apiDecks }: { decks: DeckOut[] })
   const totalCards = apiDecks.reduce((sum, deck) => sum + deck.count, 0)
   const totalDecks = apiDecks.length
 
-  const onNewDeck = async () => {
-    const name = window.prompt(t.newDeckPrompt)?.trim()
-    if (!name) return
-    try {
-      await apiPost<DeckOut>('/decks', { name })
-      router.refresh()
-    } catch {
-      window.alert(t.newDeckFailed)
-    }
-  }
+  const onNewDeck = () => router.push('/add')
 
   return (
     <div style={{ animation: 'fadeUp .45s ease both' }}>
