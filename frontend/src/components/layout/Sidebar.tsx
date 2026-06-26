@@ -1,9 +1,13 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
 import { useT } from '../../i18n/useT'
 import { SettingsPanel } from './SettingsPanel'
+import type { ProgressSummary, DeckOut } from '../../lib/api-types'
+
+const DECK_DOT_COLORS = ['var(--accent,#2f5d4e)', '#c9a23a']
 
 const navItems = (t: ReturnType<typeof useT>) => [
   {
@@ -48,7 +52,11 @@ const navItems = (t: ReturnType<typeof useT>) => [
   },
 ]
 
-export function Sidebar({ displayName }: { displayName?: string | null }) {
+export function Sidebar({ displayName, summary, decks }: {
+  displayName?: string | null
+  summary?: ProgressSummary | null
+  decks?: DeckOut[]
+}) {
   const t = useT()
   const router = useRouter()
   const pathname = usePathname()
@@ -56,6 +64,18 @@ export function Sidebar({ displayName }: { displayName?: string | null }) {
   const toggleCollapsed = useAppStore((s) => s.toggleCollapsed)
   const settingsOpen = useAppStore((s) => s.settingsOpen)
   const setPanel = useAppStore((s) => s.setPanel)
+  const streak = summary?.streak ?? 0
+
+  const recentDecks = useMemo(() => {
+    return [...(decks ?? [])]
+      .sort((a, b) => {
+        if (!a.last_reviewed_at && !b.last_reviewed_at) return 0
+        if (!a.last_reviewed_at) return 1
+        if (!b.last_reviewed_at) return -1
+        return b.last_reviewed_at.localeCompare(a.last_reviewed_at)
+      })
+      .slice(0, 3)
+  }, [decks])
 
   const items = navItems(t)
 
@@ -199,15 +219,31 @@ export function Sidebar({ displayName }: { displayName?: string | null }) {
           {t.decks.toUpperCase()}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 9, fontSize: 14 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer' }}>
-            <span style={{ width: 8, height: 8, borderRadius: 2, background: 'var(--accent,#2f5d4e)', display: 'inline-block' }} />
-            Business English
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer' }}>
-            <span style={{ width: 8, height: 8, borderRadius: 2, background: '#c9a23a', display: 'inline-block' }} />
-            Idioms &amp; Phrasal
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer', color: 'var(--rust)' }}>
+          {recentDecks.length === 0 && (
+            <div style={{ color: 'var(--muted)' }}>{t.noDeckYet}</div>
+          )}
+          {recentDecks.map((deck, i) => (
+            <div
+              key={deck.id}
+              onClick={() => router.push('/library')}
+              style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer' }}
+            >
+              <span style={{ width: 8, height: 8, borderRadius: 2, background: DECK_DOT_COLORS[i % DECK_DOT_COLORS.length], display: 'inline-block' }} />
+              {deck.name}
+            </div>
+          ))}
+          {(decks ?? []).length > 3 && (
+            <div
+              onClick={() => router.push('/library')}
+              style={{ color: 'var(--accent,#2f5d4e)', cursor: 'pointer' }}
+            >
+              {t.viewAll}
+            </div>
+          )}
+          <div
+            onClick={() => router.push('/progress')}
+            style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer', color: 'var(--rust)' }}
+          >
             <span style={{ width: 8, height: 8, borderRadius: 2, background: 'var(--rust)', display: 'inline-block' }} />
             {t.myMistakesDeck}
           </div>
@@ -248,7 +284,7 @@ export function Sidebar({ displayName }: { displayName?: string | null }) {
           />
           <div className="side-user-info" style={{ lineHeight: 1.2, flex: 1 }}>
             <div style={{ fontWeight: 600, fontSize: 14 }}>{displayName || t.guestLabel}</div>
-            <div style={{ fontSize: 12, color: 'var(--muted)' }}>{t.streakLabel(12)}</div>
+            <div style={{ fontSize: 12, color: 'var(--muted)' }}>{t.streakLabel(streak)}</div>
           </div>
           <div className="user-dots" style={{ color: 'var(--muted)', flex: 'none' }}>
             <svg width="15" height="15" viewBox="0 0 14 14" fill="currentColor">
