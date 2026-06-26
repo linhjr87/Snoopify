@@ -8,6 +8,7 @@ export const initialState: AppState = {
   sIndex: 0, sCorrect: 0, gradeError: false, dark: false, lang: 'vn', collapsed: false,
   settingsOpen: false, confirmReset: false, importOpen: false, notifOpen: false, langMenuOpen: false,
   notifRead: false,
+  chatOpen: false,
   importText: '',
 }
 
@@ -33,6 +34,7 @@ export const useAppStore = create<AppStore>()(
       toggleCollapsed: () => set((s) => ({ collapsed: !s.collapsed })),
       setPanel: (panel, open) => set({ [panel]: open } as Partial<AppState>),
       markNotifsRead: () => set({ notifRead: true }),
+      toggleChat: () => set((s) => ({ chatOpen: !s.chatOpen })),
       setImportText: (text) => set({ importText: text }),
       resetProgress: () => set({ sIndex: 0, sCorrect: 0, flipped: false, quizPick: null, fillValue: '', fillChecked: false, confirmReset: false, settingsOpen: false }),
     }),

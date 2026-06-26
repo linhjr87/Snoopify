@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { Sidebar } from './layout/Sidebar'
 import { Topbar } from './layout/Topbar'
 import { GuidedTourOverlay } from './layout/GuidedTourOverlay'
+import { ChatPanel } from './layout/ChatPanel'
 import { useTourStore } from '../store/useTourStore'
 import type { ProgressSummary, DeckOut } from '../lib/api-types'
 
@@ -53,6 +54,7 @@ export function AppShell({ children, displayName, summary, decks }: {
         {children}
       </main>
       <GuidedTourOverlay />
+      <ChatPanel />
     </div>
   )
 }
