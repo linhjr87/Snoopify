@@ -60,7 +60,7 @@ export const dict = {
     authInvalidCreds:'Email hoặc mật khẩu không đúng', authEmailTaken:'Email đã được đăng ký', authConnError:'Lỗi kết nối — thử lại sau',
     usernameL:'Tên đăng nhập', usernamePh:'nguyenvana', identifierL:'Email hoặc tên đăng nhập', identifierPh:'ban@email.com hoặc nguyenvana', authUsernameTaken:'Tên đăng nhập đã tồn tại',
     guestLabel:'Bạn',
-    aiTitle:'Trợ lý AI', aiSub:'Gia sư tiếng Anh của bạn', aiPh:'Hỏi bất cứ điều gì về tiếng Anh…', aiGreeting:'Chào bạn! Mình là gia sư AI. Cứ hỏi mình về từ vựng, ngữ pháp hay cách dùng từ nhé — mình luôn sẵn sàng hỗ trợ.', aiComingSoon:'Sắp ra mắt…' },
+    aiTitle:'Trợ lý AI', aiSub:'Gia sư tiếng Anh của bạn', aiGreeting:'Chào bạn! Mình là gia sư AI. Cứ hỏi mình về từ vựng, ngữ pháp hay cách dùng từ nhé — mình luôn sẵn sàng hỗ trợ.', aiComingSoon:'Sắp ra mắt…' },
 
   en: { learn:'Learn', decks:'Decks', home:'Home', library:'Library', review:'Review', add:'Add knowledge', progress:'Progress',
     settings:'Settings', resetProgress:'Reset progress', resetConfirm:'Erase all progress, scores and the current session?', deleteAll:'Erase all', cancel:'Cancel', resetError:'Could not reset progress. Try again.',
@@ -121,7 +121,7 @@ export const dict = {
     authInvalidCreds:'Invalid email or password', authEmailTaken:'Email already registered', authConnError:'Connection error — try again later',
     usernameL:'Username', usernamePh:'johndoe', identifierL:'Email or username', identifierPh:'you@email.com or johndoe', authUsernameTaken:'Username already taken',
     guestLabel:'You',
-    aiTitle:'AI assistant', aiSub:'Your English tutor', aiPh:'Ask anything about English…', aiGreeting:"Hi! I'm your AI tutor. Ask me about vocabulary, grammar or word usage — I'm always here to help.", aiComingSoon:'Coming soon…' },
+    aiTitle:'AI assistant', aiSub:'Your English tutor', aiGreeting:"Hi! I'm your AI tutor. Ask me about vocabulary, grammar or word usage — I'm always here to help.", aiComingSoon:'Coming soon…' },
 } as const
 
 export type Strings = typeof dict[Lang]
