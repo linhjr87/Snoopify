@@ -11,6 +11,8 @@ export default function AuthScreen() {
 
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [pw, setPw] = useState('')
   const [confirmPw, setConfirmPw] = useState('')
   const [name, setName] = useState('')
@@ -23,6 +25,8 @@ export default function AuthScreen() {
     setConfirmPw('')
     setEmail('')
     setName('')
+    setUsername('')
+    setIdentifier('')
   }
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -34,15 +38,16 @@ export default function AuthScreen() {
     }
     try {
       if (isLogin) {
-        await apiPost('/auth/login', { email, password: pw })
+        await apiPost('/auth/login', { identifier, password: pw })
       } else {
-        await apiPost('/auth/register', { email, password: pw, display_name: name })
+        await apiPost('/auth/register', { email, username, password: pw, display_name: name })
       }
       router.push('/')
       router.refresh()
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) setError(t.authInvalidCreds)
-      else if (err instanceof ApiError && err.status === 409) setError(t.authEmailTaken)
+      else if (err instanceof ApiError && err.status === 409)
+        setError(typeof err.detail === 'string' && err.detail.toLowerCase().includes('username') ? t.authUsernameTaken : t.authEmailTaken)
       else setError(t.authConnError)
     }
   }
@@ -76,18 +81,50 @@ export default function AuthScreen() {
                 />
               </div>
             )}
+            {!isLogin && (
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.usernameL}</div>
+                <input
+                  required
+                  aria-label="username"
+                  className="field"
+                  placeholder={t.usernamePh}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  style={{ width: '100%', border: '1px solid var(--line)', borderRadius: 10, padding: '11px 13px', fontFamily: "'Hanken Grotesk', sans-serif", fontSize: 15, color: 'var(--ink)', background: 'var(--paper)', outline: 'none' }}
+                />
+              </div>
+            )}
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.emailL}</div>
-              <input
-                required
-                aria-label="email"
-                className="field"
-                type="email"
-                placeholder={t.emailPh}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                style={{ width: '100%', border: '1px solid var(--line)', borderRadius: 10, padding: '11px 13px', fontFamily: "'Hanken Grotesk', sans-serif", fontSize: 15, color: 'var(--ink)', background: 'var(--paper)', outline: 'none' }}
-              />
+              {isLogin ? (
+                <>
+                  <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.identifierL}</div>
+                  <input
+                    required
+                    aria-label="identifier"
+                    className="field"
+                    type="text"
+                    placeholder={t.identifierPh}
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    style={{ width: '100%', border: '1px solid var(--line)', borderRadius: 10, padding: '11px 13px', fontFamily: "'Hanken Grotesk', sans-serif", fontSize: 15, color: 'var(--ink)', background: 'var(--paper)', outline: 'none' }}
+                  />
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.emailL}</div>
+                  <input
+                    required
+                    aria-label="email"
+                    className="field"
+                    type="email"
+                    placeholder={t.emailPh}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={{ width: '100%', border: '1px solid var(--line)', borderRadius: 10, padding: '11px 13px', fontFamily: "'Hanken Grotesk', sans-serif", fontSize: 15, color: 'var(--ink)', background: 'var(--paper)', outline: 'none' }}
+                  />
+                </>
+              )}
             </div>
             <div style={{ marginBottom: 8 }}>
               <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.pwL}</div>

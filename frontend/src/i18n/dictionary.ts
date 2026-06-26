@@ -58,6 +58,7 @@ export const dict = {
     reviewsPerDayHeading:'Lượt ôn mỗi ngày · tuần này',
 
     authInvalidCreds:'Email hoặc mật khẩu không đúng', authEmailTaken:'Email đã được đăng ký', authConnError:'Lỗi kết nối — thử lại sau',
+    usernameL:'Tên đăng nhập', usernamePh:'nguyenvana', identifierL:'Email hoặc tên đăng nhập', identifierPh:'ban@email.com hoặc nguyenvana', authUsernameTaken:'Tên đăng nhập đã tồn tại',
     guestLabel:'Bạn' },
 
   en: { learn:'Learn', decks:'Decks', home:'Home', library:'Library', review:'Review', add:'Add knowledge', progress:'Progress',
@@ -117,6 +118,7 @@ export const dict = {
     reviewsPerDayHeading:'Reviews per day · this week',
 
     authInvalidCreds:'Invalid email or password', authEmailTaken:'Email already registered', authConnError:'Connection error — try again later',
+    usernameL:'Username', usernamePh:'johndoe', identifierL:'Email or username', identifierPh:'you@email.com or johndoe', authUsernameTaken:'Username already taken',
     guestLabel:'You' },
 } as const
 
