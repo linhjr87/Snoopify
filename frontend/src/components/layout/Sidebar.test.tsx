@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Sidebar } from './Sidebar'
 import { useAppStore, initialState } from '../../store/useAppStore'
+import { useTourStore } from '../../store/useTourStore'
 import { progressSummaryFixture, decksFixture } from '../../test/fixtures'
 import type { DeckOut } from '../../lib/api-types'
 
@@ -25,6 +26,7 @@ describe('Sidebar', () => {
     localStorage.clear()
     pushMock.mockReset()
     useAppStore.setState({ ...initialState })
+    useTourStore.setState({ tourActive: false })
   })
 
   it('renders the real streak count from the summary prop', () => {
@@ -75,5 +77,16 @@ describe('Sidebar', () => {
     render(<Sidebar />)
     await userEvent.click(screen.getByText('Lỗi của tôi'))
     expect(pushMock).toHaveBeenCalledWith('/progress')
+  })
+
+  it('shows the collapse toggle when the guided tour is not active', () => {
+    render(<Sidebar />)
+    expect(screen.getByLabelText('Thu gọn')).toBeInTheDocument()
+  })
+
+  it('hides the collapse toggle while the guided tour is active (so the sidebar cannot be collapsed mid-tour)', () => {
+    useTourStore.setState({ tourActive: true })
+    render(<Sidebar />)
+    expect(screen.queryByLabelText('Thu gọn')).not.toBeInTheDocument()
   })
 })
