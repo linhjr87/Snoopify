@@ -278,13 +278,8 @@ export function Sidebar({ displayName, summary, decks }: {
           }}
         >
           <div
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: '50%',
-              background: '#e7e1d4',
-              flex: 'none',
-            }}
+            onClick={(e) => { e.stopPropagation(); router.push('/profile') }}
+            style={{ width: 34, height: 34, borderRadius: '50%', background: '#e7e1d4', flex: 'none', cursor: 'pointer' }}
           />
           <div className="side-user-info" style={{ lineHeight: 1.2, flex: 1 }}>
             <div style={{ fontWeight: 600, fontSize: 14 }}>{displayName || t.guestLabel}</div>
