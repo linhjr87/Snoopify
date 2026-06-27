@@ -100,3 +100,21 @@ async def test_patch_profile_lowercases_username(auth_client):
     res = await client.patch("/profile", json={**PATCH_BODY, "username": "MINH_DEV"})
     assert res.status_code == 200
     assert res.json()["username"] == "minh_dev"
+
+
+@pytest.mark.asyncio
+async def test_learned_counts_started_cards(auth_client, session):
+    from sqlalchemy import select
+    from app.db.models import Card, Deck
+    client, user = auth_client
+    # bump one of the user's seeded cards to "learning" (repetitions>0, interval<21)
+    deck = (await session.execute(select(Deck).where(Deck.user_id == user["id"]))).scalars().first()
+    card = (await session.execute(select(Card).where(Card.deck_id == deck.id))).scalars().first()
+    card.repetitions = 1
+    card.interval_days = 1
+    await session.commit()
+    res = await client.get("/profile")
+    assert res.status_code == 200, res.text
+    body = res.json()
+    assert body["stats"]["learned"] == 1
+    assert body["stats"]["mastered"] == 0

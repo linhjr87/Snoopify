@@ -24,7 +24,7 @@ export function EditProfileModal({ profile, onClose }: { profile: ProfileOut; on
   const save = async () => {
     setError(''); setPending(true)
     try {
-      await apiPatch('/profile', { display_name: displayName, username, level, level_target: levelTarget, goal_text: goalText, daily_target: dailyTarget })
+      await apiPatch('/profile', { display_name: displayName, username, level, level_target: levelTarget, goal_text: goalText, daily_target: Math.max(1, Math.min(500, Math.round(dailyTarget) || 1)) })
       onClose(); router.refresh()
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) setError(t.profileUsernameTaken)
