@@ -26,6 +26,18 @@ export default function ProfileScreen({ profile }: { profile: ProfileOut }) {
     { num: `${profile.stats.accuracy}%`, label: t.pAccuracy, color: 'var(--ink)' },
   ]
 
+  // Achievement copy keyed by the backend's achievement keys. Referencing the
+  // dictionary entries directly keeps this type-safe (a missing key is a compile
+  // error) — t cannot be cast to Record<string,string> because some entries are functions.
+  const achText: Record<string, { title: string; desc: string }> = {
+    streak7: { title: t.streak7, desc: t.streak7Desc },
+    mastered100: { title: t.mastered100, desc: t.mastered100Desc },
+    sessions10: { title: t.sessions10, desc: t.sessions10Desc },
+    streak30: { title: t.streak30, desc: t.streak30Desc },
+    mastered500: { title: t.mastered500, desc: t.mastered500Desc },
+    b2: { title: t.b2, desc: t.b2Desc },
+  }
+
   return (
     <div style={{ animation: 'fadeUp .45s ease both' }}>
       <div style={{ marginBottom: 26 }}>
@@ -84,8 +96,7 @@ export default function ProfileScreen({ profile }: { profile: ProfileOut }) {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 13 }}>
             {profile.achievements.map((a) => {
-              const title = (t as Record<string, string>)[a.key] ?? a.key
-              const desc = (t as Record<string, string>)[`${a.key}Desc`] ?? ''
+              const { title, desc } = achText[a.key] ?? { title: a.key, desc: '' }
               return (
                 <div key={a.key} style={{ border: '1px solid var(--line)', borderRadius: 14, background: a.earned ? 'var(--surface)' : 'transparent', padding: 15, display: 'flex', gap: 12, alignItems: 'flex-start', opacity: a.earned ? 1 : 0.6 }}>
                   <div style={{ width: 40, height: 40, borderRadius: 11, flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', background: a.earned ? ACH_COLORS[a.key] : 'var(--track)', color: a.earned ? '#fff' : 'var(--muted)', fontWeight: 700 }}>
