@@ -4,6 +4,7 @@ from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException
 from sqlalchemy import case, func, select
+from sqlalchemy.exc import IntegrityError
 
 from app.config import get_settings
 from app.db.models import Card, Deck, ReviewLog, User
@@ -105,7 +106,11 @@ async def update_profile(session, user: User, data: ProfileUpdate) -> ProfileOut
     user.level_target = data.level_target
     user.goal_text = data.goal_text
     user.daily_target = data.daily_target
-    await session.commit()
+    try:
+        await session.commit()
+    except IntegrityError as exc:
+        await session.rollback()
+        raise HTTPException(status_code=409, detail="Username already taken") from exc
     await session.refresh(user)
     return await get_profile(session, user)
 

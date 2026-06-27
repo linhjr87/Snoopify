@@ -10,7 +10,7 @@ class ProfileUpdate(BaseModel):
     username: str = Field(min_length=3, max_length=30, pattern=r"^[A-Za-z0-9_.]+$")
     level: str
     level_target: str
-    goal_text: str = Field(default="", max_length=200)
+    goal_text: str = Field(max_length=200)
     daily_target: int = Field(ge=1, le=500)
 
     @field_validator("username")

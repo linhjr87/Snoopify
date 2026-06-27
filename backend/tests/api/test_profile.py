@@ -43,10 +43,12 @@ async def test_patch_profile_rejects_invalid_level(auth_client):
 @pytest.mark.asyncio
 async def test_patch_profile_duplicate_username_is_409(client):
     # register a second user, then try to take their username from the first
-    await client.post("/auth/register", json={"email": "a@example.com", "username": "user_a", "password": "s3cret!", "display_name": "A"})
+    r1 = await client.post("/auth/register", json={"email": "a@example.com", "username": "user_a", "password": "s3cret!", "display_name": "A"})
+    assert r1.status_code == 201
     # second user in a separate client/session reusing the same app overrides
     await client.post("/auth/logout")
-    await client.post("/auth/register", json={"email": "b@example.com", "username": "taken_name", "password": "s3cret!", "display_name": "B"})
+    r2 = await client.post("/auth/register", json={"email": "b@example.com", "username": "taken_name", "password": "s3cret!", "display_name": "B"})
+    assert r2.status_code == 201
     # now logged in as B; try to rename B to A's username
     res = await client.patch("/profile", json={**PATCH_BODY, "username": "user_a"})
     assert res.status_code == 409
@@ -77,3 +79,24 @@ async def test_get_profile_shape_for_fresh_user(auth_client):
 async def test_get_profile_requires_auth(client):
     res = await client.get("/profile")
     assert res.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_patch_profile_requires_auth(client):
+    res = await client.patch("/profile", json=PATCH_BODY)
+    assert res.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_patch_profile_rejects_invalid_level_target(auth_client):
+    client, _ = auth_client
+    res = await client.patch("/profile", json={**PATCH_BODY, "level_target": "Z9"})
+    assert res.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_patch_profile_lowercases_username(auth_client):
+    client, _ = auth_client
+    res = await client.patch("/profile", json={**PATCH_BODY, "username": "MINH_DEV"})
+    assert res.status_code == 200
+    assert res.json()["username"] == "minh_dev"
