@@ -71,7 +71,8 @@ export const dict = {
     'streak30':'Chuỗi 30 ngày', 'streak30Desc':'Học liên tục 30 ngày',
     'mastered500':'500 thẻ thành thạo', 'mastered500Desc':'Thành thạo 500 thẻ',
     'b2':'Bậc thầy B2', 'b2Desc':'Đạt trình độ B2',
-    profileMenu:'Hồ sơ' },
+    profileMenu:'Hồ sơ',
+    editProfileTitle:'Chỉnh sửa hồ sơ', levelLabel:'Trình độ hiện tại', levelTargetLabel:'Trình độ mục tiêu', goalTextLabel:'Mục tiêu học tập', dailyTargetLabel:'Số thẻ mỗi ngày', saveProfile:'Lưu', profileUsernameTaken:'Tên đăng nhập đã tồn tại', profileSaveError:'Lưu thất bại — thử lại sau' },
 
   en: { learn:'Learn', decks:'Decks', home:'Home', library:'Library', review:'Review', add:'Add knowledge', progress:'Progress',
     settings:'Settings', resetProgress:'Reset progress', resetConfirm:'Erase all progress, scores and the current session?', deleteAll:'Erase all', cancel:'Cancel', resetError:'Could not reset progress. Try again.',
@@ -143,7 +144,8 @@ export const dict = {
     'streak30':'30-day streak', 'streak30Desc':'Study 30 days in a row',
     'mastered500':'500 cards mastered', 'mastered500Desc':'Master 500 cards',
     'b2':'B2 master', 'b2Desc':'Reach level B2',
-    profileMenu:'Profile' },
+    profileMenu:'Profile',
+    editProfileTitle:'Edit profile', levelLabel:'Current level', levelTargetLabel:'Target level', goalTextLabel:'Learning goal', dailyTargetLabel:'Cards per day', saveProfile:'Save', profileUsernameTaken:'Username already taken', profileSaveError:'Save failed — try again later' },
 } as const
 
 export type Strings = typeof dict[Lang]

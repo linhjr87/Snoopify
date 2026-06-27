@@ -1,17 +1,20 @@
 'use client'
+import { useState } from 'react'
 import { useAppStore } from '../../store/useAppStore'
 import { useT } from '../../i18n/useT'
 import { cefrLabel } from './cefr'
 import type { ProfileOut } from '../../lib/api-types'
+import { EditProfileModal } from './EditProfileModal'
 
 const ACH_COLORS: Record<string, string> = {
   streak7: 'var(--accent)', mastered100: 'var(--gold)', sessions10: 'var(--clay)',
   streak30: 'var(--rust)', mastered500: '#3a6ea5', b2: 'var(--accent)',
 }
 
-export default function ProfileScreen({ profile, onEdit }: { profile: ProfileOut; onEdit?: () => void }) {
+export default function ProfileScreen({ profile }: { profile: ProfileOut }) {
   const t = useT()
   const lang = useAppStore((s) => s.lang)
+  const [editing, setEditing] = useState(false)
   const initial = (profile.display_name || profile.username || '?').charAt(0).toUpperCase()
   const earned = profile.achievements.filter((a) => a.earned).length
   const memberSince = new Intl.DateTimeFormat(lang === 'en' ? 'en-US' : 'vi-VN', { month: 'long', year: 'numeric' }).format(new Date(profile.created_at))
@@ -41,7 +44,7 @@ export default function ProfileScreen({ profile, onEdit }: { profile: ProfileOut
           <div style={{ fontSize: 15, color: 'var(--muted)' }}>{profile.email}</div>
           <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 5 }}>{t.memberSince} {memberSince}</div>
         </div>
-        <button onClick={onEdit} style={{ border: '1px solid var(--line)', borderRadius: 11, background: 'var(--surface)', padding: '11px 20px', fontFamily: "'Hanken Grotesk',sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', cursor: 'pointer' }}>{t.editProfile}</button>
+        <button onClick={() => setEditing(true)} style={{ border: '1px solid var(--line)', borderRadius: 11, background: 'var(--surface)', padding: '11px 20px', fontFamily: "'Hanken Grotesk',sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', cursor: 'pointer' }}>{t.editProfile}</button>
       </section>
 
       {/* Stats */}
@@ -98,6 +101,7 @@ export default function ProfileScreen({ profile, onEdit }: { profile: ProfileOut
           </div>
         </section>
       </div>
+      {editing && <EditProfileModal profile={profile} onClose={() => setEditing(false)} />}
     </div>
   )
 }
