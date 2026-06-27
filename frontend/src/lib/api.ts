@@ -36,10 +36,3 @@ export const apiPatch = <T>(path: string, body?: unknown) =>
   request<T>(path, { method: 'PATCH', body: body === undefined ? undefined : JSON.stringify(body) })
 export const apiDelete = <T>(path: string) => request<T>(path, { method: 'DELETE' })
 
-const BACKEND = (process.env.BACKEND_URL as string | undefined) ?? 'http://localhost:8000'
-
-export async function apiFetch<T>(path: string): Promise<T> {
-  const res = await fetch(`${BACKEND}${path}`, { cache: 'no-store' })
-  if (!res.ok) throw new ApiError(res.status, res.statusText)
-  return (await res.json()) as T
-}

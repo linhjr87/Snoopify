@@ -1,8 +1,9 @@
 from fastapi import APIRouter
 
-from app.api.routers import cards, decks, health, progress, review
+from app.api.routers import auth, cards, decks, health, profile, progress, review
 
 api_router = APIRouter()
+api_router.include_router(auth.router)
 api_router.include_router(health.router)
 api_router.include_router(decks.router)
 api_router.include_router(cards.deck_cards_router)
@@ -12,3 +13,4 @@ api_router.include_router(cards.cards_router)
 api_router.include_router(review.router)
 api_router.include_router(progress.progress_router)
 api_router.include_router(progress.dashboard_router)
+api_router.include_router(profile.router)

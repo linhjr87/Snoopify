@@ -1,9 +1,34 @@
 'use client'
 
+import { useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { Sidebar } from './layout/Sidebar'
 import { Topbar } from './layout/Topbar'
+import { GuidedTourOverlay } from './layout/GuidedTourOverlay'
+import { ChatPanel } from './layout/ChatPanel'
+import { useTourStore } from '../store/useTourStore'
+import type { ProgressSummary, DeckOut } from '../lib/api-types'
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({ children, displayName, summary, decks }: {
+  children: React.ReactNode
+  displayName?: string | null
+  summary?: ProgressSummary | null
+  decks?: DeckOut[]
+}) {
+  const startTour = useTourStore((s) => s.startTour)
+  const pathname = usePathname()
+
+  useEffect(() => {
+    if (pathname === '/login') return
+    let tourDone: string | null
+    try { tourDone = localStorage.getItem('myenglish_tour_done') } catch { tourDone = '1' }
+    if (tourDone === '1') return
+    const id = setTimeout(startTour, 450)
+    return () => clearTimeout(id)
+  }, [startTour, pathname])
+
+  if (pathname === '/login') return <>{children}</>
+
   return (
     <div
       style={{
@@ -16,7 +41,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         transition: 'background .3s ease, color .3s ease',
       }}
     >
-      <Sidebar />
+      <Sidebar displayName={displayName} summary={summary} decks={decks} />
       <main
         style={{
           flex: 1,
@@ -28,6 +53,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <Topbar />
         {children}
       </main>
+      <GuidedTourOverlay />
+      <ChatPanel />
     </div>
   )
 }

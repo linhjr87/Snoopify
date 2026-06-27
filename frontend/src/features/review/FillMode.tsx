@@ -1,18 +1,20 @@
+'use client'
 import { useAppStore } from '../../store/useAppStore'
+import { useT } from '../../i18n/useT'
 import { fillIsRight } from '../../lib/grading'
 import type { SessionCard } from '../../lib/adapters'
-import { useGradeMutation } from './queries'
+import { submitGrade } from './grade'
 
 export function FillMode({ cur, isLast }: { cur: SessionCard; isLast: boolean }) {
+  const t = useT()
   const value = useAppStore((s) => s.fillValue)
   const checked = useAppStore((s) => s.fillChecked)
   const setFill = useAppStore((s) => s.setFill)
   const checkFill = useAppStore((s) => s.checkFill)
   const advance = useAppStore((s) => s.advanceSession)
-  const grade = useGradeMutation()
   const right = fillIsRight(value, cur.fill.answer)
   const fillDisplay = value || '______'
-  const nextLabel = isLast ? 'Xem kết quả →' : 'Tiếp theo →'
+  const nextLabel = isLast ? t.seeResultsCta : t.nextCta
 
   const fillBlankStyle: React.CSSProperties = {
     display: 'inline-block', minWidth: '150px', textAlign: 'center', padding: '0 6px',
@@ -26,11 +28,11 @@ export function FillMode({ cur, isLast }: { cur: SessionCard; isLast: boolean })
   }
 
   const fillResultText = right
-    ? `Chính xác — "${cur.fill.answer}".`
-    : `Chưa đúng. Đáp án: "${cur.fill.answer}".`
+    ? t.correctResult(cur.fill.answer)
+    : t.incorrectResult(cur.fill.answer)
 
   const handleNext = () => {
-    grade.mutate({ card_id: cur.cardId, rating: right ? 'remember' : 'forgot', mode: 'fill', is_correct: right })
+    void submitGrade({ card_id: cur.cardId, rating: right ? 'remember' : 'forgot', mode: 'fill', is_correct: right })
     advance(right)
   }
 
@@ -56,7 +58,7 @@ export function FillMode({ cur, isLast }: { cur: SessionCard; isLast: boolean })
 
       {/* Hint */}
       <div style={{ fontSize: '14px', color: 'var(--muted)' }}>
-        Gõ từ còn thiếu · gợi ý: <span style={{ fontFamily: 'monospace' }}>{cur.fill.hint}</span>
+        {t.fillHint} <span style={{ fontFamily: 'monospace' }}>{cur.fill.hint}</span>
       </div>
 
       {/* Input row */}
@@ -64,7 +66,7 @@ export function FillMode({ cur, isLast }: { cur: SessionCard; isLast: boolean })
         <input
           aria-label="fill"
           className="field"
-          placeholder="câu trả lời của bạn…"
+          placeholder={t.fillPlaceholder}
           value={value}
           onChange={(e) => { if (!checked) setFill(e.target.value) }}
           onKeyDown={handleKey}
@@ -88,7 +90,7 @@ export function FillMode({ cur, isLast }: { cur: SessionCard; isLast: boolean })
             transition: 'transform .18s ease, box-shadow .18s ease',
           }}
         >
-          Kiểm tra
+          {t.checkCta}
         </button>
       </div>
 

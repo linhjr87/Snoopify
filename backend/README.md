@@ -1,7 +1,7 @@
 # Snoopify Backend
 
-FastAPI + PostgreSQL backend for Snoopify (single-user, no auth). SM-2
-spaced-repetition scheduling. See the design spec at
+FastAPI + PostgreSQL backend for Snoopify. Multi-user with cookie-session auth
+(Redis-backed sessions + bcrypt) and SM-2 spaced-repetition scheduling. See the design spec at
 `../docs/superpowers/specs/2026-06-22-snoopify-backend-design.md`.
 
 ## Run (dev)

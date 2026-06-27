@@ -1,52 +1,46 @@
+'use client'
 import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
 import { useT } from '../../i18n/useT'
 import { DeckList } from './DeckList'
 import { GroupBySelector, type GroupBy } from './GroupBySelector'
 import { ImportJsonModal } from './ImportJsonModal'
-import { useCreateDeck, useDecks } from './queries'
 import { toDeckCard } from './deck-view'
 import type { DeckCardProps } from './DeckCard'
 import type { DeckOut } from '../../lib/api-types'
 
-export default function LibraryScreen() {
+export default function LibraryScreen({ decks: apiDecks }: { decks: DeckOut[] }) {
   const t = useT()
+  const lang = useAppStore((s) => s.lang)
+  const router = useRouter()
   const setPanel = useAppStore((s) => s.setPanel)
-  const decksQuery = useDecks()
-  const createDeck = useCreateDeck()
   const [group, setGroup] = useState<GroupBy>('topic')
   const [filterText, setFilterText] = useState('')
 
-  const apiDecks = decksQuery.data
-
   const decks: DeckCardProps[] = useMemo(() => {
-    const sourceDecks = apiDecks ?? []
     const needle = filterText.trim().toLowerCase()
-    const sorted = [...sourceDecks].sort((a: DeckOut, b: DeckOut) => {
+    const sorted = [...apiDecks].sort((a: DeckOut, b: DeckOut) => {
       if (group === 'mastery') return b.mastery_pct - a.mastery_pct
       if (group === 'date') return b.created_at.localeCompare(a.created_at)
       return a.topic.localeCompare(b.topic)
     })
-    return sorted
-      .filter((d) => d.name.toLowerCase().includes(needle))
-      .map(toDeckCard)
-  }, [apiDecks, filterText, group])
+    return sorted.filter((d) => d.name.toLowerCase().includes(needle)).map((d) => toDeckCard(d, lang))
+  }, [apiDecks, filterText, group, lang])
 
-  const totalCards = (apiDecks ?? []).reduce((sum, deck) => sum + deck.count, 0)
-  const totalDecks = apiDecks?.length ?? 0
+  const totalCards = apiDecks.reduce((sum, deck) => sum + deck.count, 0)
+  const totalDecks = apiDecks.length
 
-  const onNewDeck = () => {
-    const name = window.prompt('Tên bộ thẻ mới')?.trim()
-    if (name) createDeck.mutate({ name })
-  }
+  const onNewDeck = () => router.push('/add')
 
   return (
+    <>
     <div style={{ animation: 'fadeUp .45s ease both' }}>
       {/* Header row */}
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: '18px', marginBottom: '24px', flexWrap: 'wrap' }}>
         <div>
           <div style={{ fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '6px' }}>
-            {totalCards} thẻ · {totalDecks} bộ
+            {t.libraryStats(totalCards, totalDecks)}
           </div>
           <h1 style={{ margin: 0, fontFamily: "'Newsreader',serif", fontWeight: 500, fontSize: '32px' }}>
             {t.libraryTitle}
@@ -67,7 +61,7 @@ export default function LibraryScreen() {
             <input
               value={filterText}
               onChange={(e) => setFilterText(e.target.value)}
-              placeholder="lọc bộ thẻ…"
+              placeholder={t.filterDecksPlaceholder}
               style={{ border: 'none', outline: 'none', background: 'transparent', color: 'var(--muted)', fontSize: '14px', width: '100%' }}
             />
           </div>
@@ -99,10 +93,12 @@ export default function LibraryScreen() {
       </div>
 
       <GroupBySelector value={group} onChange={setGroup} />
-      {decksQuery.isLoading && <div style={{ color: 'var(--muted)', fontSize: '14px' }}>Đang tải bộ thẻ…</div>}
-      {decksQuery.isError && <div style={{ color: 'var(--rust)', fontSize: '14px' }}>Không tải được bộ thẻ. Thử lại sau.</div>}
-      {!decksQuery.isLoading && !decksQuery.isError && <DeckList decks={decks} onNewDeck={onNewDeck} />}
-      <ImportJsonModal />
+      <DeckList decks={decks} onNewDeck={onNewDeck} />
     </div>
+    {/* Modal rendered OUTSIDE the fadeUp wrapper: its translateY transform would
+        otherwise become the containing block for this position:fixed overlay,
+        trapping it inside the main column instead of the viewport. */}
+    <ImportJsonModal />
+    </>
   )
 }

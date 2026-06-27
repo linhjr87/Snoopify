@@ -15,19 +15,34 @@ services:
       timeout: 3s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # sessions are ephemeral in dev (no volume); add a volume for persistence if needed
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   api:
     build: ./backend
     command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"  # dev only — remove --reload for production
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-snoopify}:${POSTGRES_PASSWORD:-snoopify}@db:5432/${POSTGRES_DB:-snoopify}
-      SEED_ON_STARTUP: "true"
-      CORS_ORIGINS: '["http://localhost:5173"]'
+      CORS_ORIGINS: '["http://localhost:3000"]'
+      REDIS_URL: "redis://redis:6379/0"
+      COOKIE_SECURE: "false"
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/code
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   frontend:

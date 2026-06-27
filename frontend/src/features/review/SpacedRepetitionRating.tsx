@@ -1,3 +1,5 @@
+'use client'
+import { useT } from '../../i18n/useT'
 import type { Rating } from '../../lib/api-types'
 
 export function SpacedRepetitionRating({
@@ -7,10 +9,11 @@ export function SpacedRepetitionRating({
   onRate: (rating: Rating) => void
   disabled?: boolean
 }) {
+  const t = useT()
   const opts: [string, string, Rating, string, string][] = [
-    ['Quên', 'ôn lại ngay', 'forgot', 'var(--rust)', 'var(--rust)'],
-    ['Mơ hồ', 'sau 1 ngày', 'vague', 'var(--gold)', 'var(--gold)'],
-    ['Nhớ', 'sau 4 ngày', 'remember', '#3f8f5b', '#2f6b43'],
+    [t.ratingForgot, t.ratingForgotSub, 'forgot', 'var(--rust)', 'var(--rust)'],
+    [t.ratingVague, t.ratingVagueSub, 'vague', 'var(--gold)', 'var(--gold)'],
+    [t.ratingRemember, t.ratingRememberSub, 'remember', '#3f8f5b', '#2f6b43'],
   ]
   return (
     <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>

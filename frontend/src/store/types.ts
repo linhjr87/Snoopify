@@ -21,9 +21,9 @@ export interface AppState {
   importOpen: boolean
   notifOpen: boolean
   langMenuOpen: boolean
+  notifRead: boolean
+  chatOpen: boolean
   importText: string
-  isAuthenticated: boolean
-  hasOnboarded: boolean
 }
 
 export interface AppActions {
@@ -39,11 +39,10 @@ export interface AppActions {
   setLang(lang: Lang): void
   toggleCollapsed(): void
   setPanel(panel: 'settingsOpen' | 'confirmReset' | 'importOpen' | 'notifOpen' | 'langMenuOpen', open: boolean): void
+  markNotifsRead(): void
+  toggleChat(): void
   setImportText(text: string): void
   resetProgress(): void
-  login(): void
-  logout(): void
-  completeOnboarding(): void
 }
 
 export type AppStore = AppState & AppActions

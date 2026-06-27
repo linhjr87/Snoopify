@@ -1,10 +1,10 @@
-import { useState } from 'react'
+'use client'
+import { useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useT } from '../../i18n/useT'
 import { CardPreview, type PreviewData } from './CardPreview'
-import { useDecks, useCreateDeck } from '../library/queries'
-import { useAddCard } from './queries'
-import type { CardCreate } from '../../lib/api-types'
-
-const TYPES = ['Từ vựng', 'Cụm từ', 'Ngữ pháp', 'Câu mẫu', 'Ghi chú', 'Lỗi']
+import { apiPost } from '../../lib/api'
+import type { CardCreate, CardOut, DeckOut } from '../../lib/api-types'
 
 const empty: PreviewData = { word: '', phonetic: '', pos: '', meaning: '', example: '', deck: '', tags: '' }
 
@@ -14,40 +14,63 @@ const fieldStyle: React.CSSProperties = {
   fontSize: 15, color: 'var(--ink)', background: 'var(--paper)', outline: 'none',
 }
 
-export function AddCardForm() {
-  const [type, setType] = useState(TYPES[0])
+export function AddCardForm({ decks }: { decks: DeckOut[] }) {
+  const t = useT()
+  const TYPES = [t.typeVocab, t.typePhrase, t.typeGrammar, t.typeSentence, t.typeNote, t.typeMistake]
+  const router = useRouter()
+  const wordInputRef = useRef<HTMLInputElement>(null)
+  const [typeIdx, setTypeIdx] = useState(0)
   const [data, setData] = useState<PreviewData>(empty)
   const [saved, setSaved] = useState<string[]>([])
   const [deckId, setDeckId] = useState<string>('')
   const [saveError, setSaveError] = useState(false)
-
-  const { data: decks } = useDecks()
-  const createDeck = useCreateDeck()
-  const addCard = useAddCard()
-  const selectedDeckId = deckId || decks?.[0]?.id || ''
+  const selectedDeckId = deckId || decks[0]?.id || ''
 
   const set = (k: keyof PreviewData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setData((d) => ({ ...d, [k]: e.target.value }))
 
-  const handleSave = () => {
+  const doSave = async (): Promise<string | null> => {
     const word = data.word.trim()
-    if (!word || !selectedDeckId) return
-    const card: CardCreate = {
-      word, phonetic: data.phonetic, pos: data.pos, meaning: data.meaning, example: data.example,
-    }
+    if (!word || !selectedDeckId) return null
+    const card: CardCreate = { word, phonetic: data.phonetic, pos: data.pos, meaning: data.meaning, example: data.example }
     setSaveError(false)
-    addCard.mutate({ deckId: selectedDeckId, card }, {
-      onSuccess: () => { setSaved((prev) => [word, ...prev].slice(0, 10)); setData(empty) },
-      onError: () => setSaveError(true),
-    })
+    try {
+      await apiPost<CardOut>(`/decks/${selectedDeckId}/cards`, card)
+      setSaved((prev) => [word, ...prev].slice(0, 10))
+      setData(empty)
+      return word
+    } catch {
+      setSaveError(true)
+      return null
+    }
   }
 
-  const onNewDeck = () => {
-    const name = window.prompt('Tên bộ thẻ mới')?.trim()
-    if (name) createDeck.mutate({ name }, { onSuccess: (deck) => setDeckId(deck.id) })
+  const handleSave = async () => {
+    const saved = await doSave()
+    if (saved) router.refresh()
   }
 
-  const canSave = !!selectedDeckId && data.word.trim().length > 0 && !addCard.isPending
+  const handleSaveAndNext = async () => {
+    const saved = await doSave()
+    if (saved) {
+      router.refresh()
+      wordInputRef.current?.focus()
+    }
+  }
+
+  const onNewDeck = async () => {
+    const name = window.prompt(t.newDeckPrompt)?.trim()
+    if (!name) return
+    try {
+      const deck = await apiPost<DeckOut>('/decks', { name })
+      setDeckId(deck.id)
+      router.refresh()
+    } catch {
+      window.alert(t.newDeckFailed)
+    }
+  }
+
+  const canSave = !!selectedDeckId && data.word.trim().length > 0
 
   return (
     <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
@@ -60,19 +83,19 @@ export function AddCardForm() {
       }}>
         {/* Type selector */}
         <div style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 10 }}>
-          Loại
+          {t.typeLabel}
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 22 }}>
-          {TYPES.map((tp) => (
+          {TYPES.map((tp, i) => (
             <button
-              key={tp}
-              onClick={() => setType(tp)}
+              key={i}
+              onClick={() => setTypeIdx(i)}
               style={{
                 fontSize: 13,
-                border: tp === type ? '1px solid var(--accent)' : '1px solid var(--line)',
-                color: tp === type ? 'var(--accent)' : 'var(--muted)',
-                background: tp === type ? 'var(--accent-soft)' : 'transparent',
-                borderRadius: 999, padding: '6px 14px', fontWeight: tp === type ? 600 : 400,
+                border: i === typeIdx ? '1px solid var(--accent)' : '1px solid var(--line)',
+                color: i === typeIdx ? 'var(--accent)' : 'var(--muted)',
+                background: i === typeIdx ? 'var(--accent-soft)' : 'transparent',
+                borderRadius: 999, padding: '6px 14px', fontWeight: i === typeIdx ? 600 : 400,
                 fontFamily: "'Hanken Grotesk', sans-serif", cursor: 'pointer',
               }}
             >
@@ -84,31 +107,31 @@ export function AddCardForm() {
         {/* Word + Phonetic row */}
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 14 }}>
           <div style={{ flex: 1, minWidth: 180 }}>
-            <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Từ / cụm từ</div>
-            <input aria-label="word" className="field" style={fieldStyle} placeholder="resilient" value={data.word} onChange={set('word')} />
+            <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.wordPhraseLabel}</div>
+            <input ref={wordInputRef} aria-label="word" className="field" style={fieldStyle} placeholder="resilient" value={data.word} onChange={set('word')} />
           </div>
           <div style={{ width: 170 }}>
-            <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Phiên âm</div>
+            <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.phoneticLabel}</div>
             <input aria-label="phonetic" className="field" style={{ ...fieldStyle, fontFamily: 'monospace', fontSize: 13 }} placeholder="/rɪˈzɪl.i.ənt/" value={data.phonetic} onChange={set('phonetic')} />
           </div>
         </div>
 
         {/* Meaning */}
         <div style={{ marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Nghĩa</div>
+          <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.meaningLabel}</div>
           <input aria-label="meaning" className="field" style={fieldStyle} placeholder="có khả năng phục hồi nhanh; kiên cường" value={data.meaning} onChange={set('meaning')} />
         </div>
 
         {/* Example */}
         <div style={{ marginBottom: 14 }}>
-          <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Ví dụ</div>
+          <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.exampleLabel}</div>
           <textarea aria-label="example" className="field" rows={2} style={{ ...fieldStyle, resize: 'vertical' }} placeholder="She is so resilient — she bounced back within a week." value={data.example} onChange={set('example')} />
         </div>
 
         {/* Deck picker + Tags row */}
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 24 }}>
           <div style={{ flex: 1, minWidth: 160 }}>
-            <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>Bộ thẻ</div>
+            <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{t.deckLabel}</div>
             <div style={{ display: 'flex', gap: 8 }}>
               <select
                 aria-label="deck"
@@ -117,8 +140,8 @@ export function AddCardForm() {
                 value={selectedDeckId}
                 onChange={(e) => setDeckId(e.target.value)}
               >
-                {(!decks || decks.length === 0) && <option value="">(chưa có bộ thẻ)</option>}
-                {decks?.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+                {decks.length === 0 && <option value="">{t.noDeckYet}</option>}
+                {decks.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
               <button
                 onClick={onNewDeck}
@@ -127,7 +150,7 @@ export function AddCardForm() {
                   padding: '0 14px', fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 600,
                   fontSize: 14, color: 'var(--muted)', cursor: 'pointer', whiteSpace: 'nowrap',
                 }}
-              >+ Bộ mới</button>
+              >{t.newDeckShort}</button>
             </div>
           </div>
           <div style={{ flex: 1, minWidth: 160 }}>
@@ -139,7 +162,7 @@ export function AddCardForm() {
         {/* Action buttons */}
         {saveError && (
           <div role="alert" style={{ marginBottom: 10, padding: '8px 14px', borderRadius: 10, background: '#f6e6e2', border: '1px solid var(--rust)', color: 'var(--rust)', fontSize: 13, fontWeight: 600 }}>
-            Lưu thất bại — kiểm tra kết nối và thử lại.
+            {t.saveFailed}
           </div>
         )}
         <div style={{ display: 'flex', gap: 12 }}>
@@ -155,10 +178,10 @@ export function AddCardForm() {
             }}
             className="cta"
           >
-            Lưu thẻ
+            {t.saveCardCta}
           </button>
           <button
-            onClick={handleSave}
+            onClick={handleSaveAndNext}
             disabled={!canSave}
             style={{
               border: '1px solid var(--line)', borderRadius: 11, background: 'var(--surface)',
@@ -169,7 +192,7 @@ export function AddCardForm() {
             }}
             className="ghost"
           >
-            Lưu &amp; thêm tiếp
+            {t.saveAndNextCta}
           </button>
         </div>
       </section>
@@ -183,7 +206,7 @@ export function AddCardForm() {
           background: 'var(--paper)', padding: '18px 20px',
         }}>
           <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
-            Đã lưu hôm nay · {saved.length}
+            {t.savedTodayLabel(saved.length)}
           </div>
           <div style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.7 }}>
             {saved.length > 0

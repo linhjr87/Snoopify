@@ -1,17 +1,19 @@
+'use client'
 import { useAppStore } from '../../store/useAppStore'
+import { useT } from '../../i18n/useT'
 import { SpacedRepetitionRating } from './SpacedRepetitionRating'
 import type { SessionCard } from '../../lib/adapters'
 import type { Rating } from '../../lib/api-types'
-import { useGradeMutation } from './queries'
+import { submitGrade } from './grade'
 
 export function FlashcardMode({ cur }: { cur: SessionCard }) {
+  const t = useT()
   const flipped = useAppStore((s) => s.flipped)
   const flip = useAppStore((s) => s.flip)
   const advance = useAppStore((s) => s.advanceSession)
-  const grade = useGradeMutation()
 
   const handleRate = (rating: Rating) => {
-    grade.mutate({ card_id: cur.cardId, rating, mode: 'flash', is_correct: null })
+    void submitGrade({ card_id: cur.cardId, rating, mode: 'flash', is_correct: null })
     advance(rating !== 'forgot')
   }
 
@@ -37,7 +39,7 @@ export function FlashcardMode({ cur }: { cur: SessionCard }) {
             boxShadow: '0 14px 34px -22px rgba(40,35,25,0.55)',
           }}>
             <div style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '16px' }}>
-              Nhấn để lật thẻ
+              {t.tapToFlip}
             </div>
             <div style={{ fontFamily: "'Newsreader', serif", fontSize: '52px', fontWeight: 500, letterSpacing: '-0.01em' }}>
               {cur.word}
@@ -64,7 +66,7 @@ export function FlashcardMode({ cur }: { cur: SessionCard }) {
             boxShadow: '0 14px 34px -22px rgba(40,35,25,0.55)',
           }}>
             <div style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--accent,#2f5d4e)', marginBottom: '16px' }}>
-              Nghĩa
+              {t.meaningLabel}
             </div>
             <div style={{ fontFamily: "'Newsreader', serif", fontSize: '27px', fontWeight: 500, marginBottom: '14px' }}>
               {cur.meaning}
@@ -77,10 +79,10 @@ export function FlashcardMode({ cur }: { cur: SessionCard }) {
       </div>
 
       {/* Rating buttons */}
-      <SpacedRepetitionRating onRate={handleRate} disabled={grade.isPending} />
+      <SpacedRepetitionRating onRate={handleRate} />
 
       <div style={{ fontSize: '13px', color: 'var(--muted)' }}>
-        Tự chấm để tính điểm phiên · spaced repetition
+        {t.selfGradeNote}
       </div>
     </div>
   )

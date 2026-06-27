@@ -1,18 +1,21 @@
 import type { DeckOut } from '../../lib/api-types'
 import type { DeckCardProps } from './DeckCard'
-import { formatRelativeVi } from '../../lib/format'
+import type { Lang } from '../../store/types'
+import { dict } from '../../i18n/dictionary'
+import { formatRelative } from '../../lib/format'
 
 export { formatRelativeVi } from '../../lib/format'
 
-export function toDeckCard(d: DeckOut): DeckCardProps {
+export function toDeckCard(d: DeckOut, lang: Lang = 'vn'): DeckCardProps {
+  const t = dict[lang]
   const pct = Math.round(d.mastery_pct)
   const needAttention = d.count > 0 && pct < 40
   return {
     name: d.name,
-    tag: needAttention ? 'cần chú ý' : (d.topic || 'chủ đề'),
-    meta: `${d.count} thẻ · ${d.due_count} đến hạn`,
-    mastery: `thành thạo ${pct}%`,
-    last: formatRelativeVi(d.last_reviewed_at),
+    tag: needAttention ? t.needsAttentionTag : (d.topic || t.topicLabel),
+    meta: t.deckMeta(d.count, d.due_count),
+    mastery: t.masteryPct(pct),
+    last: formatRelative(d.last_reviewed_at, lang),
     barW: `${pct}%`,
     needAttention,
   }

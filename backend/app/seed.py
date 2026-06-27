@@ -1,9 +1,6 @@
-import asyncio
-
-from sqlalchemy import select
+import uuid
 
 from app.db.models import Card, Deck
-from app.db.session import SessionLocal
 
 SEED_DECK_NAME = "Bộ thẻ khởi động"
 SEED_DECK_TOPIC = "từ vựng"
@@ -35,13 +32,8 @@ def split_phon(phon: str) -> tuple[str, str]:
     return "", phon.strip()
 
 
-async def seed(session) -> bool:
-    existing = (
-        await session.execute(select(Deck).where(Deck.name == SEED_DECK_NAME))
-    ).scalars().first()
-    if existing is not None:
-        return False
-    deck = Deck(name=SEED_DECK_NAME, topic=SEED_DECK_TOPIC)
+async def seed_starter_deck(session, user_id: uuid.UUID) -> Deck:
+    deck = Deck(name=SEED_DECK_NAME, topic=SEED_DECK_TOPIC, user_id=user_id)
     for item in SEED_CARDS:
         phonetic, pos = split_phon(item["phon"])
         deck.cards.append(
@@ -54,19 +46,6 @@ async def seed(session) -> bool:
             )
         )
     session.add(deck)
-    await session.commit()
-    return True
-
-
-async def _run() -> None:
-    async with SessionLocal() as session:
-        created = await seed(session)
-        print("Seeded starter deck." if created else "Starter deck already exists; skipped.")
-
-
-def main() -> None:
-    asyncio.run(_run())
-
-
-if __name__ == "__main__":
-    main()
+    await session.flush()
+    await session.refresh(deck, attribute_names=["cards"])
+    return deck

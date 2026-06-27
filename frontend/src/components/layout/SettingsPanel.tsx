@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
 import { useT } from '../../i18n/useT'
+import { apiPost } from '../../lib/api'
 
 export function SettingsPanel() {
   const t = useT()
@@ -14,8 +15,12 @@ export function SettingsPanel() {
   }))
   const setPanel = useAppStore((s) => s.setPanel)
   const resetProgress = useAppStore((s) => s.resetProgress)
-  const logout = useAppStore((s) => s.logout)
   const [resetError, setResetError] = useState(false)
+
+  const handleLogout = async () => {
+    try { await apiPost('/auth/logout') } catch (err) { console.error('logout failed:', err) }
+    router.push('/login'); router.refresh()
+  }
 
   const handleReset = async () => {
     setResetError(false)
@@ -38,6 +43,10 @@ export function SettingsPanel() {
         bottom: 'calc(100% + 8px)',
         left: 0,
         right: 0,
+        // Keep a usable width even when the sidebar is collapsed (~54px): when
+        // over-constrained, `right` is dropped and the panel holds 200px,
+        // overhanging to the right instead of squashing the labels.
+        minWidth: 200,
         border: '1px solid var(--line)',
         borderRadius: 14,
         background: 'var(--surface)',
@@ -59,10 +68,19 @@ export function SettingsPanel() {
         {t.settings}
       </div>
 
+      {/* Profile */}
+      <button
+        onClick={() => { setPanel('settingsOpen', false); router.push('/profile') }}
+        style={{ display: 'flex', alignItems: 'center', gap: 7, width: '100%', border: 'none', background: 'transparent', color: 'var(--ink)', cursor: 'pointer', fontSize: 14, padding: '7px 8px', borderRadius: 8, textAlign: 'left', fontFamily: "'Hanken Grotesk', sans-serif", borderBottom: '1px solid var(--line)', marginBottom: 4 }}
+      >
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="6" r="3" /><path d="M3.5 15a5.5 5.5 0 0 1 11 0" /></svg>
+        {t.profileMenu}
+      </button>
+
       {/* Logout */}
       <div style={{ borderBottom: '1px solid var(--line)', paddingBottom: 8, marginBottom: 4 }}>
         <button
-          onClick={logout}
+          onClick={handleLogout}
           style={{
             display: 'flex',
             alignItems: 'center',

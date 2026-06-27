@@ -1,14 +1,16 @@
+'use client'
 import { useT } from '../../i18n/useT'
 import { AddCardForm } from './AddCardForm'
+import type { DeckOut } from '../../lib/api-types'
 
-export default function AddScreen() {
+export default function AddScreen({ decks }: { decks: DeckOut[] }) {
   const t = useT()
   return (
     <div style={{ animation: 'fadeUp .45s ease both' }}>
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, marginBottom: 24, flexWrap: 'wrap' }}>
         <div>
           <div style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 6 }}>
-            Bộ thẻ · Business English
+            {t.decks} · Business English
           </div>
           <h1 style={{ margin: 0, fontFamily: "'Newsreader', serif", fontWeight: 500, fontSize: 32, letterSpacing: '-0.01em' }}>
             {t.addTitle}
@@ -28,7 +30,7 @@ export default function AddScreen() {
           {t.importJson}
         </button>
       </div>
-      <AddCardForm />
+      <AddCardForm decks={decks} />
     </div>
   )
 }

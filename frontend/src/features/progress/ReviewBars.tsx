@@ -1,17 +1,19 @@
-import { useProgressSummary } from './queries'
+'use client'
+import { useT } from '../../i18n/useT'
+import { useAppStore } from '../../store/useAppStore'
+import { weekdayLabel } from '../../lib/format'
+import type { ProgressSummary } from '../../lib/api-types'
 
-export function ReviewBars() {
-  const { data, isError } = useProgressSummary()
-  const bars = data?.weekly_bars ?? []
+export function ReviewBars({ summary }: { summary: ProgressSummary | null }) {
+  const t = useT()
+  const lang = useAppStore((s) => s.lang)
+  const bars = summary?.weekly_bars ?? []
   const max = Math.max(1, ...bars.map((b) => b.count))
   return (
     <div style={{ marginTop: 26 }}>
       <h2 style={{ margin: '0 0 14px', fontFamily: "'Newsreader', serif", fontWeight: 500, fontSize: 19 }}>
-        Lượt ôn mỗi ngày · tuần này
+        {t.reviewsPerDayHeading}
       </h2>
-      {isError && !data && (
-        <div style={{ fontSize: 14, color: 'var(--rust)', marginBottom: 8 }}>Không tải được dữ liệu.</div>
-      )}
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 14, height: 140 }}>
         {bars.map((b, i) => (
           <div key={b.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7, height: '100%', justifyContent: 'flex-end' }}>
@@ -22,7 +24,7 @@ export function ReviewBars() {
               background: i < 5 ? 'var(--accent)' : 'transparent',
               border: i < 5 ? 'none' : '1.5px dashed var(--line)',
             }} />
-            <span style={{ fontSize: 12, color: 'var(--muted)' }}>{b.label}</span>
+            <span style={{ fontSize: 12, color: 'var(--muted)' }}>{weekdayLabel(b.label, lang)}</span>
           </div>
         ))}
       </div>
