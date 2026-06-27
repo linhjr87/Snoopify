@@ -39,6 +39,7 @@ export default function ProfileScreen({ profile }: { profile: ProfileOut }) {
   }
 
   return (
+    <>
     <div style={{ animation: 'fadeUp .45s ease both' }}>
       <div style={{ marginBottom: 26 }}>
         <div style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 6 }}>{t.profileSub}</div>
@@ -112,7 +113,10 @@ export default function ProfileScreen({ profile }: { profile: ProfileOut }) {
           </div>
         </section>
       </div>
-      {editing && <EditProfileModal profile={profile} onClose={() => setEditing(false)} />}
     </div>
+    {/* Modal rendered OUTSIDE the fadeUp wrapper so its position:fixed maps to
+        the viewport, not this animated (transformed) screen container. */}
+    {editing && <EditProfileModal profile={profile} onClose={() => setEditing(false)} />}
+    </>
   )
 }
