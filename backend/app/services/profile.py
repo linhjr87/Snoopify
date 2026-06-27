@@ -2,12 +2,13 @@ import uuid
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
+from fastapi import HTTPException
 from sqlalchemy import case, func, select
 
 from app.config import get_settings
 from app.db.models import Card, Deck, ReviewLog, User
 from app.enums import CEFR_LEVELS
-from app.schemas.profile import Achievement, ProfileOut, ProfileStats
+from app.schemas.profile import Achievement, ProfileOut, ProfileStats, ProfileUpdate
 from app.services.srs import mastery
 
 
@@ -88,6 +89,25 @@ def _achievements(mastered: int, longest: int, distinct_days: int, level: str) -
     }
     order = ["streak7", "mastered100", "sessions10", "streak30", "mastered500", "b2"]
     return [Achievement(key=k, earned=flags[k]) for k in order]
+
+
+async def update_profile(session, user: User, data: ProfileUpdate) -> ProfileOut:
+    clash = (
+        await session.execute(
+            select(User).where(User.username == data.username, User.id != user.id)
+        )
+    ).scalar_one_or_none()
+    if clash is not None:
+        raise HTTPException(status_code=409, detail="Username already taken")
+    user.display_name = data.display_name
+    user.username = data.username
+    user.level = data.level
+    user.level_target = data.level_target
+    user.goal_text = data.goal_text
+    user.daily_target = data.daily_target
+    await session.commit()
+    await session.refresh(user)
+    return await get_profile(session, user)
 
 
 async def get_profile(session, user: User) -> ProfileOut:
