@@ -1,6 +1,20 @@
+import pytest
 from sqlalchemy import select
 
 from app.db.models import Card, Deck, User
+
+
+@pytest.mark.asyncio
+async def test_user_profile_defaults(session):
+    from app.db.models import User
+    user = User(email="defaults@example.com", username="defaultsuser", password_hash="x", display_name="D")
+    session.add(user)
+    await session.flush()
+    await session.refresh(user)
+    assert user.level == "B1"
+    assert user.level_target == "B2"
+    assert user.goal_text == ""
+    assert user.daily_target == 20
 
 
 async def test_deck_card_roundtrip_and_defaults(session):
