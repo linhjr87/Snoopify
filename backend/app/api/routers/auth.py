@@ -25,10 +25,18 @@ def _set_cookie(response: Response, sid: str) -> None:
 
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 async def register(data: RegisterRequest, response: Response, session: SessionDep, redis: RedisDep):
-    exists = (await session.execute(select(User).where(User.email == data.email))).scalar_one_or_none()
-    if exists is not None:
+    email_taken = (await session.execute(select(User).where(User.email == data.email))).scalar_one_or_none()
+    if email_taken is not None:
         raise HTTPException(status_code=409, detail="Email already registered")
-    user = User(email=data.email, password_hash=hash_password(data.password), display_name=data.display_name)
+    username_taken = (await session.execute(select(User).where(User.username == data.username))).scalar_one_or_none()
+    if username_taken is not None:
+        raise HTTPException(status_code=409, detail="Username already taken")
+    user = User(
+        email=data.email,
+        username=data.username,
+        password_hash=hash_password(data.password),
+        display_name=data.display_name,
+    )
     session.add(user)
     await session.flush()  # get user.id without committing
     await seed_starter_deck(session, user.id)
@@ -41,9 +49,14 @@ async def register(data: RegisterRequest, response: Response, session: SessionDe
 
 @router.post("/login", response_model=UserOut)
 async def login(data: LoginRequest, response: Response, session: SessionDep, redis: RedisDep):
-    user = (await session.execute(select(User).where(User.email == data.email))).scalar_one_or_none()
+    ident = data.identifier.strip()
+    if "@" in ident:
+        stmt = select(User).where(User.email == ident)
+    else:
+        stmt = select(User).where(User.username == ident.lower())
+    user = (await session.execute(stmt)).scalar_one_or_none()
     if user is None:
-        verify_password(data.password, _DUMMY_HASH)  # constant-time guard: prevent email-oracle timing
+        verify_password(data.password, _DUMMY_HASH)  # constant-time guard: prevent identifier-oracle timing
         raise HTTPException(status_code=401, detail="Invalid credentials")
     if not verify_password(data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")

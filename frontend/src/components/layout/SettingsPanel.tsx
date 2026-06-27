@@ -43,6 +43,10 @@ export function SettingsPanel() {
         bottom: 'calc(100% + 8px)',
         left: 0,
         right: 0,
+        // Keep a usable width even when the sidebar is collapsed (~54px): when
+        // over-constrained, `right` is dropped and the panel holds 200px,
+        // overhanging to the right instead of squashing the labels.
+        minWidth: 200,
         border: '1px solid var(--line)',
         borderRadius: 14,
         background: 'var(--surface)',

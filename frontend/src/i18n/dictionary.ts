@@ -13,7 +13,7 @@ export const dict = {
     confirmPwL:'Nhập lại mật khẩu', confirmPwPh:'Nhập lại mật khẩu', pwMismatch:'Mật khẩu nhập lại không khớp', logoutBtn:'Đăng xuất',
     forgot:'Quên mật khẩu?', noAcc:'Chưa có tài khoản?', haveAcc:'Đã có tài khoản?', signIn:'Đăng nhập', signUp:'Đăng ký',
     loginTitle:'Đăng nhập', loginSub:'Tiếp tục học và theo dõi tiến độ của bạn.', signupTitle:'Tạo tài khoản', signupSub:'Bắt đầu hành trình học tiếng Anh ngay hôm nay.',
-    obWelcome:'Chào mừng đến với myEnglish', obWelcomeBody:'Ứng dụng giúp bạn tự do xây dựng kho từ vựng và cấu trúc của riêng mình. Không giới hạn, không gò bó.', obBegin:'Bắt đầu',
+    obWelcome:'Chào mừng đến với Snoopify', obWelcomeBody:'Ứng dụng giúp bạn tự do xây dựng kho từ vựng và cấu trúc của riêng mình. Không giới hạn, không gò bó.', obBegin:'Bắt đầu',
     obGoalT:'Mục tiêu học tập của bạn là gì?', obLevelT:'Trình độ hiện tại của bạn?', obDailyT:'Mục tiêu mỗi ngày?', obTopicT:'Bạn quan tâm chủ đề nào?', obTopicSub:'Chọn 1 hoặc nhiều chủ đề để nhận gợi ý từ vựng phù hợp.',
     obBack:'Quay lại', obNext:'Tiếp tục', obFinish:'Hoàn thành', obSkip:'Bỏ qua',
 
@@ -58,7 +58,9 @@ export const dict = {
     reviewsPerDayHeading:'Lượt ôn mỗi ngày · tuần này',
 
     authInvalidCreds:'Email hoặc mật khẩu không đúng', authEmailTaken:'Email đã được đăng ký', authConnError:'Lỗi kết nối — thử lại sau',
-    guestLabel:'Bạn' },
+    usernameL:'Tên đăng nhập', usernamePh:'nguyenvana', identifierL:'Email hoặc tên đăng nhập', identifierPh:'ban@email.com hoặc nguyenvana', authUsernameTaken:'Tên đăng nhập đã tồn tại',
+    guestLabel:'Bạn',
+    aiTitle:'Trợ lý AI', aiSub:'Gia sư tiếng Anh của bạn', aiGreeting:'Chào bạn! Mình là gia sư AI. Cứ hỏi mình về từ vựng, ngữ pháp hay cách dùng từ nhé — mình luôn sẵn sàng hỗ trợ.', aiComingSoon:'Sắp ra mắt…' },
 
   en: { learn:'Learn', decks:'Decks', home:'Home', library:'Library', review:'Review', add:'Add knowledge', progress:'Progress',
     settings:'Settings', resetProgress:'Reset progress', resetConfirm:'Erase all progress, scores and the current session?', deleteAll:'Erase all', cancel:'Cancel', resetError:'Could not reset progress. Try again.',
@@ -72,7 +74,7 @@ export const dict = {
     confirmPwL:'Confirm password', confirmPwPh:'Confirm your password', pwMismatch:'Passwords do not match', logoutBtn:'Log out',
     forgot:'Forgot password?', noAcc:"Don't have an account?", haveAcc:'Already have an account?', signIn:'Log in', signUp:'Sign up',
     loginTitle:'Log in', loginSub:'Continue learning and track your progress.', signupTitle:'Create account', signupSub:'Start your English learning journey today.',
-    obWelcome:'Welcome to myEnglish', obWelcomeBody:'The app that lets you freely build your own vocabulary and structures. No limits, no boundaries.', obBegin:'Get Started',
+    obWelcome:'Welcome to Snoopify', obWelcomeBody:'The app that lets you freely build your own vocabulary and structures. No limits, no boundaries.', obBegin:'Get Started',
     obGoalT:'What is your learning goal?', obLevelT:'What is your current level?', obDailyT:'Daily goal?', obTopicT:'What topics interest you?', obTopicSub:'Select 1 or more topics to get vocabulary suggestions.',
     obBack:'Back', obNext:'Next', obFinish:'Finish', obSkip:'Skip',
 
@@ -117,7 +119,9 @@ export const dict = {
     reviewsPerDayHeading:'Reviews per day · this week',
 
     authInvalidCreds:'Invalid email or password', authEmailTaken:'Email already registered', authConnError:'Connection error — try again later',
-    guestLabel:'You' },
+    usernameL:'Username', usernamePh:'johndoe', identifierL:'Email or username', identifierPh:'you@email.com or johndoe', authUsernameTaken:'Username already taken',
+    guestLabel:'You',
+    aiTitle:'AI assistant', aiSub:'Your English tutor', aiGreeting:"Hi! I'm your AI tutor. Ask me about vocabulary, grammar or word usage — I'm always here to help.", aiComingSoon:'Coming soon…' },
 } as const
 
 export type Strings = typeof dict[Lang]

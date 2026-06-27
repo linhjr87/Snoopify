@@ -11,7 +11,7 @@ async def test_seed_starter_deck_creates_user_owned_deck(session):
 
     from app.db.models import Card, Deck, User
 
-    user = User(email="seed@example.com", password_hash="x", display_name="Seed")
+    user = User(email="seed@example.com", username="seeduser", password_hash="x", display_name="Seed")
     session.add(user)
     await session.commit()
     await session.refresh(user)

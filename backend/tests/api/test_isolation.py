@@ -1,7 +1,7 @@
 import pytest
 
-A = {"email": "a@example.com", "password": "pw1234", "display_name": "A"}
-B = {"email": "b@example.com", "password": "pw1234", "display_name": "B"}
+A = {"email": "a@example.com", "username": "iso_a", "password": "pw1234", "display_name": "A"}
+B = {"email": "b@example.com", "username": "iso_b", "password": "pw1234", "display_name": "B"}
 
 
 async def _register(client, who):

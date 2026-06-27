@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useAppStore } from '../../store/useAppStore'
+import { useTourStore } from '../../store/useTourStore'
 import { useT } from '../../i18n/useT'
 import { SettingsPanel } from './SettingsPanel'
 import type { ProgressSummary, DeckOut } from '../../lib/api-types'
@@ -62,6 +63,7 @@ export function Sidebar({ displayName, summary, decks }: {
   const pathname = usePathname()
   const collapsed = useAppStore((s) => s.collapsed)
   const toggleCollapsed = useAppStore((s) => s.toggleCollapsed)
+  const tourActive = useTourStore((s) => s.tourActive)
   const settingsOpen = useAppStore((s) => s.settingsOpen)
   const setPanel = useAppStore((s) => s.setPanel)
   const streak = summary?.streak ?? 0
@@ -126,15 +128,16 @@ export function Sidebar({ displayName, summary, decks }: {
         </div>
       </div>
 
-      {/* Collapse FAB */}
+      {/* Collapse FAB — hidden during the guided tour so the sidebar can't be collapsed mid-tour */}
+      {!tourActive && (
       <button
         onClick={toggleCollapsed}
         className="collapse-fab"
         aria-label={t.collapse}
         style={{
           position: 'absolute',
-          top: 60,
-          right: -13,
+          top: 27,
+          right: -14,
           width: 28,
           height: 28,
           borderRadius: '50%',
@@ -160,6 +163,7 @@ export function Sidebar({ displayName, summary, decks }: {
           </svg>
         )}
       </button>
+      )}
 
       {/* Nav */}
       <nav className="nav-main" data-tour="nav" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>

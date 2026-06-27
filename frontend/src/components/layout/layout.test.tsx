@@ -97,4 +97,13 @@ describe('layout', () => {
     // resetProgress() must NOT have run, so the panel stays open
     expect(useAppStore.getState().settingsOpen).toBe(true)
   })
+
+  it('mark-as-read hides the bell badge and persists read state', async () => {
+    renderShell()
+    expect(screen.getByTestId('bell-unread-dot')).toBeInTheDocument()
+    await userEvent.click(screen.getByLabelText('Thông báo'))      // open the bell menu
+    await userEvent.click(screen.getByText('Đánh dấu đã đọc'))     // mark as read
+    expect(screen.queryByTestId('bell-unread-dot')).not.toBeInTheDocument()
+    expect(useAppStore.getState().notifRead).toBe(true)
+  })
 })
