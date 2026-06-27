@@ -68,6 +68,15 @@ export function SettingsPanel() {
         {t.settings}
       </div>
 
+      {/* Profile */}
+      <button
+        onClick={() => { setPanel('settingsOpen', false); router.push('/profile') }}
+        style={{ display: 'flex', alignItems: 'center', gap: 7, width: '100%', border: 'none', background: 'transparent', color: 'var(--ink)', cursor: 'pointer', fontSize: 14, padding: '7px 8px', borderRadius: 8, textAlign: 'left', fontFamily: "'Hanken Grotesk', sans-serif", borderBottom: '1px solid var(--line)', marginBottom: 4 }}
+      >
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="6" r="3" /><path d="M3.5 15a5.5 5.5 0 0 1 11 0" /></svg>
+        {t.profileMenu}
+      </button>
+
       {/* Logout */}
       <div style={{ borderBottom: '1px solid var(--line)', paddingBottom: 8, marginBottom: 4 }}>
         <button

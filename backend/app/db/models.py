@@ -85,6 +85,10 @@ class User(Base):
     username: Mapped[str] = mapped_column(String, nullable=False, unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String, nullable=False)
     display_name: Mapped[str] = mapped_column(String, nullable=False, default="")
+    level: Mapped[str] = mapped_column(String, nullable=False, default="B1")
+    level_target: Mapped[str] = mapped_column(String, nullable=False, default="B2")
+    goal_text: Mapped[str] = mapped_column(String, nullable=False, default="")
+    daily_target: Mapped[int] = mapped_column(Integer, nullable=False, default=20)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
