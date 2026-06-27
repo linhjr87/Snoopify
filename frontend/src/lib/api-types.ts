@@ -78,6 +78,21 @@ export interface CardOut {
   updated_at: string
 }
 
+export interface ProfileStats { learned: number; mastered: number; streak: number; accuracy: number }
+export interface Achievement { key: string; earned: boolean }
+export interface ProfileOut {
+  display_name: string
+  username: string
+  email: string
+  created_at: string
+  level: string
+  level_target: string
+  goal_text: string
+  daily_target: number
+  stats: ProfileStats
+  achievements: Achievement[]
+}
+
 export interface MasteryCounts { new: number; learning: number; proficient: number }
 export interface WeeklyBar { label: string; count: number }
 export interface ProgressSummary {
