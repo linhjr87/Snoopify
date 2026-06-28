@@ -1,0 +1,36 @@
+# Render Blueprint — Snoopify backend (FastAPI)
+# Deploy: Render Dashboard → New → Blueprint → point at this repo.
+# Vars marked `sync: false` MUST be entered in the dashboard (never commit secrets).
+services:
+  - type: web
+    name: snoopify-backend
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    # Run migrations, then start; Render injects the port via $PORT.
+    dockerCommand: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    plan: free
+    healthCheckPath: /docs
+    envVars:
+      # Supabase — RECOMMENDED: use the Session pooler (port 5432) so the URL is both
+      # IPv4-reachable and supports prepared statements (migrations/env.py does NOT
+      # disable the statement cache).
+      # Format: postgresql+asyncpg://postgres.<ref>:<pwd>@aws-0-<region>.pooler.supabase.com:5432/postgres?sslmode=require
+      - key: DATABASE_URL
+        sync: false
+      # Upstash Redis — connection string rediss://default:<pwd>@<endpoint>.upstash.io:6379
+      - key: REDIS_URL
+        sync: false
+      # JSON array of allowed origins, e.g. ["https://your-app.vercel.app"]
+      - key: CORS_ORIGINS
+        sync: false
+      - key: COOKIE_SECURE
+        value: "true"
+      # Session pooler supports prepared statements → keep false.
+      # If you switch to the Transaction pooler (6543): set this true AND run migrations
+      # separately via the Session pooler / Direct connection (env.py does not disable
+      # the statement cache).
+      - key: DB_DISABLE_STATEMENT_CACHE
+        value: "false"
+      - key: APP_ENV
+        value: "prod"
