@@ -98,6 +98,13 @@ describe('layout', () => {
     expect(useAppStore.getState().settingsOpen).toBe(true)
   })
 
+  it('opens the user menu and navigates to the profile screen', async () => {
+    renderShell()
+    await userEvent.click(screen.getByLabelText('Cài đặt'))   // opens SettingsPanel
+    await userEvent.click(screen.getByText('Hồ sơ'))           // t.profileMenu (vn default)
+    expect(pushMock).toHaveBeenCalledWith('/profile')
+  })
+
   it('mark-as-read hides the bell badge and persists read state', async () => {
     renderShell()
     expect(screen.getByTestId('bell-unread-dot')).toBeInTheDocument()

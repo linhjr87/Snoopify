@@ -34,6 +34,7 @@ export default function LibraryScreen({ decks: apiDecks }: { decks: DeckOut[] })
   const onNewDeck = () => router.push('/add')
 
   return (
+    <>
     <div style={{ animation: 'fadeUp .45s ease both' }}>
       {/* Header row */}
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: '18px', marginBottom: '24px', flexWrap: 'wrap' }}>
@@ -93,7 +94,11 @@ export default function LibraryScreen({ decks: apiDecks }: { decks: DeckOut[] })
 
       <GroupBySelector value={group} onChange={setGroup} />
       <DeckList decks={decks} onNewDeck={onNewDeck} />
-      <ImportJsonModal />
     </div>
+    {/* Modal rendered OUTSIDE the fadeUp wrapper: its translateY transform would
+        otherwise become the containing block for this position:fixed overlay,
+        trapping it inside the main column instead of the viewport. */}
+    <ImportJsonModal />
+    </>
   )
 }
