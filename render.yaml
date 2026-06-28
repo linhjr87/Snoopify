@@ -7,8 +7,9 @@ services:
     runtime: docker
     rootDir: backend
     dockerfilePath: ./Dockerfile
-    # Run migrations, then start; Render injects the port via $PORT.
-    dockerCommand: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    # Start command (migrations + uvicorn on $PORT) lives in backend/Dockerfile CMD.
+    # Do NOT set dockerCommand here: Render re-wraps it in a shell, and a nested
+    # `sh -c "..."` gets mis-quoted into a single token (causes `status 127`).
     plan: free
     healthCheckPath: /docs
     envVars:
